@@ -1,0 +1,21 @@
+{
+  "cfg": "mirage",
+  "mission": 11,
+  "tribe": "Aje",
+  "title": "Mission 11: Arena",
+  "steps": 24,
+  "passed": 23,
+  "failedStep": "the level-4 Atroxosaurus enters (1092 s, level 5)",
+  "over": true,
+  "won": true,
+  "finished": true,
+  "gameMinutes": 18.4,
+  "wallSeconds": 1,
+  "teleports": 0,
+  "cheatKills": 0,
+  "topUps": 0,
+  "triggerErrors": 0,
+  "fails": 1,
+  "exception": null,
+  "date": "2026-11-02"
+}

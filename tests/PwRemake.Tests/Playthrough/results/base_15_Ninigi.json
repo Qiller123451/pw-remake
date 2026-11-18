@@ -1,0 +1,21 @@
+{
+  "cfg": "base",
+  "mission": 15,
+  "tribe": "Ninigi",
+  "title": "Mission 15: New World Order ",
+  "steps": 5,
+  "passed": 5,
+  "failedStep": null,
+  "over": true,
+  "won": true,
+  "finished": true,
+  "gameMinutes": 14.3,
+  "wallSeconds": 41,
+  "teleports": 32,
+  "cheatKills": 304,
+  "topUps": 6,
+  "triggerErrors": 0,
+  "fails": 0,
+  "exception": null,
+  "date": "2026-11-02"
+}

@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Networked games without the engine (docs/MULTIPLAYER.md): the transport (TCP), the lobby, the host that orders
+       the players' commands into turns, the lockstep client and its pacing, hash checks and desync dumps. No Godot
+       types: the game (game/), the tests and the dedicated server (src/Server) use it alike. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>PwRemake.Net</RootNamespace>
+    <AssemblyName>PwRemake.Net</AssemblyName>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Deterministic>true</Deterministic>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Sim/PwRemake.Sim.csproj" />
+  </ItemGroup>
+</Project>

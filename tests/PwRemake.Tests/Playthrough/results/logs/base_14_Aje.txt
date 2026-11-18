@@ -1,0 +1,15 @@
+ok  1. the landing film: quest "Hunt Leighton" (1 s, at 1 s)
+ok  2. the army walks inland until the first prison comes into sight: sequence sc_7042, quest "Ada's Liberation" (18 s, at 19 s)
+ok  3. the army gets past the SEAS main base onto the way to the last prison: sequence sc_6105, quest "Hunt Leighton" (205 s, at 224 s)
+ok  4. the army breaks the main prison: quest "Ada's Liberation" (47 s, at 271 s)
+ok  5. the film ms_7020 ends the mission (0 s, at 271 s)
+ok no exception
+ok QUIT: the mission is won
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Aje (mission: Hu); game time 5 min; teleports 0; cheat kills 59; top-ups 0
+   triggers fired 32 of 141, 33 firings, 66 actions, warnings 0
+   quests: L14MQ01=done L14MQ02=done L14SQ01=hidden L14SQ02=hidden L14SQ03=hidden L14SQ04=open
+   sequences: sc_6050b@0 sc_7042@19 sc_6105@223 ms_7020@270
+   player: aje_warrior x2, aje_worker x3, Bela_s0 x1, special_eusmilus x1, Cole_s0 x1, aje_spearman x2, aje_triceratops_archer x2, aje_resource_collector x1; buildings ; res {"food":300,"wood":300,"stone":300,"skulls":467,"power":0}
+   won: {"won":true,"text":""}

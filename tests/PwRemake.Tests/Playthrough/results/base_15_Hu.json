@@ -1,0 +1,21 @@
+{
+  "cfg": "base",
+  "mission": 15,
+  "tribe": "Hu",
+  "title": "Mission 15: New World Order ",
+  "steps": 5,
+  "passed": 5,
+  "failedStep": null,
+  "over": true,
+  "won": true,
+  "finished": true,
+  "gameMinutes": 13.6,
+  "wallSeconds": 59,
+  "teleports": 43,
+  "cheatKills": 327,
+  "topUps": 7,
+  "triggerErrors": 0,
+  "fails": 0,
+  "exception": null,
+  "date": "2026-11-02"
+}

@@ -1,0 +1,898 @@
+{
+ "id": 7,
+ "title": "The Society",
+ "place": "The Victoria Embankment, London",
+ "date": "November 5, 1964",
+ "briefing": [
+  "Bonfire Night in London. Dr. Taslov has come to the old seat of Babbit's Society on the Embankment: its archive holds the papers of the first Gate machine, and he wants them before anyone else does.",
+  "At nine o'clock the sky over the river split open beside the great wheel. The fireworks are still going up - and the creatures are already in the streets. Get the people over the bridge, bring Taslov to the tear, and keep the Society standing."
+ ],
+ "night": true,
+ "dusk": {
+  "sky": 3027016,
+  "sun": 0.32,
+  "sunColor": 10134740,
+  "hemi": 0.55,
+  "lights": [
+   [
+    82,
+    3,
+    16,
+    16756838,
+    900,
+    70
+   ],
+   [
+    118,
+    3,
+    16,
+    16756838,
+    900,
+    70
+   ],
+   [
+    -150,
+    8,
+    -70,
+    16760960,
+    700,
+    80
+   ],
+   [
+    200,
+    8,
+    -86,
+    16760960,
+    500,
+    60
+   ]
+  ]
+ },
+ "crane": {
+  "ai": false
+ },
+ "creatures": [
+  "Velociraptor",
+  "Deinonychus",
+  "Allosaurus",
+  "Carnotaurus"
+ ],
+ "powers": [
+  "supply",
+  "recon",
+  "airdrop",
+  "artillery"
+ ],
+ "res": {
+  "food": 1000,
+  "wood": 1000,
+  "stone": 900
+ },
+ "camera": [
+  -110,
+  180
+ ],
+ "zones": [
+  {
+   "name": "bridge",
+   "x": 200,
+   "z": -238,
+   "r": 14,
+   "kind": "evac"
+  }
+ ],
+ "props": [
+  "sq_barge",
+  "sq_tug",
+  "sq_riverboat"
+ ],
+ "pieces": [
+  {
+   "id": "wheel",
+   "model": "sq_wheel_rim",
+   "x": -150,
+   "z": -95,
+   "y": 43,
+   "rot": 0,
+   "spin": 0.008333333333333333
+  }
+ ],
+ "map": {
+  "seed": 1105,
+  "setting": "Northland",
+  "size": 560,
+  "base": 6,
+  "water": 0,
+  "noise": [],
+  "ground": [
+   0,
+   1,
+   4,
+   3,
+   6
+  ],
+  "shrubs": 40,
+  "clear": [
+   [
+    -150,
+    -62,
+    20
+   ],
+   [
+    -150,
+    -36,
+    14
+   ],
+   [
+    100,
+    -60,
+    26
+   ]
+  ],
+  "features": [
+   {
+    "type": "river",
+    "path": [
+     [
+      -380,
+      -150
+     ],
+     [
+      380,
+      -150
+     ]
+    ],
+    "w": 110,
+    "depth": 4,
+    "bank": 3
+   },
+   {
+    "type": "strip",
+    "path": [
+     [
+      200,
+      -86
+     ],
+     [
+      200,
+      -214
+     ]
+    ],
+    "w": 16,
+    "h": 6
+   }
+  ],
+  "roads": [
+   {
+    "path": [
+     [
+      -300,
+      -84
+     ],
+     [
+      300,
+      -84
+     ]
+    ],
+    "width": 16,
+    "kind": "pave"
+   },
+   {
+    "path": [
+     [
+      -300,
+      -58
+     ],
+     [
+      300,
+      -58
+     ]
+    ],
+    "width": 15,
+    "kind": "city"
+   },
+   {
+    "path": [
+     [
+      -300,
+      -213
+     ],
+     [
+      300,
+      -213
+     ]
+    ],
+    "width": 16,
+    "kind": "pave"
+   },
+   {
+    "path": [
+     [
+      -300,
+      -240
+     ],
+     [
+      300,
+      -240
+     ]
+    ],
+    "width": 15,
+    "kind": "city"
+   },
+   {
+    "path": [
+     [
+      -300,
+      22
+     ],
+     [
+      300,
+      22
+     ]
+    ],
+    "width": 15,
+    "kind": "city"
+   },
+   {
+    "path": [
+     [
+      -300,
+      95
+     ],
+     [
+      300,
+      95
+     ]
+    ],
+    "width": 15,
+    "kind": "city"
+   },
+   {
+    "path": [
+     [
+      -300,
+      170
+     ],
+     [
+      300,
+      170
+     ]
+    ],
+    "width": 15,
+    "kind": "city"
+   },
+   {
+    "path": [
+     [
+      -300,
+      245
+     ],
+     [
+      300,
+      245
+     ]
+    ],
+    "width": 15,
+    "kind": "city"
+   },
+   {
+    "path": [
+     [
+      -200,
+      -58
+     ],
+     [
+      -200,
+      300
+     ]
+    ],
+    "width": 15,
+    "kind": "city"
+   },
+   {
+    "path": [
+     [
+      -100,
+      -58
+     ],
+     [
+      -100,
+      170
+     ]
+    ],
+    "width": 15,
+    "kind": "city"
+   },
+   {
+    "path": [
+     [
+      0,
+      -58
+     ],
+     [
+      0,
+      300
+     ]
+    ],
+    "width": 15,
+    "kind": "city"
+   },
+   {
+    "path": [
+     [
+      100,
+      22
+     ],
+     [
+      100,
+      300
+     ]
+    ],
+    "width": 15,
+    "kind": "city"
+   },
+   {
+    "path": [
+     [
+      200,
+      -240
+     ],
+     [
+      200,
+      300
+     ]
+    ],
+    "width": 15,
+    "kind": "city"
+   },
+   {
+    "path": [
+     [
+      -100,
+      245
+     ],
+     [
+      -100,
+      300
+     ]
+    ],
+    "width": 15,
+    "kind": "city"
+   },
+   {
+    "path": [
+     [
+      100,
+      15
+     ],
+     [
+      100,
+      9
+     ]
+    ],
+    "width": 8,
+    "kind": "pave"
+   }
+  ],
+  "places": [
+   {
+    "kind": "quay",
+    "path": [
+     [
+      -380,
+      -150
+     ],
+     [
+      380,
+      -150
+     ]
+    ],
+    "off": -58,
+    "steps": [
+     100
+    ],
+    "gaps": [
+     200
+    ]
+   },
+   {
+    "kind": "quay",
+    "path": [
+     [
+      -380,
+      -150
+     ],
+     [
+      380,
+      -150
+     ]
+    ],
+    "off": 58,
+    "gaps": [
+     200
+    ]
+   },
+   {
+    "kind": "avenue",
+    "path": [
+     [
+      -300,
+      -71
+     ],
+     [
+      300,
+      -71
+     ]
+    ],
+    "off": 0,
+    "step": 13
+   },
+   {
+    "kind": "avenue",
+    "path": [
+     [
+      -300,
+      -226
+     ],
+     [
+      300,
+      -226
+     ]
+    ],
+    "off": 0,
+    "step": 13
+   },
+   {
+    "kind": "lamps",
+    "path": [
+     [
+      -300,
+      -58
+     ],
+     [
+      300,
+      -58
+     ]
+    ],
+    "off": -9,
+    "step": 26
+   },
+   {
+    "kind": "lamps",
+    "path": [
+     [
+      -300,
+      -240
+     ],
+     [
+      300,
+      -240
+     ]
+    ],
+    "off": 9,
+    "step": 26
+   },
+   {
+    "kind": "model",
+    "model": "sq_wheel_frame",
+    "x": -150,
+    "z": -95,
+    "rot": 0,
+    "r": 14,
+    "y": 6
+   },
+   {
+    "kind": "model",
+    "model": "sq_pier",
+    "x": -90,
+    "z": -99.5,
+    "rot": 0,
+    "r": 0,
+    "y": 5.5,
+    "block": false
+   },
+   {
+    "kind": "model",
+    "model": "sq_riverboat",
+    "x": -90,
+    "z": -109,
+    "rot": 0,
+    "r": 0,
+    "y": 0,
+    "block": false
+   },
+   {
+    "kind": "model",
+    "model": "sq_bridge",
+    "x": 200,
+    "z": -150,
+    "rot": 1.5707963267948966,
+    "r": 0,
+    "y": 6.15
+   },
+   {
+    "kind": "model",
+    "model": "sq_society",
+    "x": 100,
+    "z": -19,
+    "rot": 3.141592653589793,
+    "r": 30
+   },
+   {
+    "kind": "model",
+    "model": "sq_stall",
+    "x": -182,
+    "z": -78,
+    "rot": 3.141592653589793,
+    "r": 2,
+    "block": false
+   },
+   {
+    "kind": "model",
+    "model": "sq_stall",
+    "x": -172,
+    "z": -78,
+    "rot": 3.141592653589793,
+    "r": 2,
+    "block": false
+   },
+   {
+    "kind": "model",
+    "model": "sq_stall",
+    "x": -128,
+    "z": -78,
+    "rot": 3.141592653589793,
+    "r": 2,
+    "block": false
+   },
+   {
+    "kind": "model",
+    "model": "sq_stall",
+    "x": -118,
+    "z": -78,
+    "rot": 3.141592653589793,
+    "r": 2,
+    "block": false
+   },
+   {
+    "kind": "model",
+    "model": "sq_barge",
+    "x": 40,
+    "z": -190,
+    "rot": 0.05,
+    "r": 0,
+    "y": 0,
+    "block": false
+   },
+   {
+    "kind": "model",
+    "model": "sq_tug",
+    "x": 62,
+    "z": -188,
+    "rot": 0.05,
+    "r": 0,
+    "y": 0,
+    "block": false
+   },
+   {
+    "kind": "model",
+    "model": "sq_barge",
+    "x": -250,
+    "z": -175,
+    "rot": 3.141592653589793,
+    "r": 0,
+    "y": 0,
+    "block": false
+   },
+   {
+    "kind": "model",
+    "model": "sq_riverboat",
+    "x": 280,
+    "z": -120,
+    "rot": 3.141592653589793,
+    "r": 0,
+    "y": 0,
+    "block": false
+   },
+   {
+    "kind": "block",
+    "x0": -300,
+    "z0": -290,
+    "x1": 192,
+    "z1": -248,
+    "sides": "s"
+   },
+   {
+    "kind": "block",
+    "x0": 208,
+    "z0": -290,
+    "x1": 300,
+    "z1": -248,
+    "sides": "s"
+   },
+   {
+    "kind": "block",
+    "x0": -268,
+    "z0": -42,
+    "x1": -208,
+    "z1": 12
+   },
+   {
+    "kind": "block",
+    "x0": -92,
+    "z0": -42,
+    "x1": -8,
+    "z1": 12
+   },
+   {
+    "kind": "block",
+    "x0": 208,
+    "z0": -42,
+    "x1": 268,
+    "z1": 12
+   },
+   {
+    "kind": "block",
+    "x0": -268,
+    "z0": 30,
+    "x1": -208,
+    "z1": 87
+   },
+   {
+    "kind": "block",
+    "x0": -192,
+    "z0": 30,
+    "x1": -108,
+    "z1": 87
+   },
+   {
+    "kind": "block",
+    "x0": -92,
+    "z0": 30,
+    "x1": -8,
+    "z1": 87
+   },
+   {
+    "kind": "block",
+    "x0": 108,
+    "z0": 30,
+    "x1": 192,
+    "z1": 87
+   },
+   {
+    "kind": "block",
+    "x0": 208,
+    "z0": 30,
+    "x1": 268,
+    "z1": 87
+   },
+   {
+    "kind": "block",
+    "x0": -268,
+    "z0": 103,
+    "x1": -208,
+    "z1": 162
+   },
+   {
+    "kind": "block",
+    "x0": -192,
+    "z0": 103,
+    "x1": -108,
+    "z1": 162
+   },
+   {
+    "kind": "block",
+    "x0": -92,
+    "z0": 103,
+    "x1": -8,
+    "z1": 162
+   },
+   {
+    "kind": "block",
+    "x0": 8,
+    "z0": 103,
+    "x1": 92,
+    "z1": 162
+   },
+   {
+    "kind": "block",
+    "x0": 108,
+    "z0": 103,
+    "x1": 192,
+    "z1": 162
+   },
+   {
+    "kind": "block",
+    "x0": 208,
+    "z0": 103,
+    "x1": 268,
+    "z1": 162
+   },
+   {
+    "kind": "block",
+    "x0": -268,
+    "z0": 178,
+    "x1": -208,
+    "z1": 237
+   },
+   {
+    "kind": "block",
+    "x0": 8,
+    "z0": 178,
+    "x1": 92,
+    "z1": 237
+   },
+   {
+    "kind": "block",
+    "x0": 108,
+    "z0": 178,
+    "x1": 192,
+    "z1": 237
+   },
+   {
+    "kind": "block",
+    "x0": 208,
+    "z0": 178,
+    "x1": 268,
+    "z1": 237
+   },
+   {
+    "kind": "block",
+    "x0": -292,
+    "z0": 253,
+    "x1": -208,
+    "z1": 300,
+    "sides": "n"
+   },
+   {
+    "kind": "block",
+    "x0": -192,
+    "z0": 253,
+    "x1": -108,
+    "z1": 300,
+    "sides": "n"
+   },
+   {
+    "kind": "block",
+    "x0": -92,
+    "z0": 253,
+    "x1": -8,
+    "z1": 300,
+    "sides": "n"
+   },
+   {
+    "kind": "block",
+    "x0": 8,
+    "z0": 253,
+    "x1": 92,
+    "z1": 300,
+    "sides": "n"
+   },
+   {
+    "kind": "block",
+    "x0": 108,
+    "z0": 253,
+    "x1": 192,
+    "z1": 300,
+    "sides": "n"
+   },
+   {
+    "kind": "block",
+    "x0": 208,
+    "z0": 253,
+    "x1": 292,
+    "z1": 300,
+    "sides": "n"
+   }
+  ],
+  "forests": [
+   {
+    "x": 40,
+    "z": -15,
+    "r": 22,
+    "n": 12
+   },
+   {
+    "x": 160,
+    "z": -16,
+    "r": 20,
+    "n": 10
+   },
+   {
+    "x": -170,
+    "z": -15,
+    "r": 16,
+    "n": 6
+   },
+   {
+    "x": -40,
+    "z": 200,
+    "r": 26,
+    "n": 18
+   },
+   {
+    "x": 50,
+    "z": 60,
+    "r": 30,
+    "n": 14
+   }
+  ],
+  "resources": [
+   {
+    "x": -88,
+    "z": 222,
+    "stone": 6,
+    "food": 6,
+    "wood": 10
+   }
+  ]
+ },
+ "start": {
+  "buildings": [
+   [
+    "seas_headquarters",
+    -140,
+    195,
+    0
+   ],
+   [
+    "seas_barracks",
+    -108,
+    199,
+    0
+   ],
+   [
+    "seas_garage",
+    -142,
+    233,
+    0
+   ]
+  ],
+  "units": [
+   [
+    "sq_halloran",
+    -152,
+    173,
+    1
+   ],
+   [
+    "seas_worker",
+    -144,
+    177,
+    6
+   ],
+   [
+    "sq_trooper",
+    -92,
+    184,
+    4,
+    2
+   ],
+   [
+    "seas_marksman",
+    -86,
+    178,
+    2,
+    2
+   ],
+   [
+    "sq_booker",
+    -100,
+    186,
+    1
+   ],
+   [
+    "sq_jeep",
+    -80,
+    192,
+    2
+   ],
+   [
+    "seas_mobile_suit",
+    -70,
+    202,
+    1
+   ]
+  ]
+ }
+}

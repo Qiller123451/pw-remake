@@ -1,0 +1,38 @@
+ok  1. the opening film sb4101: quests "Breakthrough Part I" and "Part II" (5 s, at 5 s)
+ok  2. the party reaches the place of first contact: dialogue db_4102 (Dustriders and Norsemen fight) (6 s, at 11 s)
+ok  3. the fight is over, dialogue db_4111: quest "The Bridgehead" (epoch 4) (37 s, at 48 s)
+   [48 s] epoch 1, units 7/0, flamethrowers 3 (squad 0), saved 0, fighters 4, workers 3, buildings 0: ; res food 300,wood 300,stone 300,skulls 0,power 0; no small farm
+   [228 s] epoch 1, units 7/5, flamethrowers 3 (squad 3 at (633, 870) (635, 871) (631, 870)), saved 0, fighters 4, workers 3, buildings 2: aje_tentx1 aje_small_farmx1; res food 300,wood 300,stone 200,skulls 0,power 0; farm built True, queue 0: Build/aje_resource_collector=ok; queue: housing
+   [408 s] epoch 1, units 7/5, flamethrowers 3 (squad 3 at (492, 812) (491, 811) (491, 811)), saved 0, fighters 4, workers 3, buildings 2: aje_tentx1 aje_small_farmx1; res food 300,wood 300,stone 200,skulls 254,power 0; farm built True, queue 0: Build/aje_resource_collector=ok; queue: housing
+   [589 s] epoch 1, units 5/5, flamethrowers 1 (squad 1 at (839, 741)), saved 0, fighters 2, workers 3, buildings 2: aje_tentx1 aje_small_farmx1; res food 300,wood 300,stone 200,skulls 603,power 0; farm built True, queue 0: Build/aje_resource_collector=ok; queue: housing
+   [770 s] epoch 1, units 4/5, flamethrowers 1 (squad 1 at (822, 738)), saved 0, fighters 2, workers 2, buildings 2: aje_tentx1 aje_small_farmx1; res food 300,wood 200,stone 200,skulls 709,power 0; farm built True, queue 1: Build/aje_resource_collector=ok; queue: queued
+   [951 s] epoch 2, units 23/31, flamethrowers 12 (squad 12 at (296, 724) (296, 723) (297, 723)), saved 0, fighters 13, workers 9, buildings 5: aje_tentx3 aje_small_farmx1 aje_weapons_builderx1; res food 1200,wood 1100,stone 500,skulls 763,power 0; next epoch: ok (missing )
+   [1132 s] epoch 3, units 29/31, flamethrowers 15 (squad 15 at (711, 871) (713, 874) (711, 868)), saved 0, fighters 16, workers 12, buildings 5: aje_tentx3 aje_small_farmx1 aje_weapons_builderx1; res food 1700,wood 1500,stone 500,skulls 1703,power 0; next epoch: ok (missing )
+ok  4. the base reaches epoch 4: quest "The Bridgehead" (1096 s, at 1144 s)
+   [1313 s] epoch 4, units 29/31, flamethrowers 15 (squad 15 at (994, 780) (997, 780) (997, 781)), saved 0, fighters 16, workers 12, buildings 5: aje_tentx3 aje_small_farmx1 aje_weapons_builderx1; res food 1700,wood 1500,stone 500,skulls 2899,power 0
+   [1494 s] epoch 4, units 16/31, flamethrowers 2 (squad 0), saved 15, fighters 3, workers 12, buildings 5: aje_tentx3 aje_small_farmx1 aje_weapons_builderx1; res food 1060,wood 700,stone 500,skulls 3293,power 0
+   [1675 s] epoch 4, units 23/31, flamethrowers 9 (squad 5 at (747, 848) (373, 720) (747, 849)), saved 15, fighters 10, workers 12, buildings 5: aje_tentx3 aje_small_farmx1 aje_weapons_builderx1; res food 900,wood 500,stone 500,skulls 4013,power 0
+   [1856 s] epoch 4, units 23/31, flamethrowers 9 (squad 5 at (837, 785) (836, 786) (838, 783)), saved 15, fighters 10, workers 12, buildings 5: aje_tentx3 aje_small_farmx1 aje_weapons_builderx1; res food 900,wood 500,stone 500,skulls 4677,power 0
+   [2037 s] epoch 4, units 21/31, flamethrowers 7 (squad 5 at (985, 795) (984, 791) (985, 794)), saved 15, fighters 8, workers 12, buildings 5: aje_tentx3 aje_small_farmx1 aje_weapons_builderx1; res food 900,wood 500,stone 500,skulls 5831,power 0
+   teleport (squad: aje_flamethrower) to 1180,330 at 2197 s
+   teleport (squad: aje_flamethrower) to 1180,330 at 2197 s
+   teleport (squad: aje_flamethrower) to 1180,330 at 2197 s
+   teleport (squad: aje_flamethrower) to 1180,330 at 2197 s
+ok  5. 20 flamethrowers reach the rendezvous point: quest "Breakthrough Part I" (1067 s, at 2211 s)
+   [2217 s] epoch 4, units 16/31, flamethrowers 2 (squad 0), saved 20, fighters 3, workers 12, buildings 5: aje_tentx3 aje_small_farmx1 aje_weapons_builderx1; res food 820,wood 500,stone 500,skulls 5946,power 0
+   teleport (defence: aje_flamethrower) to 278,662 at 2293 s
+   [2397 s] epoch 4, units 17/31, flamethrowers 3 (squad 0), saved 20, fighters 4, workers 12, buildings 5: aje_tentx3 aje_small_farmx1 aje_weapons_builderx1; res food 820,wood 500,stone 500,skulls 6087,power 0
+ok  6. Leighton reaches the rendezvous point, boards the carrier: film sb4108 (quest "Breakthrough Part II") (211 s, at 2422 s)
+ok  7. the film sb4108 ends the mission (QUIT) (12 s, at 2434 s)
+ok no exception
+ok QUIT: the mission is won
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Aje (mission: Hu); game time 41 min; teleports 5; cheat kills 503; top-ups 35
+   triggers fired 106 of 171, 128 firings, 363 actions, warnings 0
+   quests: LB41MQ01=done LB41MQ02=done LB41MQ03=done LB41SQ01=done LB41SQ02=open LB41SQ03=done
+   sequences: 
+   player: aje_worker x12, aje_resource_collector x1, aje_flamethrower x3; buildings aje_tent aje_small_farm aje_weapons_builder aje_tent aje_tent; res {"food":820,"wood":500,"stone":500,"skulls":6210,"power":0}
+   won: {"won":true,"text":""}
+   epoch 4, flamethrowers 3 (aje_flamethrower), population 16/31
+   variables: Flamer_Fugees=20 MQ01=1 MQ02=1 MQ03=1 Bases_seen=1 Ho_Destroyed=1 Need_For_Speed_Failed=0

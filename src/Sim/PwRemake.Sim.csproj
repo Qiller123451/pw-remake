@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- The game without the engine: rules, world, systems, computer player, campaign, Lua scripting.
+       No Godot types here (docs/ARCHITECTURE.md): the tests and a future dedicated server run it alone. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>PwRemake.Sim</RootNamespace>
+    <AssemblyName>PwRemake.Sim</AssemblyName>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <!-- deterministic float code: no fused multiply-add contraction by the JIT for the simulation -->
+    <Deterministic>true</Deterministic>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <!-- optimized also in Debug (Godot's Play builds Debug): the JIT's unoptimized code made the simulation about
+         twice as slow; the results are the same (no fast-math, no FMA contraction - the hashes of PerfReplaySkirmish) -->
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../ThirdParty/MoonSharp/MoonSharp.csproj" />
+  </ItemGroup>
+</Project>

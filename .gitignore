@@ -1,0 +1,18 @@
+# build output
+bin/
+obj/
+.godot/
+*.user
+.vs/
+.idea/
+artifacts/
+# made on your machine from your own ParaWorld installation (tools/prepare) - never commit game data
+content/configs/
+content/cache/
+# local settings and logs
+*.log
+__pycache__/
+# Godot exports (Project > Export on your machine): the game's .exe / .pck and the .NET data folder next to them
+*.exe
+*.pck
+game/data_*/

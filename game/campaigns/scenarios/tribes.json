@@ -1,0 +1,139 @@
+{
+ "tribes": [
+  "Hu",
+  "Aje",
+  "Ninigi",
+  "SEAS"
+ ],
+ "names": {
+  "Hu": "Norsemen",
+  "Aje": "Dustriders",
+  "Ninigi": "Dragon Clan",
+  "SEAS": "SEAS"
+ },
+ "kit": {
+  "Hu": {
+   "base": "hu_fireplace",
+   "worker": "hu_worker",
+   "hero": [
+    "Bela_s0"
+   ],
+   "warrior": [
+    "hu_warrior"
+   ],
+   "archer": [
+    "hu_archer"
+   ],
+   "spear": [
+    "hu_spearman"
+   ],
+   "beast": [
+    "hu_rhino",
+    "hu_mammoth"
+   ],
+   "tower": [
+    "hu_small_tower"
+   ],
+   "temple": [
+    "hu_temple"
+   ],
+   "titan": [
+    "hu_colossi",
+    "hu_mammoth"
+   ]
+  },
+  "Aje": {
+   "base": "aje_resource_collector",
+   "worker": "aje_worker",
+   "hero": [
+    "Tarna_s0",
+    "Cole_s0"
+   ],
+   "warrior": [
+    "aje_warrior"
+   ],
+   "archer": [
+    "aje_archer"
+   ],
+   "spear": [
+    "aje_spearman"
+   ],
+   "beast": [
+    "aje_stegosaurus",
+    "aje_triceratops_archer"
+   ],
+   "tower": [
+    "aje_small_tower"
+   ],
+   "temple": [
+    "aje_temple"
+   ],
+   "titan": [
+    "aje_tyrannosaurus",
+    "aje_brachiosaurus"
+   ]
+  },
+  "Ninigi": {
+   "base": "ninigi_fireplace",
+   "worker": "ninigi_worker",
+   "hero": [
+    "Miyagi_s0",
+    "hermit_s0"
+   ],
+   "warrior": [
+    "ninigi_warrior"
+   ],
+   "archer": [
+    "ninigi_archer"
+   ],
+   "spear": [
+    "ninigi_spearman"
+   ],
+   "beast": [
+    "ninigi_triceratops",
+    "ninigi_sumo"
+   ],
+   "tower": [
+    "ninigi_small_tower"
+   ],
+   "temple": [
+    "ninigi_temple"
+   ],
+   "titan": [
+    "ninigi_kong",
+    "ninigi_seismosaurus"
+   ]
+  },
+  "SEAS": {
+   "base": "seas_headquarters",
+   "worker": "seas_worker",
+   "hero": [
+    "lovelace_s0"
+   ],
+   "warrior": [
+    "seas_warrior"
+   ],
+   "archer": [
+    "seas_gunner"
+   ],
+   "spear": [
+    "seas_marksman"
+   ],
+   "beast": [
+    "seas_mobile_suit",
+    "seas_triceratops"
+   ],
+   "tower": [
+    "seas_turret_tower"
+   ],
+   "temple": [
+    "seas_laboratory",
+    "seas_barracks"
+   ],
+   "titan": [
+    "seas_rex",
+    "seas_mobile_suit"
+   ]
+  }
+ }
+}

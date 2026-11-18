@@ -1,0 +1,21 @@
+{
+  "cfg": "base",
+  "mission": 14,
+  "tribe": "Aje",
+  "title": "Mission 14: Prisoners",
+  "steps": 5,
+  "passed": 5,
+  "failedStep": null,
+  "over": true,
+  "won": true,
+  "finished": true,
+  "gameMinutes": 4.5,
+  "wallSeconds": 7,
+  "teleports": 0,
+  "cheatKills": 59,
+  "topUps": 0,
+  "triggerErrors": 0,
+  "fails": 0,
+  "exception": null,
+  "date": "2026-11-02"
+}

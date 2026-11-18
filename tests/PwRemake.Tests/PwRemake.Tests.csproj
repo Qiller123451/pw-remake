@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Tests of the simulation without the engine: dotnet run in tests/PwRemake.Tests with an optional name filter
+       (docs/TESTING.md). A small runner of our own (no test framework package needed). -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <RootNamespace>PwRemake.Tests</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/Sim/PwRemake.Sim.csproj" />
+    <ProjectReference Include="../../src/Net/PwRemake.Net.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- the game's sound logic (game/src/View/Audio/*.cs: no Godot types; the Godot side is in Audio/Godot/) -->
+    <Compile Include="../../game/src/View/Audio/*.cs" LinkBase="ViewAudio" />
+    <Compile Include="../../game/src/View/Parts/Parts.cs" LinkBase="ViewParts" />
+    <!-- the SEAS parts that keep their colours (game/src/View/Materials/SeasKeepParts.cs - no Godot types) -->
+    <Compile Include="../../game/src/View/Materials/SeasKeepParts.cs" LinkBase="ViewMaterials" />
+    <!-- the turn of particle sprites that point the way they fly (game/src/View/Fx/SpriteAngle.cs - no Godot types) -->
+    <Compile Include="../../game/src/View/Fx/SpriteAngle.cs" LinkBase="ViewFx" />
+    <!-- the mission UI's logic (game/src/UI/Mission/Logic/*.cs: queues, timing, quests, markers - no Godot types) -->
+    <Compile Include="../../game/src/UI/Mission/Logic/*.cs" LinkBase="MissionUi" />
+    <!-- the loading screen's choices (game/src/UI/Loading/Logic/*.cs: picture, texts, hints - no Godot types) -->
+    <Compile Include="../../game/src/UI/Loading/Logic/*.cs" LinkBase="Loading" />
+    <!-- the help book's index, lookups, texts and history (game/src/UI/Help/Logic/*.cs - no Godot types) -->
+    <Compile Include="../../game/src/UI/Help/Logic/*.cs" LinkBase="Help" />
+    <!-- the HUD's logic: the top bar's places, the command bar's menus ... (game/src/UI/Hud/Logic/*.cs - no Godot types) -->
+    <Compile Include="../../game/src/UI/Hud/Logic/*.cs" LinkBase="Hud" />
+    <!-- the range markers' merged outline (game/src/View/Entities/Logic/*.cs - no Godot types) -->
+    <Compile Include="../../game/src/View/Entities/Logic/*.cs" LinkBase="ViewEntities" />
+  </ItemGroup>
+</Project>

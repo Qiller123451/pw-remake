@@ -1,0 +1,266 @@
+{
+ "id": 4,
+ "title": "The Bayou",
+ "place": "Atchafalaya Basin, Louisiana",
+ "date": "August 9, 1964",
+ "unlocks": [
+  "sq_watermill",
+  "sq_radar"
+ ],
+ "briefing": [
+  "Three rifts have opened in the swamp, and whatever comes out of them swims. Fishermen tell of a jaw \"as long as a pirogue\" in the channels.",
+  "Hovercraft can carry your engineers across the water. Seal the three rifts. Mind the water."
+ ],
+ "creatures": [
+  "Baryonyx",
+  "Velociraptor",
+  "Deinonychus",
+  "Mosasaurus",
+  "Liopleurodon",
+  "Spinosaurus"
+ ],
+ "powers": [
+  "supply",
+  "recon",
+  "airdrop",
+  "artillery"
+ ],
+ "res": {
+  "food": 800,
+  "wood": 900,
+  "stone": 700
+ },
+ "map": {
+  "seed": 4409,
+  "clear": [
+   [
+    160,
+    -150,
+    22
+   ],
+   [
+    170,
+    180,
+    22
+   ],
+   [
+    -170,
+    -160,
+    22
+   ]
+  ],
+  "setting": "Jungle",
+  "size": 520,
+  "base": 3,
+  "water": 0,
+  "noise": [
+   [
+    0.008,
+    5
+   ],
+   [
+    0.03,
+    1.2
+   ]
+  ],
+  "ground": [
+   0,
+   2,
+   4,
+   3,
+   6,
+   1
+  ],
+  "features": [
+   {
+    "type": "river",
+    "path": [
+     [
+      -260,
+      -80
+     ],
+     [
+      -80,
+      -40
+     ],
+     [
+      40,
+      60
+     ],
+     [
+      260,
+      120
+     ]
+    ],
+    "w": 46,
+    "depth": 3
+   },
+   {
+    "type": "river",
+    "path": [
+     [
+      -60,
+      -260
+     ],
+     [
+      -30,
+      -100
+     ],
+     [
+      60,
+      60
+     ],
+     [
+      80,
+      260
+     ]
+    ],
+    "w": 36,
+    "depth": 3
+   },
+   {
+    "type": "flat",
+    "x": -170,
+    "z": 170,
+    "r": 70,
+    "h": 3.5
+   },
+   {
+    "type": "hill",
+    "x": 160,
+    "z": -150,
+    "r": 70,
+    "h": 5
+   }
+  ],
+  "roads": [
+   {
+    "path": [
+     [
+      -260,
+      196
+     ],
+     [
+      -205,
+      186
+     ]
+    ],
+    "width": 7,
+    "kind": "dirt"
+   }
+  ],
+  "places": [
+   {
+    "kind": "farm",
+    "x": -150,
+    "z": 80,
+    "rot": 1.2
+   },
+   {
+    "kind": "camp",
+    "x": -200,
+    "z": 210,
+    "rot": 0.2,
+    "tents": 3
+   }
+  ],
+  "forests": [
+   {
+    "x": 150,
+    "z": -150,
+    "r": 70,
+    "n": 50
+   },
+   {
+    "x": -170,
+    "z": -150,
+    "r": 60,
+    "n": 40
+   },
+   {
+    "x": 160,
+    "z": 190,
+    "r": 50,
+    "n": 30
+   },
+   {
+    "x": -60,
+    "z": 200,
+    "r": 40,
+    "n": 24
+   }
+  ],
+  "resources": [
+   {
+    "x": -170,
+    "z": 170,
+    "stone": 6,
+    "food": 6,
+    "wood": 26
+   }
+  ],
+  "shrubs": 260
+ },
+ "start": {
+  "buildings": [
+   [
+    "seas_headquarters",
+    -170,
+    170,
+    0
+   ],
+   [
+    "seas_barracks",
+    -138,
+    174,
+    0
+   ],
+   [
+    "seas_garage",
+    -172,
+    208,
+    0
+   ]
+  ],
+  "units": [
+   [
+    "sq_halloran",
+    -182,
+    148,
+    1
+   ],
+   [
+    "seas_worker",
+    -174,
+    152,
+    6
+   ],
+   [
+    "sq_trooper",
+    -160,
+    150,
+    4,
+    2
+   ],
+   [
+    "seas_marksman",
+    -154,
+    144,
+    2,
+    2
+   ],
+   [
+    "seas_hovercraft",
+    -120,
+    140,
+    2
+   ],
+   [
+    "sq_booker",
+    -150,
+    150,
+    1
+   ]
+  ]
+ }
+}

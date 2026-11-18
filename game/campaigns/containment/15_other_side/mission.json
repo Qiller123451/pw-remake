@@ -1,0 +1,246 @@
+{
+ "id": 15,
+ "title": "The Other Side",
+ "place": "The Valley of Smoke, ParaWorld",
+ "date": "July 30, 1966 (our calendar)",
+ "briefing": [
+  "Taslov's Door works. For the first time a passage between the worlds stands open on purpose - and on the other side, Crane is waiting.",
+  "He has built a camp in Tala's home valley, and an engine to bring his men across. His hunters have caged Tala's riders to sell on our side.",
+  "Keep the Dustriders' village standing, break the engine, open the cages, and burn the camp."
+ ],
+ "tribes": [
+  "Aje"
+ ],
+ "aje": {
+  "behaviour": "Mikrobe"
+ },
+ "crane": {
+  "ai": false
+ },
+ "ajeFriendly": true,
+ "models": [
+  "seas_jail_part_01"
+ ],
+ "creatures": [
+  "Velociraptor",
+  "Allosaurus",
+  "Tarbosaurus",
+  "Triceratops",
+  "Brachiosaurus",
+  "Stegosaurus"
+ ],
+ "powers": [
+  "supply",
+  "recon",
+  "airdrop",
+  "artillery"
+ ],
+ "res": {
+  "food": 900,
+  "wood": 800,
+  "stone": 700
+ },
+ "map": {
+  "seed": 7300,
+  "clear": [
+   [
+    -180,
+    190,
+    26
+   ],
+   [
+    -60,
+    60,
+    40
+   ],
+   [
+    130,
+    -130,
+    30
+   ],
+   [
+    170,
+    -175,
+    40
+   ],
+   [
+    -40,
+    -150,
+    16
+   ],
+   [
+    60,
+    110,
+    16
+   ],
+   [
+    190,
+    40,
+    16
+   ]
+  ],
+  "setting": "Jungle",
+  "size": 540,
+  "base": 6,
+  "noise": [
+   [
+    0.006,
+    8
+   ],
+   [
+    0.03,
+    1.5
+   ]
+  ],
+  "ground": [
+   0,
+   1,
+   4,
+   3,
+   6,
+   2
+  ],
+  "features": [
+   {
+    "type": "flat",
+    "x": -60,
+    "z": 60,
+    "r": 70,
+    "h": 7
+   },
+   {
+    "type": "flat",
+    "x": 160,
+    "z": -160,
+    "r": 80,
+    "h": 9
+   },
+   {
+    "type": "hill",
+    "x": 60,
+    "z": -30,
+    "r": 80,
+    "h": 14
+   },
+   {
+    "type": "flat",
+    "x": -180,
+    "z": 190,
+    "r": 60,
+    "h": 6
+   }
+  ],
+  "forests": [
+   {
+    "x": -150,
+    "z": -90,
+    "r": 100,
+    "n": 120
+   },
+   {
+    "x": 140,
+    "z": 150,
+    "r": 90,
+    "n": 100
+   },
+   {
+    "x": 60,
+    "z": -30,
+    "r": 50,
+    "n": 30
+   },
+   {
+    "x": -230,
+    "z": 60,
+    "r": 40,
+    "n": 30
+   }
+  ],
+  "resources": [
+   {
+    "x": -170,
+    "z": 140,
+    "stone": 6,
+    "food": 8,
+    "wood": 26
+   }
+  ],
+  "shrubs": 300,
+  "herds": [
+   {
+    "species": "Brachiosaurus",
+    "x": 0,
+    "z": 200,
+    "n": 3
+   },
+   {
+    "species": "Stegosaurus",
+    "x": -200,
+    "z": -200,
+    "n": 3
+   }
+  ]
+ },
+ "start": {
+  "buildings": [
+   [
+    "seas_headquarters",
+    -180,
+    190,
+    0
+   ],
+   [
+    "seas_barracks",
+    -148,
+    194,
+    0
+   ]
+  ],
+  "units": [
+   [
+    "sq_halloran",
+    -170,
+    160,
+    1
+   ],
+   [
+    "sq_taslov",
+    -176,
+    166,
+    1
+   ],
+   [
+    "sq_booker",
+    -164,
+    166,
+    1
+   ],
+   [
+    "sq_tala",
+    -158,
+    158,
+    1
+   ],
+   [
+    "seas_worker",
+    -190,
+    162,
+    6
+   ],
+   [
+    "sq_trooper",
+    -150,
+    150,
+    6,
+    2
+   ],
+   [
+    "sq_tranq",
+    -140,
+    160,
+    2,
+    2
+   ]
+  ]
+ }
+}

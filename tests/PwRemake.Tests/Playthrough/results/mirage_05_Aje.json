@@ -1,0 +1,21 @@
+{
+  "cfg": "mirage",
+  "mission": 5,
+  "tribe": "Aje",
+  "title": "Mission 5: The Holy City",
+  "steps": 12,
+  "passed": 12,
+  "failedStep": null,
+  "over": true,
+  "won": true,
+  "finished": true,
+  "gameMinutes": 5.3,
+  "wallSeconds": 4,
+  "teleports": 0,
+  "cheatKills": 110,
+  "topUps": 0,
+  "triggerErrors": 0,
+  "fails": 0,
+  "exception": null,
+  "date": "2026-11-02"
+}

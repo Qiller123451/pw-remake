@@ -1,0 +1,21 @@
+{
+  "cfg": "base",
+  "mission": 0,
+  "tribe": "Ninigi",
+  "title": "Mission 0: Tutorial",
+  "steps": 29,
+  "passed": 29,
+  "failedStep": null,
+  "over": true,
+  "won": true,
+  "finished": true,
+  "gameMinutes": 19.8,
+  "wallSeconds": 3,
+  "teleports": 5,
+  "cheatKills": 7,
+  "topUps": 2,
+  "triggerErrors": 0,
+  "fails": 0,
+  "exception": null,
+  "date": "2026-11-02"
+}

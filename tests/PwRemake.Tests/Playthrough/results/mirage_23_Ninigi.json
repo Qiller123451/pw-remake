@@ -1,0 +1,21 @@
+{
+  "cfg": "mirage",
+  "mission": 23,
+  "tribe": "Ninigi",
+  "title": "Mission 1: Seeking Ada",
+  "steps": 8,
+  "passed": 8,
+  "failedStep": null,
+  "over": true,
+  "won": true,
+  "finished": true,
+  "gameMinutes": 9,
+  "wallSeconds": 10,
+  "teleports": 0,
+  "cheatKills": 120,
+  "topUps": 0,
+  "triggerErrors": 0,
+  "fails": 0,
+  "exception": null,
+  "date": "2026-11-02"
+}

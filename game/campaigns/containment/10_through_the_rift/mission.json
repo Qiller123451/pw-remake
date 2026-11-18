@@ -1,0 +1,205 @@
+{
+ "id": 10,
+ "title": "Through the Rift",
+ "place": "ParaWorld",
+ "date": "March 20, 1965 (our calendar)",
+ "briefing": [
+  "The rifts all lead to one place. Taslov believes the root is the old Gate machine of Babbit's Society, still humming in a temple of the other world - and that its core can be turned around.",
+  "Tala will guide the expedition. Crane got there first."
+ ],
+ "tribes": [
+  "Aje"
+ ],
+ "aje": {
+  "behaviour": "Mikrobe"
+ },
+ "crane": {
+  "behaviour": "Turtle"
+ },
+ "ajeFriendly": true,
+ "creatures": [
+  "Brachiosaurus",
+  "Atroxosaurus",
+  "Triceratops",
+  "Velociraptor",
+  "Allosaurus",
+  "Stegosaurus"
+ ],
+ "powers": [
+  "supply",
+  "recon",
+  "airdrop"
+ ],
+ "res": {
+  "food": 800,
+  "wood": 600,
+  "stone": 600
+ },
+ "map": {
+  "seed": 1490,
+  "clear": [
+   [
+    160,
+    -160,
+    30
+   ],
+   [
+    -210,
+    210,
+    22
+   ],
+   [
+    120,
+    -120,
+    40
+   ]
+  ],
+  "setting": "Jungle",
+  "size": 520,
+  "base": 6,
+  "noise": [
+   [
+    0.006,
+    9
+   ],
+   [
+    0.03,
+    1.5
+   ]
+  ],
+  "ground": [
+   0,
+   1,
+   4,
+   3,
+   6,
+   2
+  ],
+  "features": [
+   {
+    "type": "flat",
+    "x": 160,
+    "z": -160,
+    "r": 70,
+    "h": 10
+   },
+   {
+    "type": "hill",
+    "x": 0,
+    "z": 0,
+    "r": 90,
+    "h": 12
+   },
+   {
+    "type": "flat",
+    "x": -180,
+    "z": 180,
+    "r": 60,
+    "h": 6
+   }
+  ],
+  "places": [
+   {
+    "kind": "model",
+    "model": "livingstone_old_seas_tempel_part_01",
+    "x": 160,
+    "z": -160,
+    "r": 12
+   }
+  ],
+  "forests": [
+   {
+    "x": -100,
+    "z": -100,
+    "r": 120,
+    "n": 160
+   },
+   {
+    "x": 120,
+    "z": 120,
+    "r": 110,
+    "n": 140
+   },
+   {
+    "x": 0,
+    "z": 0,
+    "r": 60,
+    "n": 40
+   }
+  ],
+  "resources": [
+   {
+    "x": -180,
+    "z": 180,
+    "stone": 6,
+    "food": 8,
+    "wood": 26
+   }
+  ],
+  "shrubs": 300,
+  "herds": [
+   {
+    "species": "Brachiosaurus",
+    "x": 40,
+    "z": 150,
+    "n": 3
+   },
+   {
+    "species": "Stegosaurus",
+    "x": -80,
+    "z": 40,
+    "n": 3
+   }
+  ]
+ },
+ "start": {
+  "buildings": [
+   [
+    "seas_headquarters",
+    -180,
+    190,
+    0
+   ]
+  ],
+  "units": [
+   [
+    "sq_halloran",
+    -170,
+    160,
+    1
+   ],
+   [
+    "sq_taslov",
+    -175,
+    165,
+    1
+   ],
+   [
+    "sq_booker",
+    -165,
+    165,
+    1
+   ],
+   [
+    "seas_worker",
+    -190,
+    160,
+    6
+   ],
+   [
+    "sq_trooper",
+    -160,
+    150,
+    6,
+    2
+   ],
+   [
+    "sq_tranq",
+    -150,
+    160,
+    2,
+    2
+   ]
+  ]
+ }
+}

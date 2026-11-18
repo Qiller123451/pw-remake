@@ -1,0 +1,126 @@
+{
+  "format": "pw-biomes",
+  "version": 1,
+  "biomes": [
+    {
+      "id": "Jungle",
+      "name": "Jungle",
+      "ground": "Jungle",
+      "roles": ["land2", "seabed", "land", "dirt", "rock", "path", "shore", "dry"],
+      "grass": "Jungle/grass.png",
+      "grassDensity": [0.75, 0.04, 1, 0.3, 0.15, 0, 0.04, 0.04],
+      "ambience": "jungle",
+      "original": true
+    },
+    {
+      "id": "Northland",
+      "name": "Northland",
+      "ground": "Northland",
+      "roles": ["land2", "seabed", "land", "dirt", "rock", "path", "earth", "snow"],
+      "grass": "Northland/grass.png",
+      "grassDensity": [1, 0.05, 0.85, 0.3, 0.04, 0.1, 0.1, 0],
+      "ambience": "northland",
+      "original": true
+    },
+    {
+      "id": "Savanna",
+      "name": "Savanna",
+      "ground": "Savanna",
+      "roles": ["earth", "seabed", "land", "land2", "rock", "path", "shore", "dirt"],
+      "grass": "Savanna/grass.png",
+      "grassDensity": [0.12, 0.04, 1, 0.5, 0, 0.04, 0.04, 0.12],
+      "ambience": "savanna",
+      "original": true
+    },
+    {
+      "id": "Icewaste",
+      "name": "Icewaste",
+      "ground": "Icewaste",
+      "roles": ["land2", "seabed", "dry", "earth", "rock", "path", "land", "snow"],
+      "grass": "Icewaste/grass.png",
+      "grassDensity": [0, 0, 0.8, 0.08, 0, 0.3, 0, 0],
+      "ambience": "icewaste",
+      "snowCover": 1,
+      "original": true
+    },
+    {
+      "id": "Ashvalley",
+      "name": "Ashvalley",
+      "ground": "Ashvalley",
+      "roles": ["ash", "earth", "land2", "dirt", "rock", "path", "land", "lava"],
+      "grass": "Ashvalley/grass.png",
+      "grassDensity": [0, 0.1, 0.9, 0.2, 0, 0.05, 0, 0],
+      "ambience": "ashvalley",
+      "original": true
+    },
+    {
+      "id": "Cave1",
+      "name": "Cave1",
+      "ground": "Cave1",
+      "roles": ["earth", "seabed", "land", "path", "rock", "tiles", "shore", "dirt"],
+      "grass": null,
+      "grassDensity": [0, 0, 0, 0, 0, 0, 0, 0],
+      "ambience": null,
+      "original": true
+    },
+    {
+      "id": "Cave2",
+      "name": "Cave2",
+      "ground": "Cave2",
+      "roles": ["ash", "tiles", "land2", "dirt", "rock", "earth", "land", "lava"],
+      "grass": null,
+      "grassDensity": [0, 0, 0, 0, 0, 0, 0, 0],
+      "ambience": null,
+      "original": true
+    },
+    {
+      "id": "Cave3",
+      "name": "Cave3",
+      "ground": "Cave3",
+      "roles": ["land", "land", "land", "land", "land", "land", "land", "land"],
+      "grass": null,
+      "grassDensity": [0, 0, 0, 0, 0, 0, 0, 0],
+      "ambience": null,
+      "original": true
+    },
+    {
+      "id": "Frost",
+      "name": "Frost",
+      "ground": "Icewaste",
+      "roles": ["land2", "seabed", "dry", "earth", "rock", "path", "land", "snow"],
+      "grass": "Icewaste/grass.png",
+      "grassDensity": [0, 0, 0.8, 0.08, 0, 0.3, 0, 0],
+      "ambience": "icewaste",
+      "look": {
+        "sun": [0.93, 0.97, 1.08],
+        "ambient": [0.95, 1, 1.1],
+        "sky": [0.97, 1.02, 1.08],
+        "fog": 0.8
+      },
+      "weather": {
+        "snow": 1.5,
+        "rain": 0.3
+      },
+      "snowCover": 1
+    },
+    {
+      "id": "Rainforest",
+      "name": "Rainforest",
+      "ground": "Jungle",
+      "roles": ["land2", "seabed", "land", "dirt", "rock", "path", "shore", "dry"],
+      "grass": "Jungle/grass.png",
+      "grassDensity": [0.85, 0.06, 1, 0.4, 0.2, 0, 0.04, 0.06],
+      "ambience": "jungle",
+      "look": {
+        "sun": [1.06, 1, 0.86],
+        "ambient": [1, 1.06, 0.92],
+        "sky": [0.9, 1, 0.86],
+        "fog": 0.85
+      },
+      "weather": {
+        "snow": 0,
+        "rain": 1.2
+      }
+    }
+  ]
+}

@@ -1,0 +1,120 @@
+ok  1. the opening film sc_4070: quest "Hold the Fort" (1 s, at 1 s)
+   teleport (squad1: aje_archer) to 999,534 at 187 s
+   teleport (squad1: aje_warrior) to 999,534 at 187 s
+   teleport (squad1: aje_archer) to 999,534 at 187 s
+   teleport (squad0: aje_spearman) to 636,322 at 219 s
+   teleport (squad0: aje_warrior) to 636,322 at 219 s
+   teleport (squad0: aje_archer) to 636,322 at 520 s
+   teleport (squad0: aje_spearman) to 636,322 at 520 s
+   teleport (squad0: aje_warrior) to 636,322 at 520 s
+   teleport (squad0: aje_warrior) to 636,322 at 520 s
+   teleport (squad0: aje_archer) to 636,322 at 521 s
+   teleport (squad0: aje_warrior) to 636,322 at 521 s
+   teleport (squad1: Cole_s0) to 961,587 at 562 s
+   teleport (squad1: aje_spearman) to 961,587 at 562 s
+   teleport (squad1: aje_warrior) to 961,587 at 562 s
+   teleport (squad1: aje_archer) to 961,587 at 562 s
+   teleport (squad0: aje_archer) to 636,322 at 687 s
+   teleport (squad0: aje_archer) to 636,322 at 687 s
+   teleport (squad0: aje_spearman) to 636,322 at 687 s
+   teleport (squad0: aje_warrior) to 636,322 at 687 s
+   teleport (squad0: aje_warrior) to 636,322 at 687 s
+   teleport (squad0: aje_warrior) to 636,322 at 687 s
+   teleport (squad0: aje_archer) to 636,322 at 869 s
+   teleport (squad0: aje_archer) to 636,322 at 869 s
+   teleport (squad0: aje_spearman) to 636,322 at 869 s
+   teleport (squad0: aje_warrior) to 636,322 at 869 s
+   teleport (squad0: aje_warrior) to 636,322 at 869 s
+   teleport (squad0: aje_warrior) to 636,322 at 869 s
+   teleport (squad1: aje_archer) to 964,585 at 909 s
+   teleport (squad1: aje_archer) to 964,585 at 909 s
+   teleport (squad0: aje_archer) to 636,322 at 1144 s
+   teleport (squad0: aje_spearman) to 636,322 at 1144 s
+   teleport (squad0: aje_warrior) to 636,322 at 1144 s
+   teleport (squad0: aje_warrior) to 636,322 at 1144 s
+   teleport (squad0: aje_warrior) to 636,322 at 1144 s
+   teleport (squad0: aje_archer) to 636,322 at 1145 s
+   teleport (squad1: aje_archer) to 800,370 at 1180 s
+   teleport (squad1: Cole_s0) to 800,370 at 1180 s
+   teleport (squad1: aje_spearman) to 800,370 at 1180 s
+   teleport (squad1: aje_warrior) to 800,370 at 1180 s
+   teleport (squad1: aje_warrior) to 800,370 at 1180 s
+   teleport (squad1: aje_archer) to 800,370 at 1180 s
+   teleport (squad2: aje_spearman) to 969,450 at 1248 s
+   teleport (squad0: aje_archer) to 636,322 at 1353 s
+   teleport (squad0: aje_archer) to 636,322 at 1353 s
+   teleport (squad0: aje_warrior) to 636,322 at 1353 s
+   teleport (squad0: aje_warrior) to 636,322 at 1353 s
+   teleport (squad0: aje_archer) to 636,322 at 1551 s
+   teleport (squad0: aje_archer) to 636,322 at 1551 s
+   teleport (squad0: aje_spearman) to 636,322 at 1551 s
+   teleport (squad0: aje_warrior) to 636,322 at 1551 s
+   teleport (squad0: aje_warrior) to 636,322 at 1551 s
+   teleport (squad0: aje_warrior) to 636,322 at 1551 s
+   teleport (squad1: aje_archer) to 974,466 at 1553 s
+   teleport (squad1: aje_archer) to 974,466 at 1553 s
+   teleport (squad2: aje_archer) to 964,453 at 1567 s
+   teleport (squad2: aje_spearman) to 964,453 at 1567 s
+   teleport (squad2: aje_warrior) to 964,453 at 1567 s
+   teleport (squad2: aje_archer) to 964,453 at 1567 s
+   teleport (squad2: aje_warrior) to 964,453 at 1567 s
+   teleport (squad0: aje_archer) to 636,322 at 1804 s
+   teleport (squad0: aje_archer) to 636,322 at 1805 s
+   teleport (squad0: aje_spearman) to 636,322 at 1805 s
+   teleport (squad0: aje_warrior) to 636,322 at 1805 s
+   teleport (squad0: aje_warrior) to 636,322 at 1805 s
+   teleport (squad0: aje_warrior) to 636,322 at 1805 s
+   teleport (squad1: Cole_s0) to 984,580 at 1841 s
+   teleport (squad0: aje_archer) to 636,322 at 2004 s
+   teleport (squad0: aje_archer) to 636,322 at 2004 s
+   teleport (squad0: aje_warrior) to 636,322 at 2004 s
+   teleport (squad0: aje_spearman) to 636,322 at 2005 s
+   teleport (squad0: aje_warrior) to 636,322 at 2005 s
+   teleport (squad0: aje_warrior) to 636,322 at 2005 s
+   teleport (squad2: aje_archer) to 968,447 at 2156 s
+   teleport (squad2: aje_warrior) to 968,447 at 2156 s
+   teleport (squad2: aje_archer) to 968,447 at 2156 s
+   teleport (squad0: aje_archer) to 636,322 at 2253 s
+   teleport (squad0: aje_archer) to 636,322 at 2253 s
+   teleport (squad0: aje_spearman) to 636,322 at 2253 s
+   teleport (squad0: aje_warrior) to 636,322 at 2253 s
+   teleport (squad0: aje_warrior) to 636,322 at 2253 s
+   teleport (squad0: aje_warrior) to 636,322 at 2253 s
+   teleport (squad1: aje_spearman) to 958,587 at 2383 s
+   teleport (squad0: aje_archer) to 636,322 at 2563 s
+   teleport (squad0: aje_archer) to 636,322 at 2563 s
+   teleport (squad1: aje_warrior) to 958,587 at 2641 s
+   teleport (squad0: aje_archer) to 636,322 at 2673 s
+   teleport (squad0: aje_archer) to 636,322 at 2673 s
+   teleport (squad0: aje_archer) to 636,322 at 2674 s
+   teleport (squad0: aje_warrior) to 636,322 at 2674 s
+   teleport (squad0: aje_warrior) to 636,322 at 2674 s
+   teleport (squad0: aje_warrior) to 636,322 at 2674 s
+ok  2. the army waits in front of the gate until the big SEAS attack is beaten: quest "Hold the Fort" (2842 s, at 2843 s)
+ok  3. quest "Counter Attack" (25 s, at 2868 s)
+   teleport (army: aje_archer) to 633,908 at 2868 s
+   teleport (army: aje_spearman) to 633,908 at 2868 s
+   teleport (army: aje_warrior) to 633,908 at 2868 s
+   teleport (army: aje_warrior) to 633,908 at 2868 s
+   teleport (army: aje_archer) to 633,908 at 2868 s
+   teleport (army: aje_warrior) to 633,908 at 2868 s
+ok  4. the army breaks the SEAS headquarters on the plateau: quest "Counter Attack" (32 s, at 2900 s)
+ok  5. the film ms_6020 ends the mission (5 s, at 2905 s)
+ok no exception
+ok QUIT: the mission is won
+   group team_mainbase: 4 alive seas_wehrspinne@847,697:attackmove seas_wehrspinne@842,711:attackmove seas_wehrspinne@845,701:attackmove seas_wehrspinne@837,726:attackmove
+   group team_outpost01: 0 alive 
+   group team_outpost02: 2 alive seas_wehrspinne@1241,614:attackmove seas_wehrspinne@1242,613:attackmove
+   group team_outpost03: 0 alive 
+   city wall pieces left: 19 of 20 (lost: hcl13_city_wall_87)
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Aje (mission: Ninigi); game time 48 min; teleports 97; cheat kills 287; top-ups 0
+   triggers fired 112 of 206, 112 firings, 257 actions, warnings 2
+   quests: L13MQ01=done L13MQ02=done L13SQ01=failed L13SQ02=hidden L13SQ03=hidden L13SQ04=hidden L13SQ05=hidden L13SQ06=hidden L13SQ07=hidden
+   sequences: sc_4070@0 sc_4080@2854 ms_6020@2904
+   player: aje_resource_collector x2, darwin_s0 x1, aje_archer x4, aje_worker x12, Cole_s0 x1, special_eusmilus x1, Bela_s0 x1, aje_spearman x2, aje_warrior x8; buildings ninigi_snare_trap aje_clay_wall aje_slaughterhouse aje_clay_wall_gate aje_clay_wall ninigi_snare_trap ninigi_snare_trap ninigi_snare_trap ninigi_snare_trap aje_small_tower aje_clay_wall aje_small_tower aje_small_tower aje_clay_wall aje_clay_wall_gate aje_clay_wall ninigi_stone_quarry ninigi_lumbermill aje_slaughterhouse aje_slaughterhouse ninigi_hunting_lodge aje_clay_wall aje_cook_house aje_small_farm aje_rodeo ninigi_engineer aje_small_tower aje_small_tower aje_clay_wall ninigi_snare_trap aje_medium_tower aje_clay_wall ninigi_snare_trap aje_tent; res {"food":1500,"wood":1500,"stone":1500,"skulls":4306,"power":0}
+   warning CBL_Afa01#spawn: CPLX passenger aje_brachiosaurus_sec could not be created
+   warning CBL_Afa01#spawn: CPLX passenger aje_brachiosaurus_fif could not be created
+   won: {"won":true,"text":""}
+   variables: init_main_attack=1 main_attack_done=1 team_mainbase_def=1 team_outpost01_def=1 team_outpost02_def=1 team_outpost03_def=1

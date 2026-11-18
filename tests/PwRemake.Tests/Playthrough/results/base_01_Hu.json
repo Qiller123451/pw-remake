@@ -1,0 +1,21 @@
+{
+  "cfg": "base",
+  "mission": 1,
+  "tribe": "Hu",
+  "title": "Mission 1: Stranded",
+  "steps": 21,
+  "passed": 21,
+  "failedStep": null,
+  "over": true,
+  "won": true,
+  "finished": true,
+  "gameMinutes": 6,
+  "wallSeconds": 7,
+  "teleports": 0,
+  "cheatKills": 69,
+  "topUps": 0,
+  "triggerErrors": 0,
+  "fails": 0,
+  "exception": null,
+  "date": "2026-11-02"
+}

@@ -1,0 +1,29 @@
+ok  1. the intro film ms_1090; quest "Help for the Arch Druid" is shown; the Dustriders' computer player builds (Turtle) (1 s, at 1 s)
+ok  2. the heroes leave the base: quest "Mammoth Rescue" and the counter in the info bar (17 s, at 18 s)
+ok  3. the way to mammoth cave 1: the poachers there attack the mammoths (5 s, at 23 s)
+ok  4. the poachers at cave 1 are driven away and their buildings destroyed: the cave is saved (27 s, at 50 s)
+ok  5. the way to mammoth cave 2: the poachers there attack the mammoths (8 s, at 58 s)
+ok  6. the poachers at cave 2 are driven away and their buildings destroyed: the cave is saved (17 s, at 75 s)
+ok  7. the way to mammoth cave 3: the poachers there attack the mammoths (8 s, at 83 s)
+ok  8. the poachers at cave 3 are driven away and their buildings destroyed: the cave is saved (26 s, at 109 s)
+ok  9. the way to mammoth cave 4: the poachers there attack the mammoths (6 s, at 115 s)
+ok 10. the poachers at cave 4 are driven away and their buildings destroyed: the cave is saved (16 s, at 131 s)
+ok 11. seven mammoths are saved: quest accomplished, sequence sc_1082, the Dustriders land by turtle (3 s, at 134 s)
+ok 12. the Dustrider base in the north is destroyed (all units and production buildings) (281 s, at 415 s)
+ok 13. the final sequence sc_1089 and QUIT (3 s, at 418 s)
+ok no exception
+ok the info bar shows the mammoth counter ("")
+ok the Dustriders' computer player was woken: 1:Giraffe attacks 1 2:Mikrobe 3:Mikrobe 4:Mikrobe
+ok four caves saved, 10 mammoths counted (of 10)
+ok quest "Mammoth Rescue" accomplished, sequence sc_1082
+ok the landing parties were created (CPLX: transport turtles with passengers)
+ok QUIT: the mission is won, all three main quests accomplished
+   variables: Mammoth_Max=10 mammoths_saved=10 nests_saved=4
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe SEAS (mission: Hu); game time 7 min; teleports 0; cheat kills 87; top-ups 0
+   triggers fired 96 of 144, 97 firings, 268 actions, warnings 0
+   quests: L02MQ01_help_druid=done L02MQ02_retrieve_t=done L02MQ03_destroy_th=done L02SQ01_establish_=open L02SQ02_the_lost_a=hidden L02SQ03_kill_the_s=hidden L02SQ04_sunken_shi=hidden
+   sequences: ms_1090@0 sc_1082@133 sc_1089@417
+   player: hermit_s0 x1, Cole_s0 x1, Bela_s0 x1, special_eusmilus x1, seas_warrior x1, seas_medic x1; buildings seas_headquarters; res {"food":500,"wood":375,"stone":500,"skulls":524,"power":0}
+   brains: 1:Giraffe attacks 1 2:Mikrobe 3:Mikrobe 4:Mikrobe

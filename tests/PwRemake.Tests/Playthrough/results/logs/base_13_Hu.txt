@@ -1,0 +1,56 @@
+ok  1. the opening film sc_4070: quest "Hold the Fort" (1 s, at 1 s)
+   teleport (squad0: hu_chariot) to 636,322 at 79 s
+   teleport (squad0: hu_chariot) to 636,322 at 85 s
+   teleport (squad0: Bela_s0) to 636,322 at 117 s
+   teleport (squad0: hu_spearman) to 636,322 at 117 s
+   teleport (squad0: hu_warrior) to 636,322 at 117 s
+   teleport (squad0: hu_warrior) to 636,322 at 146 s
+   teleport (squad0: hu_spearman) to 594,399 at 345 s
+   teleport (squad1: hu_archer) to 971,463 at 653 s
+   teleport (squad2: hu_chariot) to 963,452 at 655 s
+   teleport (squad2: hu_archer) to 963,452 at 655 s
+   teleport (squad2: hu_warrior) to 963,452 at 655 s
+   teleport (squad1: hu_spearman) to 982,579 at 938 s
+   teleport (squad1: hu_warrior) to 982,579 at 938 s
+   teleport (squad2: hu_chariot) to 965,453 at 1255 s
+   teleport (squad2: hu_archer) to 965,453 at 1255 s
+   teleport (squad2: hu_warrior) to 965,453 at 1255 s
+   teleport (squad2: hu_warrior) to 965,453 at 1255 s
+   teleport (squad1: Cole_s0) to 972,464 at 1553 s
+   teleport (squad1: hu_spearman) to 972,464 at 1553 s
+   teleport (squad1: hu_warrior) to 972,464 at 1553 s
+   teleport (squad2: hu_warrior) to 964,452 at 1555 s
+   teleport (squad2: hu_warrior) to 964,452 at 1555 s
+   teleport (squad1: hu_warrior) to 982,579 at 1838 s
+   teleport (squad1: hu_archer) to 982,579 at 1838 s
+   teleport (squad1: hu_chariot) to 982,579 at 2138 s
+   teleport (squad1: Cole_s0) to 982,579 at 2138 s
+   teleport (squad1: hu_spearman) to 982,579 at 2138 s
+   teleport (squad1: hu_chariot) to 682,470 at 2725 s
+   teleport (squad1: hu_warrior) to 682,470 at 2725 s
+   teleport (squad1: hu_warrior) to 682,470 at 2725 s
+   teleport (squad1: hu_archer) to 682,470 at 2725 s
+   teleport (squad2: hu_spearman) to 954,456 at 2762 s
+   teleport (squad2: hu_archer) to 954,456 at 2762 s
+ok  2. the army waits in front of the gate until the big SEAS attack is beaten: quest "Hold the Fort" (2819 s, at 2820 s)
+ok  3. quest "Counter Attack" (25 s, at 2845 s)
+   teleport (army: hu_spearman) to 605,971 at 2845 s
+   teleport (army: hu_warrior) to 605,971 at 2845 s
+ok  4. the army breaks the SEAS headquarters on the plateau: quest "Counter Attack" (5 s, at 2850 s)
+ok  5. the film ms_6020 ends the mission (5 s, at 2855 s)
+ok no exception
+ok QUIT: the mission is won
+   group team_mainbase: 1 alive seas_wehrspinne@880,601:attack
+   group team_outpost01: 0 alive 
+   group team_outpost02: 2 alive seas_wehrspinne@1110,537:attackmove seas_wehrspinne@1113,539:attackmove
+   group team_outpost03: 0 alive 
+   city wall pieces left: 19 of 20 (lost: hcl13_city_wall_87)
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Hu (mission: Ninigi); game time 48 min; teleports 35; cheat kills 181; top-ups 0
+   triggers fired 98 of 167, 98 firings, 193 actions, warnings 0
+   quests: L13MQ01=done L13MQ02=done L13SQ01=failed L13SQ02=failed L13SQ03=hidden L13SQ04=hidden L13SQ05=hidden L13SQ06=hidden L13SQ07=hidden
+   sequences: sc_4070@0 sc_4080@2831 ms_6020@2854
+   player: darwin_s0 x1, hu_chariot x4, hu_worker x12, Cole_s0 x1, special_eusmilus x1, Bela_s0 x1, hu_spearman x3, hu_warrior x15, hu_archer x2; buildings ninigi_snare_trap ninigi_snare_trap hu_small_wall hu_corn_field hu_small_wall_gate hu_small_wall ninigi_snare_trap ninigi_snare_trap ninigi_snare_trap ninigi_snare_trap hu_small_tower hu_small_wall hu_small_tower hu_small_tower hu_small_wall hu_small_wall_gate hu_small_wall hu_stone_quarry hu_lumberjack_cottage hu_corn_field hu_corn_field ninigi_hunting_lodge hu_small_wall hu_tavern hu_small_animal_farm hu_arena hu_machine_maker hu_fireplace hu_fireplace hu_small_tower hu_small_tower hu_small_wall ninigi_snare_trap hu_large_tower hu_small_wall ninigi_snare_trap hu_stone_cottage hu_stone_cottage hu_stone_cottage hu_stone_cottage; res {"food":600,"wood":520,"stone":900,"skulls":2670,"power":0}
+   won: {"won":true,"text":""}
+   variables: init_main_attack=1 main_attack_done=1 team_mainbase_def=1 team_outpost01_def=1 team_outpost02_def=1 team_outpost03_def=1

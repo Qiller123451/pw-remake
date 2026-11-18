@@ -1,0 +1,21 @@
+{
+  "cfg": "mirage",
+  "mission": 12,
+  "tribe": "SEAS",
+  "title": "Mission 12: Sea Battles",
+  "steps": 5,
+  "passed": 5,
+  "failedStep": null,
+  "over": true,
+  "won": true,
+  "finished": true,
+  "gameMinutes": 42.4,
+  "wallSeconds": 86,
+  "teleports": 16,
+  "cheatKills": 56,
+  "topUps": 0,
+  "triggerErrors": 0,
+  "fails": 0,
+  "exception": null,
+  "date": "2026-11-02"
+}

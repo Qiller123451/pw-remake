@@ -1,0 +1,77 @@
+ok  1. the opening film sc_7010: quest "The Core of the Problem" (1 s, at 1 s)
+   teleport (army: seas_warrior) to 380,722 at 99 s
+   teleport (army: Bela_s0) to 380,722 at 99 s
+   teleport (army: Cole_s0) to 380,722 at 99 s
+   teleport (army: seas_spearman) to 380,722 at 99 s
+   teleport (army: seas_marksman) to 380,722 at 100 s
+   teleport (army: seas_warrior) to 380,722 at 101 s
+   teleport (army: special_eusmilus) to 380,722 at 101 s
+   teleport (army: seas_spearman) to 380,722 at 101 s
+   teleport (army: seas_marksman) to 380,722 at 102 s
+   teleport (army: seas_spearman) to 380,722 at 102 s
+   teleport (army: seas_warrior) to 380,722 at 103 s
+   teleport (army: seas_marksman) to 380,722 at 104 s
+ok  2. the army reaches the first pumping station: film ms_7026, quest "Countdown of Death" (105 s, at 106 s)
+   teleport (guard1: seas_warrior) to 432,698 at 196 s
+   teleport (guard1: seas_warrior) to 432,698 at 196 s
+   teleport (guard1: seas_marksman) to 441,695 at 441 s
+   teleport (guard3: seas_warrior) to 624,553 at 559 s
+   teleport (guard3: seas_warrior) to 624,553 at 559 s
+   teleport (guard2: seas_warrior) to 792,688 at 597 s
+   teleport (guard2: seas_warrior) to 792,688 at 597 s
+   teleport (army: seas_warrior) to 408,477 at 666 s
+   teleport (army: seas_warrior) to 408,477 at 666 s
+   teleport (army: seas_warrior) to 408,477 at 666 s
+   teleport (army: seas_warrior) to 408,477 at 666 s
+   teleport (army: seas_warrior) to 408,477 at 666 s
+   teleport (army: seas_warrior) to 408,477 at 666 s
+   teleport (army: seas_warrior) to 408,477 at 666 s
+   teleport (army: seas_marksman) to 408,477 at 666 s
+   teleport (army: seas_spearman) to 408,477 at 666 s
+   teleport (army: seas_marksman) to 408,477 at 666 s
+   teleport (army: seas_spearman) to 408,477 at 666 s
+   teleport (army: seas_spearman) to 408,477 at 666 s
+   teleport (army: seas_marksman) to 408,477 at 666 s
+   teleport (army: seas_marksman) to 408,477 at 666 s
+   teleport (army: seas_marksman) to 406,477 at 667 s
+   teleport (army: seas_marksman) to 409,475 at 668 s
+   teleport (army: seas_marksman) to 409,475 at 668 s
+   teleport (army: seas_warrior) to 410,476 at 669 s
+   teleport (army: seas_spearman) to 411,477 at 670 s
+   teleport (guard2: seas_warrior) to 813,702 at 765 s
+   teleport (guard3: seas_warrior) to 645,551 at 776 s
+   teleport (guard4: seas_warrior) to 400,472 at 779 s
+   teleport (guard4: seas_warrior) to 400,472 at 781 s
+   teleport (army: seas_spearman) to 847,480 at 794 s
+   teleport (army: seas_warrior) to 847,481 at 802 s
+   teleport (army: seas_marksman) to 847,481 at 802 s
+   teleport (army: seas_spearman) to 845,476 at 807 s
+   teleport (army: seas_warrior) to 848,469 at 814 s
+   teleport (army: seas_marksman) to 849,469 at 824 s
+   teleport (army: seas_warrior) to 847,457 at 878 s
+ok  3. the five pumping stations are taken and held: the countdown stops, sequence sc_7040 (quest "Countdown of Death") (773 s, at 879 s)
+   teleport (guard5: seas_warrior) to 847,467 at 881 s
+   teleport (guard3: seas_warrior) to 624,553 at 920 s
+   teleport (guard4: seas_warrior) to 400,472 at 926 s
+   teleport (guard4: seas_marksman) to 400,472 at 926 s
+   teleport (guard2: seas_warrior) to 792,688 at 929 s
+   teleport (heroes: Cole_s0) to 677,439 at 944 s
+   teleport (heroes: tesla_s0) to 623,138 at 1024 s
+ok  4. Béla, Cole, Stina and Taslow walk into the crater: quest "The Core of the Problem" (147 s, at 1026 s)
+ok  5. the film sc_7041 ends the mission (4 s, at 1030 s)
+ok no exception
+ok QUIT: the mission is won
+   hero Bela_s0: alive True parked False inside False at (624, 139) task idle
+   hero Cole_s0: alive True parked False inside False at (621, 139) task idle
+   hero special_eusmilus: alive True parked False inside False at (623, 139) task idle
+   hero tesla_s0: alive True parked False inside False at (623, 138) task idle
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe SEAS (mission: Hu); game time 17 min; teleports 56; cheat kills 376; top-ups 3
+   triggers fired 112 of 163, 149 firings, 647 actions, warnings 0
+   quests: L15MQ01=done L15MQ02=done L15SQ01=done L15SQ02=failed L15SQ03=failed
+   sequences: sc_7010@0 ms_7026@99 sc_7030_a@124 sc_7038@398 sc_7040@878 sc_7041@1029
+   player: tesla_s0 x1, lovelace_s0 x1, seas_worker x8, Bela_s0 x1, Cole_s0 x1, special_eusmilus x1, seas_marksman x8, seas_warrior x15, seas_spearman x4; buildings seas_headquarters seas_barracks seas_barracks seas_barracks seas_barracks seas_barracks seas_barracks; res {"food":670,"wood":730,"stone":800,"skulls":4356,"power":0}
+   won: {"won":true,"text":""}
+   population 40/45, epoch 2
+   variables: ctrlpts=5 ctrlpt01=1 ctrlpt02=1 ctrlpt03=1 ctrlpt04=1 ctrlpt05=1 cntdwn_aborted=1 blocker=0

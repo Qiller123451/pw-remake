@@ -1,0 +1,248 @@
+{
+ "id": 8,
+ "title": "Crane's Ark",
+ "place": "Kuskokwim Mountains, Alaska",
+ "date": "December 3, 1964",
+ "unlocks": [
+  "sq_arc_halftrack"
+ ],
+ "briefing": [
+  "Crane's steamer was found empty below Gravesend. That same night a cargo plane chartered by Crane Industrial Security left for Anchorage - with Dr. Taslov aboard.",
+  "Augustus Crane, once a director of SEAS, has built a fortress in the Alaskan snow - and he has been collecting dinosaurs. Find Taslov. Break the Ark."
+ ],
+ "models": [
+  "seas_jail_part_01"
+ ],
+ "creatures": [
+  "Smilodon",
+  "Mammoth",
+  "Woolly_Rhino",
+  "Velociraptor"
+ ],
+ "crane": {
+  "behaviour": "Turtle"
+ },
+ "powers": [
+  "supply",
+  "recon",
+  "airdrop",
+  "artillery"
+ ],
+ "res": {
+  "food": 1000,
+  "wood": 1000,
+  "stone": 900
+ },
+ "map": {
+  "seed": 1203,
+  "clear": [
+   [
+    150,
+    -150,
+    44
+   ],
+   [
+    190,
+    -180,
+    14
+   ],
+   [
+    60,
+    -60,
+    14
+   ],
+   [
+    40,
+    -100,
+    14
+   ],
+   [
+    90,
+    -40,
+    14
+   ]
+  ],
+  "setting": "Icewaste",
+  "size": 520,
+  "base": 8,
+  "noise": [
+   [
+    0.005,
+    10
+   ],
+   [
+    0.025,
+    1.5
+   ]
+  ],
+  "ground": [
+   0,
+   2,
+   4,
+   3,
+   6,
+   1
+  ],
+  "features": [
+   {
+    "type": "flat",
+    "x": 150,
+    "z": -150,
+    "r": 90,
+    "h": 8
+   },
+   {
+    "type": "flat",
+    "x": -170,
+    "z": 170,
+    "r": 70,
+    "h": 8
+   },
+   {
+    "type": "ridge",
+    "path": [
+     [
+      -240,
+      -20
+     ],
+     [
+      -40,
+      -40
+     ]
+    ],
+    "w": 50,
+    "h": 22
+   }
+  ],
+  "roads": [
+   {
+    "path": [
+     [
+      -250,
+      190
+     ],
+     [
+      -60,
+      120
+     ],
+     [
+      60,
+      0
+     ],
+     [
+      150,
+      -110
+     ]
+    ],
+    "width": 7,
+    "kind": "dirt"
+   }
+  ],
+  "places": [
+   {
+    "kind": "camp",
+    "x": 200,
+    "z": -60,
+    "rot": 3.141592653589793
+   }
+  ],
+  "forests": [
+   {
+    "x": -170,
+    "z": -150,
+    "r": 70,
+    "n": 50
+   },
+   {
+    "x": 60,
+    "z": 180,
+    "r": 60,
+    "n": 40
+   }
+  ],
+  "resources": [
+   {
+    "x": -170,
+    "z": 170,
+    "stone": 6,
+    "food": 6,
+    "wood": 26
+   },
+   {
+    "x": 150,
+    "z": -150,
+    "stone": 4,
+    "food": 4
+   }
+  ],
+  "shrubs": 200
+ },
+ "start": {
+  "buildings": [
+   [
+    "seas_headquarters",
+    -185,
+    200,
+    0
+   ],
+   [
+    "seas_barracks",
+    -153,
+    204,
+    0
+   ],
+   [
+    "seas_garage",
+    -187,
+    238,
+    0
+   ]
+  ],
+  "units": [
+   [
+    "sq_halloran",
+    -197,
+    178,
+    1
+   ],
+   [
+    "seas_worker",
+    -189,
+    182,
+    6
+   ],
+   [
+    "sq_trooper",
+    -175,
+    180,
+    4,
+    2
+   ],
+   [
+    "seas_marksman",
+    -169,
+    174,
+    2,
+    2
+   ],
+   [
+    "sq_booker",
+    -150,
+    150,
+    1
+   ],
+   [
+    "sq_jeep",
+    -120,
+    160,
+    3
+   ],
+   [
+    "seas_mobile_suit",
+    -110,
+    170,
+    2
+   ]
+  ]
+ }
+}

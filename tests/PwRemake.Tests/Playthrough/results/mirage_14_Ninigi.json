@@ -1,0 +1,21 @@
+{
+  "cfg": "mirage",
+  "mission": 14,
+  "tribe": "Ninigi",
+  "title": "Mission 14: Prisoners",
+  "steps": 5,
+  "passed": 5,
+  "failedStep": null,
+  "over": true,
+  "won": true,
+  "finished": true,
+  "gameMinutes": 4,
+  "wallSeconds": 9,
+  "teleports": 1,
+  "cheatKills": 49,
+  "topUps": 0,
+  "triggerErrors": 0,
+  "fails": 0,
+  "exception": null,
+  "date": "2026-11-02"
+}

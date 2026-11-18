@@ -1,0 +1,113 @@
+ok  1. the opening film sc_4070: quest "Hold the Fort" (1 s, at 1 s)
+   teleport (squad1: hu_archer) to 999,534 at 187 s
+   teleport (squad1: hu_warrior) to 999,534 at 187 s
+   teleport (squad1: hu_warrior) to 999,534 at 187 s
+   teleport (squad1: hu_archer) to 999,534 at 187 s
+   teleport (squad0: hu_warrior) to 636,322 at 341 s
+   teleport (squad1: hu_warrior) to 961,587 at 562 s
+   teleport (squad1: hu_archer) to 970,462 at 646 s
+   teleport (squad1: Cole_s0) to 970,462 at 646 s
+   teleport (squad1: hu_spearman) to 970,462 at 646 s
+   teleport (squad1: hu_warrior) to 970,462 at 646 s
+   teleport (squad1: hu_warrior) to 970,462 at 646 s
+   teleport (squad2: hu_warrior) to 964,450 at 648 s
+   teleport (squad0: hu_archer) to 636,322 at 738 s
+   teleport (squad0: hu_archer) to 636,322 at 738 s
+   teleport (squad0: hu_spearman) to 636,322 at 738 s
+   teleport (squad0: hu_warrior) to 636,322 at 738 s
+   teleport (squad0: hu_warrior) to 636,322 at 738 s
+   teleport (squad0: hu_archer) to 636,322 at 738 s
+   teleport (squad0: hu_warrior) to 636,322 at 738 s
+   teleport (squad0: hu_warrior) to 636,322 at 739 s
+   teleport (squad0: hu_archer) to 636,322 at 938 s
+   teleport (squad0: hu_archer) to 636,322 at 938 s
+   teleport (squad0: hu_warrior) to 636,322 at 938 s
+   teleport (squad0: hu_warrior) to 636,322 at 938 s
+   teleport (squad0: hu_warrior) to 636,322 at 938 s
+   teleport (squad0: hu_archer) to 636,322 at 938 s
+   teleport (squad0: hu_warrior) to 636,322 at 938 s
+   teleport (squad1: Cole_s0) to 982,578 at 938 s
+   teleport (squad0: hu_archer) to 636,322 at 1165 s
+   teleport (squad0: hu_archer) to 636,322 at 1165 s
+   teleport (squad0: hu_spearman) to 636,322 at 1165 s
+   teleport (squad0: hu_warrior) to 636,322 at 1165 s
+   teleport (squad0: hu_warrior) to 636,322 at 1165 s
+   teleport (squad0: hu_archer) to 636,322 at 1165 s
+   teleport (squad0: hu_warrior) to 636,322 at 1165 s
+   teleport (squad0: hu_warrior) to 636,322 at 1166 s
+   teleport (squad1: Cole_s0) to 982,579 at 1238 s
+   teleport (squad1: hu_archer) to 982,579 at 1238 s
+   teleport (squad1: hu_warrior) to 982,579 at 1238 s
+   teleport (squad0: hu_warrior) to 636,322 at 1416 s
+   teleport (squad0: hu_archer) to 636,322 at 1416 s
+   teleport (squad0: hu_archer) to 636,322 at 1417 s
+   teleport (squad0: hu_archer) to 636,322 at 1417 s
+   teleport (squad0: hu_spearman) to 636,322 at 1417 s
+   teleport (squad0: hu_warrior) to 636,322 at 1417 s
+   teleport (squad0: hu_warrior) to 636,322 at 1417 s
+   teleport (squad0: hu_warrior) to 636,322 at 1417 s
+   teleport (squad1: hu_archer) to 966,463 at 1554 s
+   teleport (squad1: Cole_s0) to 966,463 at 1554 s
+   teleport (squad1: hu_spearman) to 966,463 at 1554 s
+   teleport (squad1: hu_warrior) to 966,463 at 1554 s
+   teleport (squad1: hu_warrior) to 966,463 at 1554 s
+   teleport (squad1: hu_archer) to 966,463 at 1554 s
+   teleport (squad2: hu_archer) to 961,449 at 1556 s
+   teleport (squad2: hu_spearman) to 961,449 at 1556 s
+   teleport (squad2: hu_warrior) to 961,449 at 1556 s
+   teleport (squad2: hu_archer) to 961,449 at 1556 s
+   teleport (squad2: hu_warrior) to 961,449 at 1556 s
+   teleport (squad2: hu_warrior) to 961,449 at 1556 s
+   teleport (squad2: hu_warrior) to 961,449 at 1556 s
+   teleport (squad2: hu_archer) to 930,370 at 1558 s
+   teleport (squad2: hu_warrior) to 930,370 at 1558 s
+   teleport (squad2: hu_warrior) to 930,370 at 1558 s
+   teleport (squad2: hu_archer) to 930,370 at 1558 s
+   teleport (squad2: hu_warrior) to 930,370 at 1558 s
+   teleport (squad1: special_eusmilus) to 984,580 at 1841 s
+   teleport (squad1: hu_spearman) to 984,580 at 1841 s
+   teleport (squad1: hu_warrior) to 984,580 at 1841 s
+   teleport (squad1: hu_archer) to 984,580 at 1841 s
+   teleport (squad1: hu_warrior) to 984,580 at 1841 s
+   teleport (squad1: hu_warrior) to 984,580 at 1841 s
+   teleport (squad1: hu_archer) to 984,580 at 2141 s
+   teleport (squad1: hu_spearman) to 984,580 at 2141 s
+   teleport (squad1: hu_warrior) to 984,580 at 2141 s
+   teleport (squad1: hu_archer) to 984,580 at 2141 s
+   teleport (squad1: hu_warrior) to 984,580 at 2141 s
+   teleport (squad1: hu_warrior) to 984,580 at 2141 s
+   teleport (squad1: hu_warrior) to 984,580 at 2141 s
+   teleport (squad2: Bela_s0) to 960,451 at 2156 s
+   teleport (squad1: hu_spearman) to 960,587 at 2368 s
+   teleport (squad1: hu_warrior) to 960,587 at 2368 s
+   teleport (squad1: hu_archer) to 960,587 at 2368 s
+   teleport (squad1: hu_warrior) to 958,587 at 2577 s
+   teleport (squad1: hu_warrior) to 800,370 at 2579 s
+   teleport (squad1: hu_warrior) to 957,587 at 2732 s
+   teleport (squad1: hu_warrior) to 952,530 at 2762 s
+   teleport (squad1: hu_warrior) to 952,530 at 2762 s
+   teleport (squad1: hu_warrior) to 952,530 at 2762 s
+   teleport (squad2: hu_warrior) to 930,370 at 2762 s
+ok  2. the army waits in front of the gate until the big SEAS attack is beaten: quest "Hold the Fort" (2849 s, at 2850 s)
+ok  3. quest "Counter Attack" (25 s, at 2875 s)
+   teleport (army: hu_archer) to 633,908 at 2875 s
+   teleport (army: hu_warrior) to 633,908 at 2875 s
+   teleport (army: special_eusmilus) to 671,947 at 2970 s
+ok  4. the army breaks the SEAS headquarters on the plateau: quest "Counter Attack" (100 s, at 2975 s)
+ok  5. the film ms_6020 ends the mission (5 s, at 2980 s)
+ok no exception
+ok QUIT: the mission is won
+   group team_mainbase: 0 alive 
+   group team_outpost01: 0 alive 
+   group team_outpost02: 0 alive 
+   group team_outpost03: 0 alive 
+   city wall pieces left: 19 of 20 (lost: hcl13_city_wall_87)
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Hu (mission: Ninigi); game time 50 min; teleports 92; cheat kills 262; top-ups 0
+   triggers fired 79 of 206, 79 firings, 197 actions, warnings 0
+   quests: L13MQ01=done L13MQ02=done L13SQ01=hidden L13SQ02=hidden L13SQ03=hidden L13SQ04=hidden L13SQ05=hidden L13SQ06=hidden L13SQ07=hidden
+   sequences: sc_4070@0 sc_4080@2861 ms_6020@2979
+   player: darwin_s0 x1, hu_archer x5, hu_worker x14, Cole_s0 x1, special_eusmilus x1, Bela_s0 x1, hu_spearman x2, hu_warrior x15; buildings ninigi_snare_trap ninigi_snare_trap hu_small_wall hu_corn_field hu_small_wall_gate hu_small_wall ninigi_snare_trap ninigi_snare_trap ninigi_snare_trap ninigi_snare_trap hu_small_wall hu_small_tower hu_small_tower hu_small_wall hu_small_wall_gate hu_small_wall hu_stone_quarry hu_lumberjack_cottage hu_corn_field hu_corn_field ninigi_hunting_lodge hu_small_wall hu_tavern hu_small_animal_farm hu_arena hu_machine_maker hu_fireplace hu_fireplace hu_small_tower hu_small_tower hu_small_wall ninigi_snare_trap hu_large_tower hu_small_wall ninigi_snare_trap hu_small_tower hu_stone_cottage hu_stone_cottage; res {"food":1255,"wood":1500,"stone":1500,"skulls":3719,"power":0}
+   won: {"won":true,"text":""}
+   variables: init_main_attack=1 main_attack_done=1 team_mainbase_def=1 team_outpost01_def=1 team_outpost02_def=1 team_outpost03_def=1

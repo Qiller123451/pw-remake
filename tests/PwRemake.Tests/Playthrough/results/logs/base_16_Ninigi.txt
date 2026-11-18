@@ -1,0 +1,17 @@
+ok  1. the opening film sc_7050: quests "Survival" and "Stampede" (1 s, at 1 s)
+ok  2. the barracks and garages of the three SEAS bases are broken: quest "Stampede" (198 s, at 199 s)
+ok  3. the last SEAS troops are beaten: sequence sc_7052, quest "The Scorpion" (15 s, at 214 s)
+ok  4. the Scorpio is destroyed: sequence sc_7054, quest "Exo Enforcer" (169 s, at 383 s)
+ok  5. Babbit's combat suit is beaten: quests "Exo Enforcer" and "Survival" (5 s, at 388 s)
+ok  6. the film ms_7060 ends the mission (0 s, at 388 s)
+ok no exception
+ok QUIT: the mission is won
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Ninigi (mission: Hu); game time 6 min; teleports 0; cheat kills 53; top-ups 0
+   triggers fired 75 of 100, 185 firings, 294 actions, warnings 0
+   quests: L16MQ01=done L16MQ02=done L16MQ03=done L16MQ04=done L16SQ01=failed
+   sequences: sc_7050@0 sc_7052@213 sc_7054@382 ms_7060@387
+   player: lovelace_s0 x1, Bela_s0 x1, special_eusmilus x1, Cole_s0 x1; buildings ninigi_small_tower ninigi_small_tower; res {"food":200,"wood":150,"stone":100,"skulls":1045,"power":0}
+   won: {"won":true,"text":""}
+   variables: C_dead=2 V_dead=2 CV_dead=2 conquered_towers=1

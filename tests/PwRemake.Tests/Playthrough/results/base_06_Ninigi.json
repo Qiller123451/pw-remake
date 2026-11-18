@@ -1,0 +1,21 @@
+{
+  "cfg": "base",
+  "mission": 6,
+  "tribe": "Ninigi",
+  "title": "Mission 6: Pirates and Hostages",
+  "steps": 4,
+  "passed": 4,
+  "failedStep": null,
+  "over": true,
+  "won": true,
+  "finished": true,
+  "gameMinutes": 11.1,
+  "wallSeconds": 27,
+  "teleports": 3,
+  "cheatKills": 74,
+  "topUps": 7,
+  "triggerErrors": 0,
+  "fails": 0,
+  "exception": null,
+  "date": "2026-11-02"
+}

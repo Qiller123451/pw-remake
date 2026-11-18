@@ -1,0 +1,62 @@
+ok  1. the opening film ms_3010: quests "A dangerous Path" and "Survival of the Fittest" (1 s, at 1 s)
+ok  2. the heroes follow the path to the bridge: sequence sc_3025 (the bridge breaks) (59 s, at 60 s)
+ok  3. the heroes reach the Dragon Clan village: dialogue ds_3020, quest "Rescue Mission" (39 s, at 99 s)
+ok  4. the Barbarians attacking the village are beaten: quest "Rescue Mission", sequence sc_3030, the village joins (39 s, at 138 s)
+ok  5. quest "Hunting the Looters" (0 s, at 138 s)
+   teleport (army: ninigi_warrior) to 177,818 at 212 s
+   teleport (army: ninigi_archer) to 177,818 at 212 s
+   teleport (army: ninigi_archer) to 177,818 at 212 s
+   teleport (army: ninigi_warrior) to 177,818 at 212 s
+   teleport (army: ninigi_warrior) to 177,818 at 212 s
+   teleport (army: special_eusmilus) to 177,818 at 212 s
+   teleport (army: ninigi_warrior) to 246,403 at 218 s
+   teleport (army: Bela_s0) to 246,403 at 218 s
+   teleport (army: Cole_s0) to 246,403 at 218 s
+   teleport (army: ninigi_monk) to 246,403 at 218 s
+   teleport (army: ninigi_archer) to 716,610 at 348 s
+ok  6. the three parts of the wreck are fetched from the Barbarian altars (211 s, at 349 s)
+   teleport (army: special_eusmilus) to 720,257 at 400 s
+   teleport (army: ninigi_warrior) to 716,263 at 401 s
+   teleport (army: ninigi_warrior) to 716,263 at 401 s
+   teleport (army: ninigi_warrior) to 716,263 at 401 s
+ok  7. the airplane is cleared and a tower stands next to it: quest "The Bird of Steel", sequence sc_3033 (137 s, at 486 s)
+ok  8. the film sc_3033: quest "A dangerous Path" accomplished, the launch ramp is the player's (2 s, at 488 s)
+   teleport (army: special_eusmilus) to 748,314 at 622 s
+   teleport (army: ninigi_warrior) to 748,314 at 625 s
+   teleport (army: ninigi_warrior) to 748,314 at 626 s
+   teleport (army: ninigi_warrior) to 748,314 at 626 s
+   teleport (army: special_eusmilus) to 748,314 at 683 s
+   teleport (army: ninigi_warrior) to 748,314 at 686 s
+   teleport (army: ninigi_warrior) to 748,314 at 687 s
+   teleport (army: ninigi_warrior) to 748,314 at 687 s
+   teleport (army: special_eusmilus) to 748,314 at 803 s
+   teleport (army: ninigi_warrior) to 748,314 at 807 s
+   teleport (army: ninigi_warrior) to 748,314 at 807 s
+   teleport (army: ninigi_warrior) to 748,314 at 807 s
+   teleport (army: special_eusmilus) to 748,314 at 935 s
+   teleport (army: ninigi_warrior) to 748,314 at 938 s
+   teleport (army: ninigi_warrior) to 748,314 at 939 s
+   teleport (army: special_eusmilus) to 748,314 at 1152 s
+   teleport (army: ninigi_warrior) to 748,314 at 1154 s
+   teleport (army: ninigi_warrior) to 748,314 at 1154 s
+   teleport (army: ninigi_warrior) to 748,314 at 1154 s
+   teleport (army: special_eusmilus) to 748,314 at 1437 s
+   teleport (army: ninigi_warrior) to 748,314 at 1441 s
+   teleport (army: ninigi_warrior) to 748,314 at 1441 s
+   teleport (army: ninigi_warrior) to 748,314 at 1441 s
+   teleport (army: special_eusmilus) to 748,314 at 1556 s
+   teleport (army: ninigi_warrior) to 748,314 at 1559 s
+   teleport (army: ninigi_warrior) to 748,314 at 1559 s
+   teleport (army: ninigi_warrior) to 748,314 at 1560 s
+ok  9. the workers build the launch ramp while the army guards it: quest "Prepare for Start" (1164 s, at 1652 s)
+ok 10. the film ms_3040 ends the mission (2 s, at 1654 s)
+ok no exception
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Ninigi; game time 28 min; teleports 42; cheat kills 210; top-ups 1
+   triggers fired 95 of 121, 150 firings, 478 actions, warnings 0
+   quests: L09MQ01=done L09MQ03=done L09MQ02=done L09MQ04=done L09MQ05=done L09MQ06=done L09SQ01=failed L09SQ02=hidden
+   sequences: ms_3010@0 sc_3025@59 sc_3030@134 sc_3033@487 ms_3040@1653
+   player: ninigi_worker x8, ninigi_warrior x3, ninigi_harvester x1, special_eusmilus x1; buildings ninigi_small_tower carrier_launch_pad ninigi_lumbermill ninigi_small_tower; res {"food":300,"wood":500,"stone":300,"skulls":1521,"power":0}
+   won: {"won":true,"text":""}
+   variables: parts_collected=4 mq03_done=1 mq05_done=1 mq06_done=1 reinforcements=1

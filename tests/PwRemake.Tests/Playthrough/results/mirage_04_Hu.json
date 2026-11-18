@@ -1,0 +1,21 @@
+{
+  "cfg": "mirage",
+  "mission": 4,
+  "tribe": "Hu",
+  "title": "Mission 4: The Dustriders",
+  "steps": 4,
+  "passed": 4,
+  "failedStep": null,
+  "over": true,
+  "won": true,
+  "finished": true,
+  "gameMinutes": 1.4,
+  "wallSeconds": 8,
+  "teleports": 6,
+  "cheatKills": 21,
+  "topUps": 0,
+  "triggerErrors": 0,
+  "fails": 0,
+  "exception": null,
+  "date": "2026-11-02"
+}

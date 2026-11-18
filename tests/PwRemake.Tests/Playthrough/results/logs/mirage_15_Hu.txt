@@ -1,0 +1,68 @@
+ok  1. the opening film sc_7010: quest "The Core of the Problem" (1 s, at 1 s)
+   teleport (army: special_eusmilus) to 380,722 at 93 s
+ok  2. the army reaches the first pumping station: film ms_7026, quest "Countdown of Death" (99 s, at 100 s)
+   teleport (army: Bela_s0) to 464,698 at 100 s
+   teleport (army: hu_archer) to 465,698 at 101 s
+   teleport (army: hu_spearman) to 465,698 at 101 s
+   teleport (army: hu_spearman) to 465,698 at 101 s
+   teleport (guard3: hu_warrior) to 624,553 at 224 s
+   teleport (guard3: hu_warrior) to 653,554 at 421 s
+   teleport (guard1: hu_warrior) to 456,689 at 776 s
+   teleport (guard1: hu_warrior) to 456,689 at 776 s
+   teleport (guard3: hu_archer) to 624,553 at 809 s
+   teleport (guard2: hu_spearman) to 792,688 at 900 s
+   teleport (guard2: hu_warrior) to 792,688 at 900 s
+   teleport (guard1: hu_warrior) to 456,689 at 925 s
+   teleport (guard1: hu_warrior) to 456,689 at 925 s
+   teleport (guard3: hu_archer) to 646,549 at 928 s
+   teleport (army: hu_warrior) to 408,477 at 969 s
+   teleport (army: hu_warrior) to 408,477 at 969 s
+   teleport (army: hu_warrior) to 408,477 at 969 s
+   teleport (army: hu_warrior) to 408,477 at 969 s
+   teleport (army: hu_warrior) to 408,477 at 969 s
+   teleport (army: hu_warrior) to 408,477 at 969 s
+   teleport (army: hu_warrior) to 408,477 at 969 s
+   teleport (army: hu_warrior) to 408,477 at 969 s
+   teleport (army: hu_warrior) to 408,477 at 969 s
+   teleport (army: hu_warrior) to 408,477 at 969 s
+   teleport (army: hu_archer) to 408,477 at 969 s
+   teleport (army: hu_spearman) to 408,477 at 969 s
+   teleport (army: hu_warrior) to 408,477 at 969 s
+   teleport (army: hu_warrior) to 408,477 at 969 s
+   teleport (army: hu_warrior) to 408,477 at 969 s
+   teleport (army: Cole_s0) to 409,475 at 970 s
+   teleport (army: hu_warrior) to 409,475 at 970 s
+   teleport (army: hu_archer) to 409,475 at 970 s
+   teleport (army: hu_warrior) to 409,475 at 970 s
+   teleport (army: hu_spearman) to 415,470 at 971 s
+   teleport (guard1: hu_warrior) to 456,689 at 993 s
+   teleport (guard1: hu_warrior) to 456,689 at 1055 s
+   teleport (guard1: hu_warrior) to 456,689 at 1067 s
+   teleport (guard3: hu_warrior) to 624,553 at 1102 s
+   teleport (guard3: hu_warrior) to 648,551 at 1103 s
+   teleport (guard2: hu_warrior) to 792,688 at 1127 s
+   teleport (guard1: hu_warrior) to 456,689 at 1134 s
+   teleport (guard1: hu_warrior) to 456,689 at 1134 s
+   teleport (army: hu_warrior) to 847,480 at 1142 s
+   teleport (army: hu_archer) to 838,477 at 1172 s
+ok  3. the five pumping stations are taken and held: the countdown stops, sequence sc_7040 (quest "Countdown of Death") (1078 s, at 1178 s)
+   teleport (guard1: hu_warrior) to 456,689 at 1204 s
+   teleport (heroes: tesla_s0) to 623,138 at 1267 s
+ok  4. Béla, Cole, Stina and Taslow walk into the crater: quest "The Core of the Problem" (90 s, at 1268 s)
+ok  5. the film sc_7041 ends the mission (3 s, at 1271 s)
+ok no exception
+ok QUIT: the mission is won
+   hero Bela_s0: alive True parked False inside False at (624, 139) task idle
+   hero Cole_s0: alive True parked False inside False at (621, 139) task idle
+   hero special_eusmilus: alive True parked False inside False at (623, 139) task idle
+   hero tesla_s0: alive True parked False inside False at (623, 138) task idle
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Hu; game time 21 min; teleports 47; cheat kills 397; top-ups 6
+   triggers fired 106 of 163, 305 firings, 1595 actions, warnings 0
+   quests: L15MQ01=done L15MQ02=done L15SQ01=done L15SQ02=failed L15SQ03=failed
+   sequences: sc_7010@0 ms_7026@93 sc_7030_a@104 sc_7038@842 sc_7040@1177 sc_7041@1270
+   player: tesla_s0 x1, lovelace_s0 x1, hu_warrior x19, hu_worker x10, Bela_s0 x1, Cole_s0 x1, special_eusmilus x1, hu_spearman x4, hu_archer x2; buildings hu_fireplace hu_stone_cottage hu_arena hu_stone_cottage hu_stone_cottage hu_stone_cottage; res {"food":440,"wood":520,"stone":800,"skulls":3948,"power":0}
+   won: {"won":true,"text":""}
+   population 40/47, epoch 2
+   variables: ctrlpts=5 ctrlpt01=1 ctrlpt02=1 ctrlpt03=1 ctrlpt04=1 ctrlpt05=1 cntdwn_aborted=1 blocker=0

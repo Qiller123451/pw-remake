@@ -1,0 +1,21 @@
+{
+  "cfg": "base",
+  "mission": 6,
+  "tribe": "Hu",
+  "title": "Mission 6: Pirates and Hostages",
+  "steps": 4,
+  "passed": 4,
+  "failedStep": null,
+  "over": true,
+  "won": true,
+  "finished": true,
+  "gameMinutes": 14.8,
+  "wallSeconds": 24,
+  "teleports": 7,
+  "cheatKills": 107,
+  "topUps": 20,
+  "triggerErrors": 0,
+  "fails": 0,
+  "exception": null,
+  "date": "2026-11-02"
+}

@@ -1,0 +1,2 @@
+-- Mission 4-3 "Operation Neptune", base: what differs from common/43.lua (its keys replace the common file's; `seats` per seat).
+return {  }

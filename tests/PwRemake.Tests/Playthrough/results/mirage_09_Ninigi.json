@@ -1,0 +1,21 @@
+{
+  "cfg": "mirage",
+  "mission": 9,
+  "tribe": "Ninigi",
+  "title": "Mission 9: Perilous Path",
+  "steps": 10,
+  "passed": 10,
+  "failedStep": null,
+  "over": true,
+  "won": true,
+  "finished": true,
+  "gameMinutes": 27.6,
+  "wallSeconds": 66,
+  "teleports": 42,
+  "cheatKills": 210,
+  "topUps": 1,
+  "triggerErrors": 0,
+  "fails": 0,
+  "exception": null,
+  "date": "2026-11-02"
+}

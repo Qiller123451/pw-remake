@@ -1,0 +1,17 @@
+ok  1. quest "Freeing the Hostages" from the start (1 s, at 1 s)
+   teleport (army: special_eusmilus) to 331,554 at 80 s
+   teleport (army: Cole_s0) to 331,554 at 89 s
+   teleport (army: Bela_s0) to 372,524 at 119 s
+ok  2. the army reaches the pirates' prison and breaks its buildings: the hostages are free (sc_8080) (199 s, at 200 s)
+ok  3. the fleet breaks the water gate and sinks the big pirate ship in the bay (sc_8013) (467 s, at 667 s)
+ok  4. the film ms_8090 ends the mission (0 s, at 667 s)
+ok no exception
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Ninigi (mission: Aje); game time 11 min; teleports 3; cheat kills 74; top-ups 7
+   triggers fired 55 of 114, 55 firings, 118 actions, warnings 0
+   quests: L06MQ01=done L06MQ02=done L06SQ01=failed L06SQ02=hidden L06SQ03=hidden
+   sequences: sc_8005@0 sc_8080@200 sc_8011@440 8043@575 sc_8013@666 ms_8090@666
+   player: Cole_s0 x1, special_eusmilus x1, ninigi_worker x6, Bela_s0 x1, ninigi_fire_boat x10; buildings ninigi_fireplace ninigi_lumbermill ninigi_dojo ninigi_engineer ninigi_paddy ninigi_temple ninigi_warehouse ninigi_harbour; res {"food":880,"wood":1500,"stone":800,"skulls":870,"power":0}
+   won: {"won":true,"text":""}
+   warships ninigi_fire_boat ninigi_fire_boat ninigi_fire_boat ninigi_fire_boat ninigi_fire_boat ninigi_fire_boat ninigi_fire_boat ninigi_fire_boat ninigi_fire_boat ninigi_fire_boat; epoch 3

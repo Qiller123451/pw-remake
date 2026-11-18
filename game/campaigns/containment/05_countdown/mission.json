@@ -1,0 +1,225 @@
+{
+ "id": 5,
+ "title": "Countdown at the Cape",
+ "place": "Cape Canaveral, Florida",
+ "date": "September 30, 1964",
+ "unlocks": [
+  "sq_aa_halftrack"
+ ],
+ "briefing": [
+  "Dr. Imai's team has put one of Taslov's stabilizers into the nose of a rocket. In orbit it can find every rift on the continent - but it has to get there first.",
+  "The launch window opens in fifteen minutes. Rifts have opened on the beach. Protect Launch Complex 34 until lift-off."
+ ],
+ "creatures": [
+  "Baryonyx",
+  "Spinosaurus",
+  "Velociraptor",
+  "Carnotaurus",
+  "Kronosaurus",
+  "Dunkleosteus"
+ ],
+ "powers": [
+  "supply",
+  "recon",
+  "airdrop",
+  "artillery"
+ ],
+ "res": {
+  "food": 900,
+  "wood": 900,
+  "stone": 800
+ },
+ "map": {
+  "seed": 1930,
+  "clear": [
+   [
+    10,
+    0,
+    30
+   ],
+   [
+    120,
+    -130,
+    22
+   ],
+   [
+    120,
+    140,
+    22
+   ]
+  ],
+  "setting": "Jungle",
+  "size": 480,
+  "base": 4,
+  "water": 0,
+  "noise": [
+   [
+    0.006,
+    3
+   ],
+   [
+    0.03,
+    0.8
+   ]
+  ],
+  "ground": [
+   6,
+   5,
+   4,
+   3,
+   6,
+   0
+  ],
+  "features": [
+   {
+    "type": "basin",
+    "x": 260,
+    "z": 0,
+    "r": 220,
+    "depth": 12
+   },
+   {
+    "type": "flat",
+    "x": -60,
+    "z": 30,
+    "r": 110,
+    "h": 4
+   }
+  ],
+  "roads": [
+   {
+    "path": [
+     [
+      -240,
+      30
+     ],
+     [
+      -60,
+      30
+     ],
+     [
+      20,
+      10
+     ]
+    ],
+    "width": 9,
+    "kind": "highway"
+   },
+   {
+    "path": [
+     [
+      -60,
+      30
+     ],
+     [
+      -60,
+      200
+     ]
+    ],
+    "width": 7,
+    "kind": "street"
+   }
+  ],
+  "places": [
+   {
+    "kind": "launch",
+    "x": 10,
+    "z": 0,
+    "rot": 0,
+    "pad": false
+   },
+   {
+    "kind": "camp",
+    "x": -120,
+    "z": 120,
+    "rot": 0
+   }
+  ],
+  "forests": [
+   {
+    "x": -180,
+    "z": -150,
+    "r": 60,
+    "n": 40
+   },
+   {
+    "x": -170,
+    "z": 170,
+    "r": 50,
+    "n": 30
+   }
+  ],
+  "resources": [
+   {
+    "x": -120,
+    "z": 60,
+    "stone": 6,
+    "food": 6,
+    "wood": 26
+   }
+  ],
+  "shrubs": 200
+ },
+ "start": {
+  "buildings": [
+   [
+    "seas_headquarters",
+    -130,
+    84,
+    0
+   ],
+   [
+    "seas_barracks",
+    -98,
+    88,
+    0
+   ],
+   [
+    "seas_garage",
+    -132,
+    122,
+    0
+   ]
+  ],
+  "units": [
+   [
+    "sq_halloran",
+    -142,
+    62,
+    1
+   ],
+   [
+    "seas_worker",
+    -134,
+    66,
+    6
+   ],
+   [
+    "sq_trooper",
+    48,
+    0,
+    4,
+    2
+   ],
+   [
+    "seas_marksman",
+    54,
+    -6,
+    2,
+    2
+   ],
+   [
+    "sq_taslov",
+    -90,
+    20,
+    1
+   ],
+   [
+    "sq_aa_halftrack",
+    -80,
+    40,
+    2
+   ]
+  ]
+ }
+}

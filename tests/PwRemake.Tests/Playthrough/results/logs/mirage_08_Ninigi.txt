@@ -1,0 +1,25 @@
+ok  1. the opening sequence sc_2590; quests "Opening the Gate I" and "Protective Escort" (3 s, at 3 s)
+ok  2. the guards of keystone 1 are beaten (41 s, at 44 s)
+ok  3. Kleemann is brought to keystone 1: the crystal is activated (1 s, at 45 s)
+ok  4. sequence sc_2583a, quest 1 done, quest "Opening the Gate II" with the crystal counter (2 s, at 47 s)
+ok  5. the guards of keystone 2 are beaten (103 s, at 150 s)
+ok  6. Kleemann is brought to keystone 2: the crystal is activated (0 s, at 150 s)
+ok  7. the guards of keystone 3 are beaten (91 s, at 241 s)
+ok  8. Kleemann is brought to keystone 3: the crystal is activated (5 s, at 246 s)
+ok  9. all three crystals: sequence sc_2585, the undead march out of Valhalla (quest "Counting the Undead") (6 s, at 252 s)
+ok 10. the four undead groups are destroyed (123 s, at 375 s)
+ok 11. heroes and Kleemann gather before the gate: sequence sc_3004, the base is left behind (95 s, at 470 s)
+ok 12. the undead behind the gate are beaten: sequence sc_3005, Kleemann walks off (33 s, at 503 s)
+ok 13. the guardians of Valhalla are beaten (sequence sc_3009) (39 s, at 542 s)
+ok 14. Kleemann, turned into an undead, is defeated: the final sequence sc_3012 wins the mission (12 s, at 554 s)
+ok no exception
+ok ACND activated one of the three "capture order" folders: Gda02#order_01_stone_03, Gda01#order_01_stone_02
+ok three crystals counted, quest "Opening the Gate II" accomplished
+ok SQNZ quit: the mission is won; escort, journey and revelations accomplished
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Ninigi (mission: Aje); game time 9 min; teleports 0; cheat kills 177; top-ups 0
+   triggers fired 93 of 124, 93 firings, 235 actions, warnings 0
+   quests: L08MQ01=done L08MQ03=done L08MQ04=done L08MQ02=done L08MQ05=done L08MQ06=done L08SQ01=hidden
+   sequences: sc_2590@0 sc_2583a@47 sc_2585@249 sc_3004@468 sc_3005@502 sc_3009@542 sc_3012@554
+   player: Bela_s0 x1, Cole_s0 x1, special_eusmilus x1; buildings ; res {"food":0,"wood":0,"stone":0,"skulls":177,"power":0}

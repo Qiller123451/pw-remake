@@ -1,0 +1,249 @@
+{
+ "id": 6,
+ "title": "Big Tooth",
+ "place": "Bellingham, Washington",
+ "date": "October 18, 1964",
+ "unlocks": [
+  "sq_electric_net",
+  "sq_tesla_coil"
+ ],
+ "briefing": [
+  "The satellite found a rift under a lumber town - and something came through it that the newspapers are calling Big Tooth. Bullets bounce off it. Artillery annoys it.",
+  "Taslov has built electrified nets. Build them in its path, lure it onto one, and when it is stunned, put it to sleep. Then it is Booker's problem."
+ ],
+ "creatures": [
+  "Velociraptor",
+  "Deinonychus",
+  "Allosaurus",
+  "Gigantosaurus"
+ ],
+ "powers": [
+  "supply",
+  "recon",
+  "airdrop",
+  "artillery"
+ ],
+ "res": {
+  "food": 1000,
+  "wood": 1000,
+  "stone": 900
+ },
+ "map": {
+  "seed": 1018,
+  "clear": [
+   [
+    190,
+    -190,
+    22
+   ],
+   [
+    -200,
+    120,
+    22
+   ],
+   [
+    160,
+    -170,
+    16
+   ]
+  ],
+  "setting": "Northland",
+  "size": 500,
+  "base": 6,
+  "noise": [
+   [
+    0.005,
+    8
+   ],
+   [
+    0.025,
+    1.2
+   ]
+  ],
+  "ground": [
+   0,
+   2,
+   4,
+   3,
+   6,
+   1
+  ],
+  "features": [
+   {
+    "type": "flat",
+    "x": 0,
+    "z": 0,
+    "r": 150,
+    "h": 6
+   },
+   {
+    "type": "hill",
+    "x": 180,
+    "z": -170,
+    "r": 80,
+    "h": 18
+   }
+  ],
+  "roads": [
+   {
+    "path": [
+     [
+      -250,
+      170
+     ],
+     [
+      -100,
+      120
+     ],
+     [
+      0,
+      100
+     ],
+     [
+      250,
+      90
+     ]
+    ],
+    "width": 9,
+    "kind": "highway"
+   }
+  ],
+  "places": [
+   {
+    "kind": "town",
+    "x": 10,
+    "z": -10,
+    "rot": 0,
+    "blocks": 2,
+    "len": 200
+   },
+   {
+    "kind": "industry",
+    "x": 170,
+    "z": 150,
+    "rot": 0
+   }
+  ],
+  "forests": [
+   {
+    "x": -180,
+    "z": -170,
+    "r": 70,
+    "n": 60
+   },
+   {
+    "x": 190,
+    "z": -40,
+    "r": 50,
+    "n": 40
+   },
+   {
+    "x": -200,
+    "z": 40,
+    "r": 50,
+    "n": 30
+   }
+  ],
+  "resources": [
+   {
+    "x": -150,
+    "z": 190,
+    "stone": 6,
+    "food": 6,
+    "wood": 26
+   }
+  ],
+  "shrubs": 260
+ },
+ "start": {
+  "buildings": [
+   [
+    "seas_headquarters",
+    -160,
+    186,
+    0
+   ],
+   [
+    "seas_barracks",
+    -128,
+    190,
+    0
+   ],
+   [
+    "seas_garage",
+    -162,
+    224,
+    0
+   ]
+  ],
+  "units": [
+   [
+    "sq_halloran",
+    -172,
+    164,
+    1
+   ],
+   [
+    "seas_worker",
+    -164,
+    168,
+    6
+   ],
+   [
+    "sq_trooper",
+    -150,
+    166,
+    4,
+    2
+   ],
+   [
+    "seas_marksman",
+    -144,
+    160,
+    2,
+    2
+   ],
+   [
+    "sq_taslov",
+    -140,
+    160,
+    1
+   ],
+   [
+    "sq_booker",
+    -130,
+    165,
+    1
+   ],
+   [
+    "sq_tranq",
+    -120,
+    170,
+    4,
+    2
+   ],
+   [
+    "sq_capture_truck",
+    -110,
+    190,
+    2
+   ]
+  ]
+ },
+ "zones": [
+  {
+   "name": "pen",
+   "x": -200,
+   "z": 120,
+   "r": 16,
+   "kind": "pen"
+  },
+  {
+   "name": "shelter",
+   "x": -190,
+   "z": 210,
+   "r": 16,
+   "kind": "evac"
+  }
+ ]
+}

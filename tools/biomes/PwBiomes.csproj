@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- The biome authoring tool (docs/BIOMES.md "Authoring"): dotnet run (in tools/biomes) with a command
+       Uses the simulation's map reader and BiomeAuthoring - no Godot. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <RootNamespace>PwRemake.Tools.Biomes</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/Sim/PwRemake.Sim.csproj" />
+  </ItemGroup>
+</Project>

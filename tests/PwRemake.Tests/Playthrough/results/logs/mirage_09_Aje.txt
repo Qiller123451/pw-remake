@@ -1,0 +1,50 @@
+ok  1. the opening film ms_3010: quests "A dangerous Path" and "Survival of the Fittest" (1 s, at 1 s)
+ok  2. the heroes follow the path to the bridge: sequence sc_3025 (the bridge breaks) (59 s, at 60 s)
+ok  3. the heroes reach the Dragon Clan village: dialogue ds_3020, quest "Rescue Mission" (39 s, at 99 s)
+ok  4. the Barbarians attacking the village are beaten: quest "Rescue Mission", sequence sc_3030, the village joins (39 s, at 138 s)
+ok  5. quest "Hunting the Looters" (0 s, at 138 s)
+   teleport (army: special_eusmilus) to 177,818 at 212 s
+   teleport (army: aje_warrior) to 177,818 at 212 s
+   teleport (army: aje_archer) to 177,818 at 212 s
+   teleport (army: aje_warrior) to 177,818 at 212 s
+   teleport (army: aje_warrior) to 177,818 at 212 s
+   teleport (army: special_eusmilus) to 246,403 at 289 s
+   teleport (army: Bela_s0) to 716,610 at 290 s
+   teleport (army: Cole_s0) to 716,610 at 290 s
+   teleport (army: aje_archer) to 716,610 at 290 s
+   teleport (army: aje_warrior) to 716,610 at 290 s
+   teleport (army: aje_shaman) to 716,610 at 290 s
+ok  6. the three parts of the wreck are fetched from the Barbarian altars (153 s, at 291 s)
+   teleport (army: aje_archer) to 719,252 at 403 s
+ok  7. the airplane is cleared and a tower stands next to it: quest "The Bird of Steel", sequence sc_3033 (123 s, at 414 s)
+   teleport (all: aje_warrior) to 748,314 at 414 s
+   teleport (all: ninigi_harvester) to 748,314 at 414 s
+   teleport (all: aje_worker) to 748,314 at 414 s
+ok  8. the film sc_3033: quest "A dangerous Path" accomplished, the launch ramp is the player's (2 s, at 416 s)
+   teleport (army: Bela_s0) to 748,314 at 596 s
+   teleport (army: aje_archer) to 748,314 at 596 s
+   teleport (army: Cole_s0) to 748,314 at 597 s
+   teleport (army: aje_warrior) to 748,314 at 597 s
+   teleport (army: aje_shaman) to 748,314 at 597 s
+   teleport (army: Bela_s0) to 748,314 at 1959 s
+   teleport (army: aje_archer) to 748,314 at 1959 s
+   teleport (army: Cole_s0) to 748,314 at 1961 s
+   teleport (army: aje_warrior) to 748,314 at 1961 s
+   teleport (army: aje_shaman) to 748,314 at 1961 s
+   teleport (army: Bela_s0) to 748,314 at 2188 s
+   teleport (army: aje_archer) to 748,314 at 2189 s
+   teleport (army: Cole_s0) to 748,314 at 2190 s
+   teleport (army: aje_warrior) to 748,314 at 2190 s
+   teleport (army: aje_shaman) to 748,314 at 2190 s
+ok  9. the workers build the launch ramp while the army guards it: quest "Prepare for Start" (1884 s, at 2300 s)
+ok 10. the film ms_3040 ends the mission (3 s, at 2303 s)
+ok no exception
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Aje (mission: Ninigi); game time 38 min; teleports 30; cheat kills 492; top-ups 7
+   triggers fired 99 of 121, 205 firings, 663 actions, warnings 0
+   quests: L09MQ01=done L09MQ03=done L09MQ02=done L09MQ04=done L09MQ05=done L09MQ06=done L09SQ01=failed L09SQ02=hidden
+   sequences: ms_3010@0 sc_3025@59 sc_3030@134 sc_3033@416 ms_3040@2302
+   player: ninigi_harvester x1, Bela_s0 x1, Cole_s0 x1, aje_worker x5, aje_archer x1, aje_warrior x1, aje_resource_collector x1, aje_shaman x1; buildings carrier_launch_pad aje_small_tower; res {"food":500,"wood":400,"stone":100,"skulls":3363,"power":0}
+   won: {"won":true,"text":""}
+   variables: parts_collected=4 mq03_done=1 mq05_done=1 mq06_done=1 reinforcements=1

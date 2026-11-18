@@ -1,0 +1,21 @@
+{
+  "cfg": "base",
+  "mission": 6,
+  "tribe": "Aje",
+  "title": "Mission 6: Pirates and Hostages",
+  "steps": 4,
+  "passed": 4,
+  "failedStep": null,
+  "over": true,
+  "won": true,
+  "finished": true,
+  "gameMinutes": 13.8,
+  "wallSeconds": 23,
+  "teleports": 3,
+  "cheatKills": 91,
+  "topUps": 20,
+  "triggerErrors": 0,
+  "fails": 0,
+  "exception": null,
+  "date": "2026-11-02"
+}

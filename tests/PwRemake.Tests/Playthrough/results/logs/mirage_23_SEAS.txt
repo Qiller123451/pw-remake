@@ -1,0 +1,25 @@
+ok  1. the opening film: quest "Seeking Ada" (1 s, at 1 s)
+ok  2. the squad finds the Barbarians' outpost: dialogue s02_aussenposten, quest "The Outpost" (74 s, at 75 s)
+ok  3. the outpost is destroyed (its units and producers): quest "The Outpost", film seq_ss2_apdest, quest "The Main Base" (177 s, at 252 s)
+ok  4. the infiltration team waits at the meeting point and Leighton joins it: dialogue s02_infiltration (30 s, at 282 s)
+ok  5. the infiltration team opens the gates of the main base: dialogue s02_infiltration_end (56 s, at 338 s)
+ok  6. the squad enters the main base: quest "Ada's Rescue" (29 s, at 367 s)
+   teleport (army: seas_marksman) to 326,190 at 523 s
+   teleport (army: seas_warrior) to 326,190 at 525 s
+   teleport (army: seas_warrior) to 326,190 at 526 s
+   teleport (army: seas_warrior) to 326,190 at 526 s
+   teleport (army: livingstone_s0) to 326,190 at 526 s
+ok  7. four units reach the sacrificial pit: film seq_ss2_end (160 s, at 527 s)
+ok  8. the film seq_ss2_end ends the mission (quit) (0 s, at 527 s)
+ok no exception
+ok the mission is won
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe SEAS; game time 9 min; teleports 5; cheat kills 75; top-ups 0
+   triggers fired 69 of 94, 83 firings, 198 actions, warnings 0
+   quests: single_seas_02_MQ0=open single_seas_02_MQ0=open single_seas_02_MQ0=done single_seas_02_MQ0=done single_seas_02_MQ0=open single_seas_02_SQ0=open
+   sequences: 
+   player: ; buildings ; res {"food":500,"wood":300,"stone":200,"skulls":570,"power":0}
+   won: {"won":true,"text":""}
+   variables: harbours_operate=1 difficulty=1 outpost_alive=0 adaquest=1
+   outpost left: 

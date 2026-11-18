@@ -1,0 +1,266 @@
+{
+ "id": 11,
+ "title": "Containment",
+ "place": "Copper Basin, Nevada",
+ "date": "April 1, 1965",
+ "briefing": [
+  "Back where it began. Taslov has built a new Gate machine around the stolen core. When it reaches full charge it will pull every rift on Earth shut at once.",
+  "Every rift is opening wider in protest - and Crane is coming for the machine with everything he has left. Hold for twenty minutes."
+ ],
+ "tribes": [
+  "Aje"
+ ],
+ "aje": {
+  "behaviour": "Mikrobe"
+ },
+ "crane": {
+  "behaviour": "Giraffe"
+ },
+ "ajeFriendly": true,
+ "creatures": [
+  "Velociraptor",
+  "Deinonychus",
+  "Allosaurus",
+  "Carnotaurus",
+  "Atroxosaurus",
+  "Triceratops",
+  "Smilodon",
+  "Spinosaurus"
+ ],
+ "powers": [
+  "supply",
+  "recon",
+  "airdrop",
+  "artillery"
+ ],
+ "res": {
+  "food": 1500,
+  "wood": 1500,
+  "stone": 1500
+ },
+ "map": {
+  "seed": 1965,
+  "clear": [
+   [
+    0,
+    0,
+    30
+   ],
+   [
+    0,
+    -210,
+    22
+   ],
+   [
+    210,
+    -20,
+    22
+   ],
+   [
+    -210,
+    -40,
+    22
+   ],
+   [
+    120,
+    210,
+    22
+   ]
+  ],
+  "setting": "Savanna",
+  "size": 520,
+  "base": 6,
+  "noise": [
+   [
+    0.004,
+    9
+   ],
+   [
+    0.02,
+    1.5
+   ]
+  ],
+  "ground": [
+   0,
+   3,
+   4,
+   7,
+   6,
+   1
+  ],
+  "features": [
+   {
+    "type": "mesa",
+    "x": 190,
+    "z": -170,
+    "r": 60,
+    "h": 18
+   },
+   {
+    "type": "mesa",
+    "x": -200,
+    "z": -180,
+    "r": 50,
+    "h": 14
+   },
+   {
+    "type": "flat",
+    "x": -20,
+    "z": 0,
+    "r": 140,
+    "h": 6
+   }
+  ],
+  "roads": [
+   {
+    "path": [
+     [
+      -40,
+      260
+     ],
+     [
+      -40,
+      120
+     ],
+     [
+      -20,
+      40
+     ],
+     [
+      0,
+      -40
+     ],
+     [
+      10,
+      -260
+     ]
+    ],
+    "width": 9,
+    "kind": "highway"
+   }
+  ],
+  "places": [
+   {
+    "kind": "town",
+    "x": -20,
+    "z": -60,
+    "rot": 0,
+    "blocks": 1,
+    "len": 150,
+    "empty": 0.4
+   }
+  ],
+  "rocks": [
+   {
+    "x": 160,
+    "z": 40,
+    "r": 60,
+    "n": 24
+   }
+  ],
+  "resources": [
+   {
+    "x": -60,
+    "z": 150,
+    "stone": 8,
+    "food": 8,
+    "wood": 26
+   }
+  ],
+  "forests": [
+   {
+    "x": -170,
+    "z": 170,
+    "r": 50,
+    "n": 30
+   }
+  ],
+  "shrubs": 300
+ },
+ "start": {
+  "buildings": [
+   [
+    "seas_headquarters",
+    -100,
+    150,
+    0
+   ],
+   [
+    "seas_barracks",
+    -68,
+    154,
+    0
+   ],
+   [
+    "seas_garage",
+    -102,
+    188,
+    0
+   ],
+   [
+    "sq_searchlight",
+    30,
+    40,
+    0
+   ],
+   [
+    "sq_flak",
+    -70,
+    50,
+    0
+   ]
+  ],
+  "units": [
+   [
+    "sq_halloran",
+    -112,
+    128,
+    1
+   ],
+   [
+    "seas_worker",
+    -104,
+    132,
+    6
+   ],
+   [
+    "sq_trooper",
+    -2,
+    -30,
+    4,
+    2
+   ],
+   [
+    "seas_marksman",
+    4,
+    -36,
+    2,
+    2
+   ],
+   [
+    "sq_taslov",
+    -10,
+    20,
+    1
+   ],
+   [
+    "sq_booker",
+    -30,
+    40,
+    1
+   ],
+   [
+    "seas_triceratops",
+    -40,
+    60,
+    3
+   ],
+   [
+    "sq_aa_halftrack",
+    0,
+    70,
+    2
+   ]
+  ]
+ }
+}

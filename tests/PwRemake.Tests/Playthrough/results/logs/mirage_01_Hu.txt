@@ -1,0 +1,39 @@
+ok  1. the intro film and the mentor: the first quests appear (13 s, at 13 s)
+ok  2. Cole walks up the beach into the fight with the Dilophosaurus (3 s, at 16 s)
+ok  3. the Dilophosauruses are killed and their nest destroyed (10 s, at 26 s)
+ok  4. Cole meets the Norseman at the question mark; he thanks and walks home (3 s, at 29 s)
+ok  5. Cole reaches the village: the barbarians inside turn hostile (3 s, at 32 s)
+ok  6. the barbarians in the first village are beaten (11 s, at 43 s)
+ok  7. Cole talks to the warriors at the gate: quest "Rescue from Dilophosauruses" done, the Norsemen join (34 s, at 77 s)
+ok  8. outside the village: the barbarians with the captured spearmen are seen (2 s, at 79 s)
+ok  9. the direct way: the barbarians attack (7 s, at 86 s)
+ok 10. the guards are beaten and the spearmen freed (18 s, at 104 s)
+ok 11. Cole finds Stina (sequence sc_1040); she joins (13 s, at 117 s)
+ok 12. the Smilodons around Stina are killed: quest "Stina's Rescue" done (5 s, at 122 s)
+ok 13. on to the Smilodon pride (10 s, at 132 s)
+ok 14. all Smilodons and their cave are destroyed (sequence sc_1050) (18 s, at 150 s)
+ok 15. Cole and Stina reach the prison (sequence sc_1060): Béla joins (9 s, at 159 s)
+ok 16. Béla frees the archers (10 s, at 169 s)
+ok 17. the guards of the prison camp are beaten (50 s, at 219 s)
+ok 18. Béla frees the workers: the camp is the player's (sequence sc_1071), the base phase starts (13 s, at 232 s)
+ok 19. the barbarian outpost is destroyed (side quest) (113 s, at 345 s)
+ok 20. the barbarian main base falls: its town centre is destroyed (23 s, at 368 s)
+ok 21. the final film ms_1120 and QUIT (6 s, at 374 s)
+ok no exception
+ok quest "Rescue from Dilophosauruses" accomplished, Norsemen joined the player (OCPY)
+ok quest "Liberation of the Spearmen" accomplished, the spearmen are the player's
+ok quest "Stina's Rescue" accomplished, Stina is the player's
+ok quest "Wild Cat Alert" accomplished
+ok quest "Béla's Rescue" accomplished, Béla is the player's
+ok quest "Liberation of Prisoners" accomplished: the player has buildings and workers
+ok the outpost's computer player was woken (AIBV Dodo): 1:Dodo attacks 1 2:Giraffe 3:Mikrobe 4:Mikrobe
+ok main quest "The Barbarian Threat": done
+ok QUIT: the mission is won
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Hu; game time 6 min; teleports 0; cheat kills 66; top-ups 0
+   triggers fired 198 of 313, 204 firings, 523 actions, warnings 0
+   quests: L01MQ00_never_let_=done L01MQ01_find_stina=done L01MQ01b_find_bela=done L01MQ02_vanish_the=done L01MQ03_help_hu_vs=done L01MQ04_free_spear=done L01MQ05_revenge_of=done L01MQ06_free_the_p=done L01SQ01_suprise_at=failed L01SQ02_find_all_a=hidden L01SQ03_repair_bui=open L01SQ04_Base_Basic=open L01SQ05_hu_outpost=done L01SQ06_Base_Enhan=hidden L01SQ07_Base_Fight=hidden L01MQ00b_coles_dea=hidden
+   sequences: ms_1000_1010@0 sc_1040@117 sc_1050@149 sc_1060@159 sc_1071@230 sc_1058_a@342 ms_1120@373
+   player: Bela_s0 x1, hu_warrior x5, hu_spearman x4, hu_archer x3, Cole_s0 x1, hu_worker x3, special_eusmilus x1; buildings hu_fireplace hu_palisade hu_palisade hu_palisade hu_palisade_gate hu_stone_cottage hu_palisade hu_palisade hu_palisade hu_palisade hu_stone_quarry hu_palisade hu_palisade hu_palisade hu_palisade hu_palisade hu_palisade_gate hu_palisade hu_palisade hu_palisade hu_palisade hu_palisade hu_palisade hu_palisade hu_tavern hu_palisade_gate hu_palisade hu_palisade hu_stone_cottage hu_palisade; res {"food":100,"wood":100,"stone":100,"skulls":510,"power":0}
+   brains: 1:Dodo attacks 1 2:Giraffe 3:Mikrobe 4:Mikrobe; diplomacy of player 0: 0=2 1=0 2=0 3=2 4=1

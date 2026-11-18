@@ -1,0 +1,21 @@
+{
+  "cfg": "base",
+  "mission": 3,
+  "tribe": "Aje",
+  "title": "Mission 3: Amazon Island",
+  "steps": 3,
+  "passed": 3,
+  "failedStep": null,
+  "over": true,
+  "won": true,
+  "finished": true,
+  "gameMinutes": 1.8,
+  "wallSeconds": 2,
+  "teleports": 0,
+  "cheatKills": 39,
+  "topUps": 0,
+  "triggerErrors": 0,
+  "fails": 0,
+  "exception": null,
+  "date": "2026-11-02"
+}

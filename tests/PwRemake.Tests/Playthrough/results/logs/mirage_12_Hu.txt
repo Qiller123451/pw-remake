@@ -1,0 +1,32 @@
+ok  1. the opening film sc_4025: quest "The Telescope Tower" (1 s, at 1 s)
+ok  2. the army reaches the tower ruin: it becomes the player's (15 s, at 16 s)
+ok  3. the workers repair the telescope tower while the army guards it: quest "The Telescope Tower", film sc_4030 (117 s, at 133 s)
+   teleport (army: hu_archer) to 723,267 at 133 s
+   teleport (army: special_eusmilus) to 723,267 at 133 s
+   teleport (army: Bela_s0) to 723,267 at 133 s
+ok  4. quest "The SEAS Storm" (7 s, at 140 s)
+   teleport (fleet: hu_dragon_boat) to 1270,724 at 394 s
+   teleport (army: hu_archer) to 758,161 at 427 s
+   teleport (army: hu_archer) to 758,161 at 427 s
+   teleport (army: special_eusmilus) to 758,161 at 427 s
+   teleport (army: Bela_s0) to 758,161 at 427 s
+   teleport (army: special_eusmilus) to 631,222 at 539 s
+   teleport (army: hu_archer) to 631,222 at 544 s
+   teleport (army: hu_archer) to 631,222 at 544 s
+   teleport (army: hu_archer) to 631,222 at 545 s
+   teleport (army: Cole_s0) to 631,222 at 545 s
+   teleport (army: hu_archer) to 631,222 at 546 s
+   teleport (army: Bela_s0) to 631,222 at 548 s
+   teleport (army: hu_archer) to 639,336 at 765 s
+ok  5. the fleet stops the carrier ships for 40 minutes: film sc_4038, the mission is won (2404 s, at 2544 s)
+ok no exception
+ok QUIT: the mission is won
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Hu (mission: Ninigi); game time 42 min; teleports 16; cheat kills 54; top-ups 0
+   triggers fired 116 of 195, 399 firings, 738 actions, warnings 0
+   quests: L12MQ01=done L12MQ02=hidden L12MQ03=done L12SQ01=open L12SQ02=open
+   sequences: sc_4025@1 sc_4030@138 sc_4027@176 sc_4038@2543
+   player: hu_transport_ship x1, hu_archer x4, hu_worker x10, Cole_s0 x1, special_eusmilus x1, Bela_s0 x1, hu_dragon_boat x12; buildings hu_arena hu_fireplace ninigi_telescope_tower_ruins ninigi_hunting_lodge hu_stone_quarry hu_stone_cottage hu_stone_cottage hu_stone_cottage; res {"food":480,"wood":400,"stone":1000,"skulls":1330,"power":0}
+   won: {"won":true,"text":""}
+   variables: Carrier=0 Turmstörer=2 Tower_Island=0; warships hu_dragon_boat hu_dragon_boat hu_dragon_boat hu_dragon_boat hu_dragon_boat hu_dragon_boat hu_dragon_boat hu_dragon_boat hu_dragon_boat hu_dragon_boat hu_dragon_boat hu_dragon_boat

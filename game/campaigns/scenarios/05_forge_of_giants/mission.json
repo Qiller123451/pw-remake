@@ -1,0 +1,3743 @@
+{
+ "id": 5,
+ "title": "The Forge of Giants",
+ "place": "The Frozen Reach",
+ "setting": "Icewaste",
+ "briefing": [
+  "In the Frozen Reach an enemy warlord has found the old forges of the giants, and he is using them. His smiths are building a Titan - and when it walks, nothing in the north will stand against it.",
+  "Three forges feed it. Every one you destroy sets the Titan back, and leaves it weaker. Break the forges, storm the fortress - or be ready when the Titan comes for you."
+ ],
+ "variants": {
+  "Hu": {
+   "0": {
+    "foeTribe": "SEAS",
+    "foe": {
+     "tribe": "SEAS",
+     "name": "The Warlord's SEAS",
+     "behaviour": "Turtle"
+    },
+    "models": [
+     "seas_rex",
+     "seas_mobile_suit",
+     "Bela_s0",
+     "hu_colossi",
+     "hu_mammoth",
+     "hu_rhino",
+     "Tarna_s0",
+     "Cole_s0",
+     "aje_tyrannosaurus",
+     "aje_brachiosaurus",
+     "aje_stegosaurus",
+     "aje_triceratops_archer",
+     "Miyagi_s0",
+     "hermit_s0",
+     "ninigi_kong",
+     "ninigi_seismosaurus",
+     "ninigi_triceratops",
+     "ninigi_sumo",
+     "lovelace_s0",
+     "seas_triceratops",
+     "hu_zombie_warrior",
+     "hu_undead_warrior",
+     "hu_zombie_archer",
+     "hu_zombie_killer",
+     "schliemann_zombie"
+    ],
+    "creatures": [
+     "Mammoth",
+     "Smilodon",
+     "Woolly_Rhino"
+    ],
+    "res": {
+     "food": 1000,
+     "wood": 1000,
+     "stone": 900
+    },
+    "epoch": 2,
+    "powers": [],
+    "map": {
+     "seed": 3505,
+     "setting": "Icewaste",
+     "size": 560,
+     "base": 7,
+     "noise": [
+      [
+       0.005,
+       8
+      ],
+      [
+       0.025,
+       1.4
+      ]
+     ],
+     "ground": [
+      0,
+      2,
+      4,
+      3,
+      6,
+      1
+     ],
+     "clear": [
+      [
+       -200,
+       200,
+       30
+      ],
+      [
+       190,
+       -190,
+       40
+      ],
+      [
+       -150,
+       -120,
+       20
+      ],
+      [
+       40,
+       -20,
+       20
+      ],
+      [
+       140,
+       110,
+       20
+      ]
+     ],
+     "features": [
+      {
+       "type": "flat",
+       "x": -200,
+       "z": 200,
+       "r": 60,
+       "h": 7
+      },
+      {
+       "type": "flat",
+       "x": 185,
+       "z": -185,
+       "r": 80,
+       "h": 10
+      },
+      {
+       "type": "ridge",
+       "path": [
+        [
+         -120,
+         40
+        ],
+        [
+         40,
+         160
+        ]
+       ],
+       "w": 40,
+       "h": 20
+      },
+      {
+       "type": "ridge",
+       "path": [
+        [
+         -40,
+         -160
+        ],
+        [
+         80,
+         -60
+        ]
+       ],
+       "w": 40,
+       "h": 18
+      }
+     ],
+     "places": [
+      {
+       "kind": "model",
+       "model": "northland_obelisk_02",
+       "x": -164,
+       "z": -132,
+       "rot": 0,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_04",
+       "x": -136,
+       "z": -132,
+       "rot": 0,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_03",
+       "x": 26,
+       "z": -32,
+       "rot": 1,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_05",
+       "x": 54,
+       "z": -32,
+       "rot": 1,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_04",
+       "x": 126,
+       "z": 98,
+       "rot": 2,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_06",
+       "x": 154,
+       "z": 98,
+       "rot": 2,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_skeleton",
+       "x": 0,
+       "z": 60,
+       "rot": 0,
+       "r": 4,
+       "block": false
+      }
+     ],
+     "forests": [
+      {
+       "x": -220,
+       "z": 60,
+       "r": 50,
+       "n": 30
+      },
+      {
+       "x": 60,
+       "z": 220,
+       "r": 50,
+       "n": 30
+      },
+      {
+       "x": -60,
+       "z": -230,
+       "r": 40,
+       "n": 20
+      },
+      {
+       "x": 230,
+       "z": 40,
+       "r": 40,
+       "n": 20
+      }
+     ],
+     "rocks": [
+      {
+       "x": 0,
+       "z": 0,
+       "r": 50,
+       "n": 16
+      }
+     ],
+     "resources": [
+      {
+       "x": -220,
+       "z": 160,
+       "stone": 8,
+       "food": 8,
+       "wood": 20
+      },
+      {
+       "x": -120,
+       "z": 230,
+       "stone": 4,
+       "food": 4,
+       "wood": 10
+      }
+     ],
+     "shrubs": 220
+    },
+    "start": {
+     "buildings": [
+      [
+       "hu_fireplace",
+       -200,
+       200,
+       0
+      ]
+     ],
+     "units": [
+      [
+       "hu_worker",
+       -208,
+       184,
+       8
+      ],
+      [
+       [
+        "Bela_s0"
+       ],
+       -190,
+       182,
+       1,
+       2
+      ],
+      [
+       [
+        "hu_warrior"
+       ],
+       -184,
+       192,
+       4,
+       2
+      ],
+      [
+       [
+        "hu_archer"
+       ],
+       -180,
+       186,
+       3,
+       2
+      ],
+      [
+       [
+        "hu_rhino",
+        "hu_mammoth"
+       ],
+       -216,
+       194,
+       1,
+       2
+      ]
+     ]
+    },
+    "titanAt": 900
+   },
+   "1": {
+    "foeTribe": "SEAS",
+    "foe": {
+     "tribe": "SEAS",
+     "name": "The Warlord's SEAS",
+     "behaviour": "Turtle"
+    },
+    "models": [
+     "seas_rex",
+     "seas_mobile_suit",
+     "Bela_s0",
+     "hu_colossi",
+     "hu_mammoth",
+     "hu_rhino",
+     "Tarna_s0",
+     "Cole_s0",
+     "aje_tyrannosaurus",
+     "aje_brachiosaurus",
+     "aje_stegosaurus",
+     "aje_triceratops_archer",
+     "Miyagi_s0",
+     "hermit_s0",
+     "ninigi_kong",
+     "ninigi_seismosaurus",
+     "ninigi_triceratops",
+     "ninigi_sumo",
+     "lovelace_s0",
+     "seas_triceratops",
+     "hu_zombie_warrior",
+     "hu_undead_warrior",
+     "hu_zombie_archer",
+     "hu_zombie_killer",
+     "schliemann_zombie"
+    ],
+    "creatures": [
+     "Mammoth",
+     "Smilodon",
+     "Woolly_Rhino"
+    ],
+    "res": {
+     "food": 1000,
+     "wood": 1000,
+     "stone": 900
+    },
+    "epoch": 2,
+    "powers": [],
+    "map": {
+     "seed": 3505,
+     "setting": "Icewaste",
+     "size": 560,
+     "base": 7,
+     "noise": [
+      [
+       0.005,
+       8
+      ],
+      [
+       0.025,
+       1.4
+      ]
+     ],
+     "ground": [
+      0,
+      2,
+      4,
+      3,
+      6,
+      1
+     ],
+     "clear": [
+      [
+       -200,
+       200,
+       30
+      ],
+      [
+       190,
+       -190,
+       40
+      ],
+      [
+       -150,
+       -120,
+       20
+      ],
+      [
+       40,
+       -20,
+       20
+      ],
+      [
+       140,
+       110,
+       20
+      ]
+     ],
+     "features": [
+      {
+       "type": "flat",
+       "x": -200,
+       "z": 200,
+       "r": 60,
+       "h": 7
+      },
+      {
+       "type": "flat",
+       "x": 185,
+       "z": -185,
+       "r": 80,
+       "h": 10
+      },
+      {
+       "type": "ridge",
+       "path": [
+        [
+         -120,
+         40
+        ],
+        [
+         40,
+         160
+        ]
+       ],
+       "w": 40,
+       "h": 20
+      },
+      {
+       "type": "ridge",
+       "path": [
+        [
+         -40,
+         -160
+        ],
+        [
+         80,
+         -60
+        ]
+       ],
+       "w": 40,
+       "h": 18
+      }
+     ],
+     "places": [
+      {
+       "kind": "model",
+       "model": "northland_obelisk_02",
+       "x": -164,
+       "z": -132,
+       "rot": 0,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_04",
+       "x": -136,
+       "z": -132,
+       "rot": 0,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_03",
+       "x": 26,
+       "z": -32,
+       "rot": 1,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_05",
+       "x": 54,
+       "z": -32,
+       "rot": 1,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_04",
+       "x": 126,
+       "z": 98,
+       "rot": 2,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_06",
+       "x": 154,
+       "z": 98,
+       "rot": 2,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_skeleton",
+       "x": 0,
+       "z": 60,
+       "rot": 0,
+       "r": 4,
+       "block": false
+      }
+     ],
+     "forests": [
+      {
+       "x": -220,
+       "z": 60,
+       "r": 50,
+       "n": 30
+      },
+      {
+       "x": 60,
+       "z": 220,
+       "r": 50,
+       "n": 30
+      },
+      {
+       "x": -60,
+       "z": -230,
+       "r": 40,
+       "n": 20
+      },
+      {
+       "x": 230,
+       "z": 40,
+       "r": 40,
+       "n": 20
+      }
+     ],
+     "rocks": [
+      {
+       "x": 0,
+       "z": 0,
+       "r": 50,
+       "n": 16
+      }
+     ],
+     "resources": [
+      {
+       "x": -220,
+       "z": 160,
+       "stone": 8,
+       "food": 8,
+       "wood": 20
+      },
+      {
+       "x": -120,
+       "z": 230,
+       "stone": 4,
+       "food": 4,
+       "wood": 10
+      }
+     ],
+     "shrubs": 220
+    },
+    "start": {
+     "buildings": [
+      [
+       "hu_fireplace",
+       -200,
+       200,
+       0
+      ]
+     ],
+     "units": [
+      [
+       "hu_worker",
+       -208,
+       184,
+       8
+      ],
+      [
+       [
+        "Bela_s0"
+       ],
+       -190,
+       182,
+       1,
+       2
+      ],
+      [
+       [
+        "hu_warrior"
+       ],
+       -184,
+       192,
+       4,
+       2
+      ],
+      [
+       [
+        "hu_archer"
+       ],
+       -180,
+       186,
+       3,
+       2
+      ],
+      [
+       [
+        "hu_rhino",
+        "hu_mammoth"
+       ],
+       -216,
+       194,
+       1,
+       2
+      ]
+     ]
+    },
+    "titanAt": 900
+   },
+   "2": {
+    "foeTribe": "SEAS",
+    "foe": {
+     "tribe": "SEAS",
+     "name": "The Warlord's SEAS",
+     "behaviour": "Turtle"
+    },
+    "models": [
+     "seas_rex",
+     "seas_mobile_suit",
+     "Bela_s0",
+     "hu_colossi",
+     "hu_mammoth",
+     "hu_rhino",
+     "Tarna_s0",
+     "Cole_s0",
+     "aje_tyrannosaurus",
+     "aje_brachiosaurus",
+     "aje_stegosaurus",
+     "aje_triceratops_archer",
+     "Miyagi_s0",
+     "hermit_s0",
+     "ninigi_kong",
+     "ninigi_seismosaurus",
+     "ninigi_triceratops",
+     "ninigi_sumo",
+     "lovelace_s0",
+     "seas_triceratops",
+     "hu_zombie_warrior",
+     "hu_undead_warrior",
+     "hu_zombie_archer",
+     "hu_zombie_killer",
+     "schliemann_zombie"
+    ],
+    "creatures": [
+     "Mammoth",
+     "Smilodon",
+     "Woolly_Rhino"
+    ],
+    "res": {
+     "food": 1000,
+     "wood": 1000,
+     "stone": 900
+    },
+    "epoch": 2,
+    "powers": [],
+    "map": {
+     "seed": 3505,
+     "setting": "Icewaste",
+     "size": 560,
+     "base": 7,
+     "noise": [
+      [
+       0.005,
+       8
+      ],
+      [
+       0.025,
+       1.4
+      ]
+     ],
+     "ground": [
+      0,
+      2,
+      4,
+      3,
+      6,
+      1
+     ],
+     "clear": [
+      [
+       -200,
+       200,
+       30
+      ],
+      [
+       190,
+       -190,
+       40
+      ],
+      [
+       -150,
+       -120,
+       20
+      ],
+      [
+       40,
+       -20,
+       20
+      ],
+      [
+       140,
+       110,
+       20
+      ]
+     ],
+     "features": [
+      {
+       "type": "flat",
+       "x": -200,
+       "z": 200,
+       "r": 60,
+       "h": 7
+      },
+      {
+       "type": "flat",
+       "x": 185,
+       "z": -185,
+       "r": 80,
+       "h": 10
+      },
+      {
+       "type": "ridge",
+       "path": [
+        [
+         -120,
+         40
+        ],
+        [
+         40,
+         160
+        ]
+       ],
+       "w": 40,
+       "h": 20
+      },
+      {
+       "type": "ridge",
+       "path": [
+        [
+         -40,
+         -160
+        ],
+        [
+         80,
+         -60
+        ]
+       ],
+       "w": 40,
+       "h": 18
+      }
+     ],
+     "places": [
+      {
+       "kind": "model",
+       "model": "northland_obelisk_02",
+       "x": -164,
+       "z": -132,
+       "rot": 0,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_04",
+       "x": -136,
+       "z": -132,
+       "rot": 0,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_03",
+       "x": 26,
+       "z": -32,
+       "rot": 1,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_05",
+       "x": 54,
+       "z": -32,
+       "rot": 1,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_04",
+       "x": 126,
+       "z": 98,
+       "rot": 2,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_06",
+       "x": 154,
+       "z": 98,
+       "rot": 2,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_skeleton",
+       "x": 0,
+       "z": 60,
+       "rot": 0,
+       "r": 4,
+       "block": false
+      }
+     ],
+     "forests": [
+      {
+       "x": -220,
+       "z": 60,
+       "r": 50,
+       "n": 30
+      },
+      {
+       "x": 60,
+       "z": 220,
+       "r": 50,
+       "n": 30
+      },
+      {
+       "x": -60,
+       "z": -230,
+       "r": 40,
+       "n": 20
+      },
+      {
+       "x": 230,
+       "z": 40,
+       "r": 40,
+       "n": 20
+      }
+     ],
+     "rocks": [
+      {
+       "x": 0,
+       "z": 0,
+       "r": 50,
+       "n": 16
+      }
+     ],
+     "resources": [
+      {
+       "x": -220,
+       "z": 160,
+       "stone": 8,
+       "food": 8,
+       "wood": 20
+      },
+      {
+       "x": -120,
+       "z": 230,
+       "stone": 4,
+       "food": 4,
+       "wood": 10
+      }
+     ],
+     "shrubs": 220
+    },
+    "start": {
+     "buildings": [
+      [
+       "hu_fireplace",
+       -200,
+       200,
+       0
+      ]
+     ],
+     "units": [
+      [
+       "hu_worker",
+       -208,
+       184,
+       8
+      ],
+      [
+       [
+        "Bela_s0"
+       ],
+       -190,
+       182,
+       1,
+       2
+      ],
+      [
+       [
+        "hu_warrior"
+       ],
+       -184,
+       192,
+       4,
+       2
+      ],
+      [
+       [
+        "hu_archer"
+       ],
+       -180,
+       186,
+       3,
+       2
+      ],
+      [
+       [
+        "hu_rhino",
+        "hu_mammoth"
+       ],
+       -216,
+       194,
+       1,
+       2
+      ]
+     ]
+    },
+    "titanAt": 720
+   }
+  },
+  "Aje": {
+   "0": {
+    "foeTribe": "SEAS",
+    "foe": {
+     "tribe": "SEAS",
+     "name": "The Warlord's SEAS",
+     "behaviour": "Turtle"
+    },
+    "models": [
+     "seas_rex",
+     "seas_mobile_suit",
+     "Bela_s0",
+     "hu_colossi",
+     "hu_mammoth",
+     "hu_rhino",
+     "Tarna_s0",
+     "Cole_s0",
+     "aje_tyrannosaurus",
+     "aje_brachiosaurus",
+     "aje_stegosaurus",
+     "aje_triceratops_archer",
+     "Miyagi_s0",
+     "hermit_s0",
+     "ninigi_kong",
+     "ninigi_seismosaurus",
+     "ninigi_triceratops",
+     "ninigi_sumo",
+     "lovelace_s0",
+     "seas_triceratops",
+     "hu_zombie_warrior",
+     "hu_undead_warrior",
+     "hu_zombie_archer",
+     "hu_zombie_killer",
+     "schliemann_zombie"
+    ],
+    "creatures": [
+     "Mammoth",
+     "Smilodon",
+     "Woolly_Rhino"
+    ],
+    "res": {
+     "food": 1000,
+     "wood": 1000,
+     "stone": 900
+    },
+    "epoch": 2,
+    "powers": [],
+    "map": {
+     "seed": 3505,
+     "setting": "Icewaste",
+     "size": 560,
+     "base": 7,
+     "noise": [
+      [
+       0.005,
+       8
+      ],
+      [
+       0.025,
+       1.4
+      ]
+     ],
+     "ground": [
+      0,
+      2,
+      4,
+      3,
+      6,
+      1
+     ],
+     "clear": [
+      [
+       -200,
+       200,
+       30
+      ],
+      [
+       190,
+       -190,
+       40
+      ],
+      [
+       -150,
+       -120,
+       20
+      ],
+      [
+       40,
+       -20,
+       20
+      ],
+      [
+       140,
+       110,
+       20
+      ]
+     ],
+     "features": [
+      {
+       "type": "flat",
+       "x": -200,
+       "z": 200,
+       "r": 60,
+       "h": 7
+      },
+      {
+       "type": "flat",
+       "x": 185,
+       "z": -185,
+       "r": 80,
+       "h": 10
+      },
+      {
+       "type": "ridge",
+       "path": [
+        [
+         -120,
+         40
+        ],
+        [
+         40,
+         160
+        ]
+       ],
+       "w": 40,
+       "h": 20
+      },
+      {
+       "type": "ridge",
+       "path": [
+        [
+         -40,
+         -160
+        ],
+        [
+         80,
+         -60
+        ]
+       ],
+       "w": 40,
+       "h": 18
+      }
+     ],
+     "places": [
+      {
+       "kind": "model",
+       "model": "northland_obelisk_02",
+       "x": -164,
+       "z": -132,
+       "rot": 0,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_04",
+       "x": -136,
+       "z": -132,
+       "rot": 0,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_03",
+       "x": 26,
+       "z": -32,
+       "rot": 1,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_05",
+       "x": 54,
+       "z": -32,
+       "rot": 1,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_04",
+       "x": 126,
+       "z": 98,
+       "rot": 2,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_06",
+       "x": 154,
+       "z": 98,
+       "rot": 2,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_skeleton",
+       "x": 0,
+       "z": 60,
+       "rot": 0,
+       "r": 4,
+       "block": false
+      }
+     ],
+     "forests": [
+      {
+       "x": -220,
+       "z": 60,
+       "r": 50,
+       "n": 30
+      },
+      {
+       "x": 60,
+       "z": 220,
+       "r": 50,
+       "n": 30
+      },
+      {
+       "x": -60,
+       "z": -230,
+       "r": 40,
+       "n": 20
+      },
+      {
+       "x": 230,
+       "z": 40,
+       "r": 40,
+       "n": 20
+      }
+     ],
+     "rocks": [
+      {
+       "x": 0,
+       "z": 0,
+       "r": 50,
+       "n": 16
+      }
+     ],
+     "resources": [
+      {
+       "x": -220,
+       "z": 160,
+       "stone": 8,
+       "food": 8,
+       "wood": 20
+      },
+      {
+       "x": -120,
+       "z": 230,
+       "stone": 4,
+       "food": 4,
+       "wood": 10
+      }
+     ],
+     "shrubs": 220
+    },
+    "start": {
+     "buildings": [],
+     "units": [
+      [
+       "aje_resource_collector",
+       -200,
+       200,
+       1
+      ],
+      [
+       "aje_worker",
+       -208,
+       184,
+       8
+      ],
+      [
+       [
+        "Tarna_s0",
+        "Cole_s0"
+       ],
+       -190,
+       182,
+       1,
+       2
+      ],
+      [
+       [
+        "aje_warrior"
+       ],
+       -184,
+       192,
+       4,
+       2
+      ],
+      [
+       [
+        "aje_archer"
+       ],
+       -180,
+       186,
+       3,
+       2
+      ],
+      [
+       [
+        "aje_stegosaurus",
+        "aje_triceratops_archer"
+       ],
+       -216,
+       194,
+       1,
+       2
+      ]
+     ]
+    },
+    "titanAt": 900
+   },
+   "1": {
+    "foeTribe": "SEAS",
+    "foe": {
+     "tribe": "SEAS",
+     "name": "The Warlord's SEAS",
+     "behaviour": "Turtle"
+    },
+    "models": [
+     "seas_rex",
+     "seas_mobile_suit",
+     "Bela_s0",
+     "hu_colossi",
+     "hu_mammoth",
+     "hu_rhino",
+     "Tarna_s0",
+     "Cole_s0",
+     "aje_tyrannosaurus",
+     "aje_brachiosaurus",
+     "aje_stegosaurus",
+     "aje_triceratops_archer",
+     "Miyagi_s0",
+     "hermit_s0",
+     "ninigi_kong",
+     "ninigi_seismosaurus",
+     "ninigi_triceratops",
+     "ninigi_sumo",
+     "lovelace_s0",
+     "seas_triceratops",
+     "hu_zombie_warrior",
+     "hu_undead_warrior",
+     "hu_zombie_archer",
+     "hu_zombie_killer",
+     "schliemann_zombie"
+    ],
+    "creatures": [
+     "Mammoth",
+     "Smilodon",
+     "Woolly_Rhino"
+    ],
+    "res": {
+     "food": 1000,
+     "wood": 1000,
+     "stone": 900
+    },
+    "epoch": 2,
+    "powers": [],
+    "map": {
+     "seed": 3505,
+     "setting": "Icewaste",
+     "size": 560,
+     "base": 7,
+     "noise": [
+      [
+       0.005,
+       8
+      ],
+      [
+       0.025,
+       1.4
+      ]
+     ],
+     "ground": [
+      0,
+      2,
+      4,
+      3,
+      6,
+      1
+     ],
+     "clear": [
+      [
+       -200,
+       200,
+       30
+      ],
+      [
+       190,
+       -190,
+       40
+      ],
+      [
+       -150,
+       -120,
+       20
+      ],
+      [
+       40,
+       -20,
+       20
+      ],
+      [
+       140,
+       110,
+       20
+      ]
+     ],
+     "features": [
+      {
+       "type": "flat",
+       "x": -200,
+       "z": 200,
+       "r": 60,
+       "h": 7
+      },
+      {
+       "type": "flat",
+       "x": 185,
+       "z": -185,
+       "r": 80,
+       "h": 10
+      },
+      {
+       "type": "ridge",
+       "path": [
+        [
+         -120,
+         40
+        ],
+        [
+         40,
+         160
+        ]
+       ],
+       "w": 40,
+       "h": 20
+      },
+      {
+       "type": "ridge",
+       "path": [
+        [
+         -40,
+         -160
+        ],
+        [
+         80,
+         -60
+        ]
+       ],
+       "w": 40,
+       "h": 18
+      }
+     ],
+     "places": [
+      {
+       "kind": "model",
+       "model": "northland_obelisk_02",
+       "x": -164,
+       "z": -132,
+       "rot": 0,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_04",
+       "x": -136,
+       "z": -132,
+       "rot": 0,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_03",
+       "x": 26,
+       "z": -32,
+       "rot": 1,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_05",
+       "x": 54,
+       "z": -32,
+       "rot": 1,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_04",
+       "x": 126,
+       "z": 98,
+       "rot": 2,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_06",
+       "x": 154,
+       "z": 98,
+       "rot": 2,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_skeleton",
+       "x": 0,
+       "z": 60,
+       "rot": 0,
+       "r": 4,
+       "block": false
+      }
+     ],
+     "forests": [
+      {
+       "x": -220,
+       "z": 60,
+       "r": 50,
+       "n": 30
+      },
+      {
+       "x": 60,
+       "z": 220,
+       "r": 50,
+       "n": 30
+      },
+      {
+       "x": -60,
+       "z": -230,
+       "r": 40,
+       "n": 20
+      },
+      {
+       "x": 230,
+       "z": 40,
+       "r": 40,
+       "n": 20
+      }
+     ],
+     "rocks": [
+      {
+       "x": 0,
+       "z": 0,
+       "r": 50,
+       "n": 16
+      }
+     ],
+     "resources": [
+      {
+       "x": -220,
+       "z": 160,
+       "stone": 8,
+       "food": 8,
+       "wood": 20
+      },
+      {
+       "x": -120,
+       "z": 230,
+       "stone": 4,
+       "food": 4,
+       "wood": 10
+      }
+     ],
+     "shrubs": 220
+    },
+    "start": {
+     "buildings": [],
+     "units": [
+      [
+       "aje_resource_collector",
+       -200,
+       200,
+       1
+      ],
+      [
+       "aje_worker",
+       -208,
+       184,
+       8
+      ],
+      [
+       [
+        "Tarna_s0",
+        "Cole_s0"
+       ],
+       -190,
+       182,
+       1,
+       2
+      ],
+      [
+       [
+        "aje_warrior"
+       ],
+       -184,
+       192,
+       4,
+       2
+      ],
+      [
+       [
+        "aje_archer"
+       ],
+       -180,
+       186,
+       3,
+       2
+      ],
+      [
+       [
+        "aje_stegosaurus",
+        "aje_triceratops_archer"
+       ],
+       -216,
+       194,
+       1,
+       2
+      ]
+     ]
+    },
+    "titanAt": 900
+   },
+   "2": {
+    "foeTribe": "SEAS",
+    "foe": {
+     "tribe": "SEAS",
+     "name": "The Warlord's SEAS",
+     "behaviour": "Turtle"
+    },
+    "models": [
+     "seas_rex",
+     "seas_mobile_suit",
+     "Bela_s0",
+     "hu_colossi",
+     "hu_mammoth",
+     "hu_rhino",
+     "Tarna_s0",
+     "Cole_s0",
+     "aje_tyrannosaurus",
+     "aje_brachiosaurus",
+     "aje_stegosaurus",
+     "aje_triceratops_archer",
+     "Miyagi_s0",
+     "hermit_s0",
+     "ninigi_kong",
+     "ninigi_seismosaurus",
+     "ninigi_triceratops",
+     "ninigi_sumo",
+     "lovelace_s0",
+     "seas_triceratops",
+     "hu_zombie_warrior",
+     "hu_undead_warrior",
+     "hu_zombie_archer",
+     "hu_zombie_killer",
+     "schliemann_zombie"
+    ],
+    "creatures": [
+     "Mammoth",
+     "Smilodon",
+     "Woolly_Rhino"
+    ],
+    "res": {
+     "food": 1000,
+     "wood": 1000,
+     "stone": 900
+    },
+    "epoch": 2,
+    "powers": [],
+    "map": {
+     "seed": 3505,
+     "setting": "Icewaste",
+     "size": 560,
+     "base": 7,
+     "noise": [
+      [
+       0.005,
+       8
+      ],
+      [
+       0.025,
+       1.4
+      ]
+     ],
+     "ground": [
+      0,
+      2,
+      4,
+      3,
+      6,
+      1
+     ],
+     "clear": [
+      [
+       -200,
+       200,
+       30
+      ],
+      [
+       190,
+       -190,
+       40
+      ],
+      [
+       -150,
+       -120,
+       20
+      ],
+      [
+       40,
+       -20,
+       20
+      ],
+      [
+       140,
+       110,
+       20
+      ]
+     ],
+     "features": [
+      {
+       "type": "flat",
+       "x": -200,
+       "z": 200,
+       "r": 60,
+       "h": 7
+      },
+      {
+       "type": "flat",
+       "x": 185,
+       "z": -185,
+       "r": 80,
+       "h": 10
+      },
+      {
+       "type": "ridge",
+       "path": [
+        [
+         -120,
+         40
+        ],
+        [
+         40,
+         160
+        ]
+       ],
+       "w": 40,
+       "h": 20
+      },
+      {
+       "type": "ridge",
+       "path": [
+        [
+         -40,
+         -160
+        ],
+        [
+         80,
+         -60
+        ]
+       ],
+       "w": 40,
+       "h": 18
+      }
+     ],
+     "places": [
+      {
+       "kind": "model",
+       "model": "northland_obelisk_02",
+       "x": -164,
+       "z": -132,
+       "rot": 0,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_04",
+       "x": -136,
+       "z": -132,
+       "rot": 0,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_03",
+       "x": 26,
+       "z": -32,
+       "rot": 1,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_05",
+       "x": 54,
+       "z": -32,
+       "rot": 1,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_04",
+       "x": 126,
+       "z": 98,
+       "rot": 2,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_06",
+       "x": 154,
+       "z": 98,
+       "rot": 2,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_skeleton",
+       "x": 0,
+       "z": 60,
+       "rot": 0,
+       "r": 4,
+       "block": false
+      }
+     ],
+     "forests": [
+      {
+       "x": -220,
+       "z": 60,
+       "r": 50,
+       "n": 30
+      },
+      {
+       "x": 60,
+       "z": 220,
+       "r": 50,
+       "n": 30
+      },
+      {
+       "x": -60,
+       "z": -230,
+       "r": 40,
+       "n": 20
+      },
+      {
+       "x": 230,
+       "z": 40,
+       "r": 40,
+       "n": 20
+      }
+     ],
+     "rocks": [
+      {
+       "x": 0,
+       "z": 0,
+       "r": 50,
+       "n": 16
+      }
+     ],
+     "resources": [
+      {
+       "x": -220,
+       "z": 160,
+       "stone": 8,
+       "food": 8,
+       "wood": 20
+      },
+      {
+       "x": -120,
+       "z": 230,
+       "stone": 4,
+       "food": 4,
+       "wood": 10
+      }
+     ],
+     "shrubs": 220
+    },
+    "start": {
+     "buildings": [],
+     "units": [
+      [
+       "aje_resource_collector",
+       -200,
+       200,
+       1
+      ],
+      [
+       "aje_worker",
+       -208,
+       184,
+       8
+      ],
+      [
+       [
+        "Tarna_s0",
+        "Cole_s0"
+       ],
+       -190,
+       182,
+       1,
+       2
+      ],
+      [
+       [
+        "aje_warrior"
+       ],
+       -184,
+       192,
+       4,
+       2
+      ],
+      [
+       [
+        "aje_archer"
+       ],
+       -180,
+       186,
+       3,
+       2
+      ],
+      [
+       [
+        "aje_stegosaurus",
+        "aje_triceratops_archer"
+       ],
+       -216,
+       194,
+       1,
+       2
+      ]
+     ]
+    },
+    "titanAt": 720
+   }
+  },
+  "Ninigi": {
+   "0": {
+    "foeTribe": "SEAS",
+    "foe": {
+     "tribe": "SEAS",
+     "name": "The Warlord's SEAS",
+     "behaviour": "Turtle"
+    },
+    "models": [
+     "seas_rex",
+     "seas_mobile_suit",
+     "Bela_s0",
+     "hu_colossi",
+     "hu_mammoth",
+     "hu_rhino",
+     "Tarna_s0",
+     "Cole_s0",
+     "aje_tyrannosaurus",
+     "aje_brachiosaurus",
+     "aje_stegosaurus",
+     "aje_triceratops_archer",
+     "Miyagi_s0",
+     "hermit_s0",
+     "ninigi_kong",
+     "ninigi_seismosaurus",
+     "ninigi_triceratops",
+     "ninigi_sumo",
+     "lovelace_s0",
+     "seas_triceratops",
+     "hu_zombie_warrior",
+     "hu_undead_warrior",
+     "hu_zombie_archer",
+     "hu_zombie_killer",
+     "schliemann_zombie"
+    ],
+    "creatures": [
+     "Mammoth",
+     "Smilodon",
+     "Woolly_Rhino"
+    ],
+    "res": {
+     "food": 1000,
+     "wood": 1000,
+     "stone": 900
+    },
+    "epoch": 2,
+    "powers": [],
+    "map": {
+     "seed": 3505,
+     "setting": "Icewaste",
+     "size": 560,
+     "base": 7,
+     "noise": [
+      [
+       0.005,
+       8
+      ],
+      [
+       0.025,
+       1.4
+      ]
+     ],
+     "ground": [
+      0,
+      2,
+      4,
+      3,
+      6,
+      1
+     ],
+     "clear": [
+      [
+       -200,
+       200,
+       30
+      ],
+      [
+       190,
+       -190,
+       40
+      ],
+      [
+       -150,
+       -120,
+       20
+      ],
+      [
+       40,
+       -20,
+       20
+      ],
+      [
+       140,
+       110,
+       20
+      ]
+     ],
+     "features": [
+      {
+       "type": "flat",
+       "x": -200,
+       "z": 200,
+       "r": 60,
+       "h": 7
+      },
+      {
+       "type": "flat",
+       "x": 185,
+       "z": -185,
+       "r": 80,
+       "h": 10
+      },
+      {
+       "type": "ridge",
+       "path": [
+        [
+         -120,
+         40
+        ],
+        [
+         40,
+         160
+        ]
+       ],
+       "w": 40,
+       "h": 20
+      },
+      {
+       "type": "ridge",
+       "path": [
+        [
+         -40,
+         -160
+        ],
+        [
+         80,
+         -60
+        ]
+       ],
+       "w": 40,
+       "h": 18
+      }
+     ],
+     "places": [
+      {
+       "kind": "model",
+       "model": "northland_obelisk_02",
+       "x": -164,
+       "z": -132,
+       "rot": 0,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_04",
+       "x": -136,
+       "z": -132,
+       "rot": 0,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_03",
+       "x": 26,
+       "z": -32,
+       "rot": 1,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_05",
+       "x": 54,
+       "z": -32,
+       "rot": 1,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_04",
+       "x": 126,
+       "z": 98,
+       "rot": 2,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_06",
+       "x": 154,
+       "z": 98,
+       "rot": 2,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_skeleton",
+       "x": 0,
+       "z": 60,
+       "rot": 0,
+       "r": 4,
+       "block": false
+      }
+     ],
+     "forests": [
+      {
+       "x": -220,
+       "z": 60,
+       "r": 50,
+       "n": 30
+      },
+      {
+       "x": 60,
+       "z": 220,
+       "r": 50,
+       "n": 30
+      },
+      {
+       "x": -60,
+       "z": -230,
+       "r": 40,
+       "n": 20
+      },
+      {
+       "x": 230,
+       "z": 40,
+       "r": 40,
+       "n": 20
+      }
+     ],
+     "rocks": [
+      {
+       "x": 0,
+       "z": 0,
+       "r": 50,
+       "n": 16
+      }
+     ],
+     "resources": [
+      {
+       "x": -220,
+       "z": 160,
+       "stone": 8,
+       "food": 8,
+       "wood": 20
+      },
+      {
+       "x": -120,
+       "z": 230,
+       "stone": 4,
+       "food": 4,
+       "wood": 10
+      }
+     ],
+     "shrubs": 220
+    },
+    "start": {
+     "buildings": [
+      [
+       "ninigi_fireplace",
+       -200,
+       200,
+       0
+      ]
+     ],
+     "units": [
+      [
+       "ninigi_worker",
+       -208,
+       184,
+       8
+      ],
+      [
+       [
+        "Miyagi_s0",
+        "hermit_s0"
+       ],
+       -190,
+       182,
+       1,
+       2
+      ],
+      [
+       [
+        "ninigi_warrior"
+       ],
+       -184,
+       192,
+       4,
+       2
+      ],
+      [
+       [
+        "ninigi_archer"
+       ],
+       -180,
+       186,
+       3,
+       2
+      ],
+      [
+       [
+        "ninigi_triceratops",
+        "ninigi_sumo"
+       ],
+       -216,
+       194,
+       1,
+       2
+      ]
+     ]
+    },
+    "titanAt": 900
+   },
+   "1": {
+    "foeTribe": "SEAS",
+    "foe": {
+     "tribe": "SEAS",
+     "name": "The Warlord's SEAS",
+     "behaviour": "Turtle"
+    },
+    "models": [
+     "seas_rex",
+     "seas_mobile_suit",
+     "Bela_s0",
+     "hu_colossi",
+     "hu_mammoth",
+     "hu_rhino",
+     "Tarna_s0",
+     "Cole_s0",
+     "aje_tyrannosaurus",
+     "aje_brachiosaurus",
+     "aje_stegosaurus",
+     "aje_triceratops_archer",
+     "Miyagi_s0",
+     "hermit_s0",
+     "ninigi_kong",
+     "ninigi_seismosaurus",
+     "ninigi_triceratops",
+     "ninigi_sumo",
+     "lovelace_s0",
+     "seas_triceratops",
+     "hu_zombie_warrior",
+     "hu_undead_warrior",
+     "hu_zombie_archer",
+     "hu_zombie_killer",
+     "schliemann_zombie"
+    ],
+    "creatures": [
+     "Mammoth",
+     "Smilodon",
+     "Woolly_Rhino"
+    ],
+    "res": {
+     "food": 1000,
+     "wood": 1000,
+     "stone": 900
+    },
+    "epoch": 2,
+    "powers": [],
+    "map": {
+     "seed": 3505,
+     "setting": "Icewaste",
+     "size": 560,
+     "base": 7,
+     "noise": [
+      [
+       0.005,
+       8
+      ],
+      [
+       0.025,
+       1.4
+      ]
+     ],
+     "ground": [
+      0,
+      2,
+      4,
+      3,
+      6,
+      1
+     ],
+     "clear": [
+      [
+       -200,
+       200,
+       30
+      ],
+      [
+       190,
+       -190,
+       40
+      ],
+      [
+       -150,
+       -120,
+       20
+      ],
+      [
+       40,
+       -20,
+       20
+      ],
+      [
+       140,
+       110,
+       20
+      ]
+     ],
+     "features": [
+      {
+       "type": "flat",
+       "x": -200,
+       "z": 200,
+       "r": 60,
+       "h": 7
+      },
+      {
+       "type": "flat",
+       "x": 185,
+       "z": -185,
+       "r": 80,
+       "h": 10
+      },
+      {
+       "type": "ridge",
+       "path": [
+        [
+         -120,
+         40
+        ],
+        [
+         40,
+         160
+        ]
+       ],
+       "w": 40,
+       "h": 20
+      },
+      {
+       "type": "ridge",
+       "path": [
+        [
+         -40,
+         -160
+        ],
+        [
+         80,
+         -60
+        ]
+       ],
+       "w": 40,
+       "h": 18
+      }
+     ],
+     "places": [
+      {
+       "kind": "model",
+       "model": "northland_obelisk_02",
+       "x": -164,
+       "z": -132,
+       "rot": 0,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_04",
+       "x": -136,
+       "z": -132,
+       "rot": 0,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_03",
+       "x": 26,
+       "z": -32,
+       "rot": 1,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_05",
+       "x": 54,
+       "z": -32,
+       "rot": 1,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_04",
+       "x": 126,
+       "z": 98,
+       "rot": 2,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_06",
+       "x": 154,
+       "z": 98,
+       "rot": 2,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_skeleton",
+       "x": 0,
+       "z": 60,
+       "rot": 0,
+       "r": 4,
+       "block": false
+      }
+     ],
+     "forests": [
+      {
+       "x": -220,
+       "z": 60,
+       "r": 50,
+       "n": 30
+      },
+      {
+       "x": 60,
+       "z": 220,
+       "r": 50,
+       "n": 30
+      },
+      {
+       "x": -60,
+       "z": -230,
+       "r": 40,
+       "n": 20
+      },
+      {
+       "x": 230,
+       "z": 40,
+       "r": 40,
+       "n": 20
+      }
+     ],
+     "rocks": [
+      {
+       "x": 0,
+       "z": 0,
+       "r": 50,
+       "n": 16
+      }
+     ],
+     "resources": [
+      {
+       "x": -220,
+       "z": 160,
+       "stone": 8,
+       "food": 8,
+       "wood": 20
+      },
+      {
+       "x": -120,
+       "z": 230,
+       "stone": 4,
+       "food": 4,
+       "wood": 10
+      }
+     ],
+     "shrubs": 220
+    },
+    "start": {
+     "buildings": [
+      [
+       "ninigi_fireplace",
+       -200,
+       200,
+       0
+      ]
+     ],
+     "units": [
+      [
+       "ninigi_worker",
+       -208,
+       184,
+       8
+      ],
+      [
+       [
+        "Miyagi_s0",
+        "hermit_s0"
+       ],
+       -190,
+       182,
+       1,
+       2
+      ],
+      [
+       [
+        "ninigi_warrior"
+       ],
+       -184,
+       192,
+       4,
+       2
+      ],
+      [
+       [
+        "ninigi_archer"
+       ],
+       -180,
+       186,
+       3,
+       2
+      ],
+      [
+       [
+        "ninigi_triceratops",
+        "ninigi_sumo"
+       ],
+       -216,
+       194,
+       1,
+       2
+      ]
+     ]
+    },
+    "titanAt": 900
+   },
+   "2": {
+    "foeTribe": "SEAS",
+    "foe": {
+     "tribe": "SEAS",
+     "name": "The Warlord's SEAS",
+     "behaviour": "Turtle"
+    },
+    "models": [
+     "seas_rex",
+     "seas_mobile_suit",
+     "Bela_s0",
+     "hu_colossi",
+     "hu_mammoth",
+     "hu_rhino",
+     "Tarna_s0",
+     "Cole_s0",
+     "aje_tyrannosaurus",
+     "aje_brachiosaurus",
+     "aje_stegosaurus",
+     "aje_triceratops_archer",
+     "Miyagi_s0",
+     "hermit_s0",
+     "ninigi_kong",
+     "ninigi_seismosaurus",
+     "ninigi_triceratops",
+     "ninigi_sumo",
+     "lovelace_s0",
+     "seas_triceratops",
+     "hu_zombie_warrior",
+     "hu_undead_warrior",
+     "hu_zombie_archer",
+     "hu_zombie_killer",
+     "schliemann_zombie"
+    ],
+    "creatures": [
+     "Mammoth",
+     "Smilodon",
+     "Woolly_Rhino"
+    ],
+    "res": {
+     "food": 1000,
+     "wood": 1000,
+     "stone": 900
+    },
+    "epoch": 2,
+    "powers": [],
+    "map": {
+     "seed": 3505,
+     "setting": "Icewaste",
+     "size": 560,
+     "base": 7,
+     "noise": [
+      [
+       0.005,
+       8
+      ],
+      [
+       0.025,
+       1.4
+      ]
+     ],
+     "ground": [
+      0,
+      2,
+      4,
+      3,
+      6,
+      1
+     ],
+     "clear": [
+      [
+       -200,
+       200,
+       30
+      ],
+      [
+       190,
+       -190,
+       40
+      ],
+      [
+       -150,
+       -120,
+       20
+      ],
+      [
+       40,
+       -20,
+       20
+      ],
+      [
+       140,
+       110,
+       20
+      ]
+     ],
+     "features": [
+      {
+       "type": "flat",
+       "x": -200,
+       "z": 200,
+       "r": 60,
+       "h": 7
+      },
+      {
+       "type": "flat",
+       "x": 185,
+       "z": -185,
+       "r": 80,
+       "h": 10
+      },
+      {
+       "type": "ridge",
+       "path": [
+        [
+         -120,
+         40
+        ],
+        [
+         40,
+         160
+        ]
+       ],
+       "w": 40,
+       "h": 20
+      },
+      {
+       "type": "ridge",
+       "path": [
+        [
+         -40,
+         -160
+        ],
+        [
+         80,
+         -60
+        ]
+       ],
+       "w": 40,
+       "h": 18
+      }
+     ],
+     "places": [
+      {
+       "kind": "model",
+       "model": "northland_obelisk_02",
+       "x": -164,
+       "z": -132,
+       "rot": 0,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_04",
+       "x": -136,
+       "z": -132,
+       "rot": 0,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_03",
+       "x": 26,
+       "z": -32,
+       "rot": 1,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_05",
+       "x": 54,
+       "z": -32,
+       "rot": 1,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_04",
+       "x": 126,
+       "z": 98,
+       "rot": 2,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_06",
+       "x": 154,
+       "z": 98,
+       "rot": 2,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_skeleton",
+       "x": 0,
+       "z": 60,
+       "rot": 0,
+       "r": 4,
+       "block": false
+      }
+     ],
+     "forests": [
+      {
+       "x": -220,
+       "z": 60,
+       "r": 50,
+       "n": 30
+      },
+      {
+       "x": 60,
+       "z": 220,
+       "r": 50,
+       "n": 30
+      },
+      {
+       "x": -60,
+       "z": -230,
+       "r": 40,
+       "n": 20
+      },
+      {
+       "x": 230,
+       "z": 40,
+       "r": 40,
+       "n": 20
+      }
+     ],
+     "rocks": [
+      {
+       "x": 0,
+       "z": 0,
+       "r": 50,
+       "n": 16
+      }
+     ],
+     "resources": [
+      {
+       "x": -220,
+       "z": 160,
+       "stone": 8,
+       "food": 8,
+       "wood": 20
+      },
+      {
+       "x": -120,
+       "z": 230,
+       "stone": 4,
+       "food": 4,
+       "wood": 10
+      }
+     ],
+     "shrubs": 220
+    },
+    "start": {
+     "buildings": [
+      [
+       "ninigi_fireplace",
+       -200,
+       200,
+       0
+      ]
+     ],
+     "units": [
+      [
+       "ninigi_worker",
+       -208,
+       184,
+       8
+      ],
+      [
+       [
+        "Miyagi_s0",
+        "hermit_s0"
+       ],
+       -190,
+       182,
+       1,
+       2
+      ],
+      [
+       [
+        "ninigi_warrior"
+       ],
+       -184,
+       192,
+       4,
+       2
+      ],
+      [
+       [
+        "ninigi_archer"
+       ],
+       -180,
+       186,
+       3,
+       2
+      ],
+      [
+       [
+        "ninigi_triceratops",
+        "ninigi_sumo"
+       ],
+       -216,
+       194,
+       1,
+       2
+      ]
+     ]
+    },
+    "titanAt": 720
+   }
+  },
+  "SEAS": {
+   "0": {
+    "foeTribe": "Hu",
+    "foe": {
+     "tribe": "Hu",
+     "name": "The Warlord's Norsemen",
+     "behaviour": "Turtle"
+    },
+    "models": [
+     "hu_colossi",
+     "hu_mammoth",
+     "Bela_s0",
+     "hu_rhino",
+     "Tarna_s0",
+     "Cole_s0",
+     "aje_tyrannosaurus",
+     "aje_brachiosaurus",
+     "aje_stegosaurus",
+     "aje_triceratops_archer",
+     "Miyagi_s0",
+     "hermit_s0",
+     "ninigi_kong",
+     "ninigi_seismosaurus",
+     "ninigi_triceratops",
+     "ninigi_sumo",
+     "lovelace_s0",
+     "seas_rex",
+     "seas_mobile_suit",
+     "seas_triceratops",
+     "hu_zombie_warrior",
+     "hu_undead_warrior",
+     "hu_zombie_archer",
+     "hu_zombie_killer",
+     "schliemann_zombie"
+    ],
+    "creatures": [
+     "Mammoth",
+     "Smilodon",
+     "Woolly_Rhino"
+    ],
+    "res": {
+     "food": 1000,
+     "wood": 1000,
+     "stone": 900
+    },
+    "epoch": 2,
+    "powers": [],
+    "map": {
+     "seed": 3505,
+     "setting": "Icewaste",
+     "size": 560,
+     "base": 7,
+     "noise": [
+      [
+       0.005,
+       8
+      ],
+      [
+       0.025,
+       1.4
+      ]
+     ],
+     "ground": [
+      0,
+      2,
+      4,
+      3,
+      6,
+      1
+     ],
+     "clear": [
+      [
+       -200,
+       200,
+       30
+      ],
+      [
+       190,
+       -190,
+       40
+      ],
+      [
+       -150,
+       -120,
+       20
+      ],
+      [
+       40,
+       -20,
+       20
+      ],
+      [
+       140,
+       110,
+       20
+      ]
+     ],
+     "features": [
+      {
+       "type": "flat",
+       "x": -200,
+       "z": 200,
+       "r": 60,
+       "h": 7
+      },
+      {
+       "type": "flat",
+       "x": 185,
+       "z": -185,
+       "r": 80,
+       "h": 10
+      },
+      {
+       "type": "ridge",
+       "path": [
+        [
+         -120,
+         40
+        ],
+        [
+         40,
+         160
+        ]
+       ],
+       "w": 40,
+       "h": 20
+      },
+      {
+       "type": "ridge",
+       "path": [
+        [
+         -40,
+         -160
+        ],
+        [
+         80,
+         -60
+        ]
+       ],
+       "w": 40,
+       "h": 18
+      }
+     ],
+     "places": [
+      {
+       "kind": "model",
+       "model": "northland_obelisk_02",
+       "x": -164,
+       "z": -132,
+       "rot": 0,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_04",
+       "x": -136,
+       "z": -132,
+       "rot": 0,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_03",
+       "x": 26,
+       "z": -32,
+       "rot": 1,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_05",
+       "x": 54,
+       "z": -32,
+       "rot": 1,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_04",
+       "x": 126,
+       "z": 98,
+       "rot": 2,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_06",
+       "x": 154,
+       "z": 98,
+       "rot": 2,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_skeleton",
+       "x": 0,
+       "z": 60,
+       "rot": 0,
+       "r": 4,
+       "block": false
+      }
+     ],
+     "forests": [
+      {
+       "x": -220,
+       "z": 60,
+       "r": 50,
+       "n": 30
+      },
+      {
+       "x": 60,
+       "z": 220,
+       "r": 50,
+       "n": 30
+      },
+      {
+       "x": -60,
+       "z": -230,
+       "r": 40,
+       "n": 20
+      },
+      {
+       "x": 230,
+       "z": 40,
+       "r": 40,
+       "n": 20
+      }
+     ],
+     "rocks": [
+      {
+       "x": 0,
+       "z": 0,
+       "r": 50,
+       "n": 16
+      }
+     ],
+     "resources": [
+      {
+       "x": -220,
+       "z": 160,
+       "stone": 8,
+       "food": 8,
+       "wood": 20
+      },
+      {
+       "x": -120,
+       "z": 230,
+       "stone": 4,
+       "food": 4,
+       "wood": 10
+      }
+     ],
+     "shrubs": 220
+    },
+    "start": {
+     "buildings": [
+      [
+       "seas_headquarters",
+       -200,
+       200,
+       0
+      ]
+     ],
+     "units": [
+      [
+       "seas_worker",
+       -208,
+       184,
+       8
+      ],
+      [
+       [
+        "lovelace_s0"
+       ],
+       -190,
+       182,
+       1,
+       2
+      ],
+      [
+       [
+        "seas_warrior"
+       ],
+       -184,
+       192,
+       4,
+       2
+      ],
+      [
+       [
+        "seas_gunner"
+       ],
+       -180,
+       186,
+       3,
+       2
+      ],
+      [
+       [
+        "seas_mobile_suit",
+        "seas_triceratops"
+       ],
+       -216,
+       194,
+       1,
+       2
+      ]
+     ]
+    },
+    "titanAt": 900
+   },
+   "1": {
+    "foeTribe": "Hu",
+    "foe": {
+     "tribe": "Hu",
+     "name": "The Warlord's Norsemen",
+     "behaviour": "Turtle"
+    },
+    "models": [
+     "hu_colossi",
+     "hu_mammoth",
+     "Bela_s0",
+     "hu_rhino",
+     "Tarna_s0",
+     "Cole_s0",
+     "aje_tyrannosaurus",
+     "aje_brachiosaurus",
+     "aje_stegosaurus",
+     "aje_triceratops_archer",
+     "Miyagi_s0",
+     "hermit_s0",
+     "ninigi_kong",
+     "ninigi_seismosaurus",
+     "ninigi_triceratops",
+     "ninigi_sumo",
+     "lovelace_s0",
+     "seas_rex",
+     "seas_mobile_suit",
+     "seas_triceratops",
+     "hu_zombie_warrior",
+     "hu_undead_warrior",
+     "hu_zombie_archer",
+     "hu_zombie_killer",
+     "schliemann_zombie"
+    ],
+    "creatures": [
+     "Mammoth",
+     "Smilodon",
+     "Woolly_Rhino"
+    ],
+    "res": {
+     "food": 1000,
+     "wood": 1000,
+     "stone": 900
+    },
+    "epoch": 2,
+    "powers": [],
+    "map": {
+     "seed": 3505,
+     "setting": "Icewaste",
+     "size": 560,
+     "base": 7,
+     "noise": [
+      [
+       0.005,
+       8
+      ],
+      [
+       0.025,
+       1.4
+      ]
+     ],
+     "ground": [
+      0,
+      2,
+      4,
+      3,
+      6,
+      1
+     ],
+     "clear": [
+      [
+       -200,
+       200,
+       30
+      ],
+      [
+       190,
+       -190,
+       40
+      ],
+      [
+       -150,
+       -120,
+       20
+      ],
+      [
+       40,
+       -20,
+       20
+      ],
+      [
+       140,
+       110,
+       20
+      ]
+     ],
+     "features": [
+      {
+       "type": "flat",
+       "x": -200,
+       "z": 200,
+       "r": 60,
+       "h": 7
+      },
+      {
+       "type": "flat",
+       "x": 185,
+       "z": -185,
+       "r": 80,
+       "h": 10
+      },
+      {
+       "type": "ridge",
+       "path": [
+        [
+         -120,
+         40
+        ],
+        [
+         40,
+         160
+        ]
+       ],
+       "w": 40,
+       "h": 20
+      },
+      {
+       "type": "ridge",
+       "path": [
+        [
+         -40,
+         -160
+        ],
+        [
+         80,
+         -60
+        ]
+       ],
+       "w": 40,
+       "h": 18
+      }
+     ],
+     "places": [
+      {
+       "kind": "model",
+       "model": "northland_obelisk_02",
+       "x": -164,
+       "z": -132,
+       "rot": 0,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_04",
+       "x": -136,
+       "z": -132,
+       "rot": 0,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_03",
+       "x": 26,
+       "z": -32,
+       "rot": 1,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_05",
+       "x": 54,
+       "z": -32,
+       "rot": 1,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_04",
+       "x": 126,
+       "z": 98,
+       "rot": 2,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_06",
+       "x": 154,
+       "z": 98,
+       "rot": 2,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_skeleton",
+       "x": 0,
+       "z": 60,
+       "rot": 0,
+       "r": 4,
+       "block": false
+      }
+     ],
+     "forests": [
+      {
+       "x": -220,
+       "z": 60,
+       "r": 50,
+       "n": 30
+      },
+      {
+       "x": 60,
+       "z": 220,
+       "r": 50,
+       "n": 30
+      },
+      {
+       "x": -60,
+       "z": -230,
+       "r": 40,
+       "n": 20
+      },
+      {
+       "x": 230,
+       "z": 40,
+       "r": 40,
+       "n": 20
+      }
+     ],
+     "rocks": [
+      {
+       "x": 0,
+       "z": 0,
+       "r": 50,
+       "n": 16
+      }
+     ],
+     "resources": [
+      {
+       "x": -220,
+       "z": 160,
+       "stone": 8,
+       "food": 8,
+       "wood": 20
+      },
+      {
+       "x": -120,
+       "z": 230,
+       "stone": 4,
+       "food": 4,
+       "wood": 10
+      }
+     ],
+     "shrubs": 220
+    },
+    "start": {
+     "buildings": [
+      [
+       "seas_headquarters",
+       -200,
+       200,
+       0
+      ]
+     ],
+     "units": [
+      [
+       "seas_worker",
+       -208,
+       184,
+       8
+      ],
+      [
+       [
+        "lovelace_s0"
+       ],
+       -190,
+       182,
+       1,
+       2
+      ],
+      [
+       [
+        "seas_warrior"
+       ],
+       -184,
+       192,
+       4,
+       2
+      ],
+      [
+       [
+        "seas_gunner"
+       ],
+       -180,
+       186,
+       3,
+       2
+      ],
+      [
+       [
+        "seas_mobile_suit",
+        "seas_triceratops"
+       ],
+       -216,
+       194,
+       1,
+       2
+      ]
+     ]
+    },
+    "titanAt": 900
+   },
+   "2": {
+    "foeTribe": "Hu",
+    "foe": {
+     "tribe": "Hu",
+     "name": "The Warlord's Norsemen",
+     "behaviour": "Turtle"
+    },
+    "models": [
+     "hu_colossi",
+     "hu_mammoth",
+     "Bela_s0",
+     "hu_rhino",
+     "Tarna_s0",
+     "Cole_s0",
+     "aje_tyrannosaurus",
+     "aje_brachiosaurus",
+     "aje_stegosaurus",
+     "aje_triceratops_archer",
+     "Miyagi_s0",
+     "hermit_s0",
+     "ninigi_kong",
+     "ninigi_seismosaurus",
+     "ninigi_triceratops",
+     "ninigi_sumo",
+     "lovelace_s0",
+     "seas_rex",
+     "seas_mobile_suit",
+     "seas_triceratops",
+     "hu_zombie_warrior",
+     "hu_undead_warrior",
+     "hu_zombie_archer",
+     "hu_zombie_killer",
+     "schliemann_zombie"
+    ],
+    "creatures": [
+     "Mammoth",
+     "Smilodon",
+     "Woolly_Rhino"
+    ],
+    "res": {
+     "food": 1000,
+     "wood": 1000,
+     "stone": 900
+    },
+    "epoch": 2,
+    "powers": [],
+    "map": {
+     "seed": 3505,
+     "setting": "Icewaste",
+     "size": 560,
+     "base": 7,
+     "noise": [
+      [
+       0.005,
+       8
+      ],
+      [
+       0.025,
+       1.4
+      ]
+     ],
+     "ground": [
+      0,
+      2,
+      4,
+      3,
+      6,
+      1
+     ],
+     "clear": [
+      [
+       -200,
+       200,
+       30
+      ],
+      [
+       190,
+       -190,
+       40
+      ],
+      [
+       -150,
+       -120,
+       20
+      ],
+      [
+       40,
+       -20,
+       20
+      ],
+      [
+       140,
+       110,
+       20
+      ]
+     ],
+     "features": [
+      {
+       "type": "flat",
+       "x": -200,
+       "z": 200,
+       "r": 60,
+       "h": 7
+      },
+      {
+       "type": "flat",
+       "x": 185,
+       "z": -185,
+       "r": 80,
+       "h": 10
+      },
+      {
+       "type": "ridge",
+       "path": [
+        [
+         -120,
+         40
+        ],
+        [
+         40,
+         160
+        ]
+       ],
+       "w": 40,
+       "h": 20
+      },
+      {
+       "type": "ridge",
+       "path": [
+        [
+         -40,
+         -160
+        ],
+        [
+         80,
+         -60
+        ]
+       ],
+       "w": 40,
+       "h": 18
+      }
+     ],
+     "places": [
+      {
+       "kind": "model",
+       "model": "northland_obelisk_02",
+       "x": -164,
+       "z": -132,
+       "rot": 0,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_04",
+       "x": -136,
+       "z": -132,
+       "rot": 0,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_03",
+       "x": 26,
+       "z": -32,
+       "rot": 1,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_05",
+       "x": 54,
+       "z": -32,
+       "rot": 1,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_04",
+       "x": 126,
+       "z": 98,
+       "rot": 2,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_obelisk_06",
+       "x": 154,
+       "z": 98,
+       "rot": 2,
+       "r": 3
+      },
+      {
+       "kind": "model",
+       "model": "northland_skeleton",
+       "x": 0,
+       "z": 60,
+       "rot": 0,
+       "r": 4,
+       "block": false
+      }
+     ],
+     "forests": [
+      {
+       "x": -220,
+       "z": 60,
+       "r": 50,
+       "n": 30
+      },
+      {
+       "x": 60,
+       "z": 220,
+       "r": 50,
+       "n": 30
+      },
+      {
+       "x": -60,
+       "z": -230,
+       "r": 40,
+       "n": 20
+      },
+      {
+       "x": 230,
+       "z": 40,
+       "r": 40,
+       "n": 20
+      }
+     ],
+     "rocks": [
+      {
+       "x": 0,
+       "z": 0,
+       "r": 50,
+       "n": 16
+      }
+     ],
+     "resources": [
+      {
+       "x": -220,
+       "z": 160,
+       "stone": 8,
+       "food": 8,
+       "wood": 20
+      },
+      {
+       "x": -120,
+       "z": 230,
+       "stone": 4,
+       "food": 4,
+       "wood": 10
+      }
+     ],
+     "shrubs": 220
+    },
+    "start": {
+     "buildings": [
+      [
+       "seas_headquarters",
+       -200,
+       200,
+       0
+      ]
+     ],
+     "units": [
+      [
+       "seas_worker",
+       -208,
+       184,
+       8
+      ],
+      [
+       [
+        "lovelace_s0"
+       ],
+       -190,
+       182,
+       1,
+       2
+      ],
+      [
+       [
+        "seas_warrior"
+       ],
+       -184,
+       192,
+       4,
+       2
+      ],
+      [
+       [
+        "seas_gunner"
+       ],
+       -180,
+       186,
+       3,
+       2
+      ],
+      [
+       [
+        "seas_mobile_suit",
+        "seas_triceratops"
+       ],
+       -216,
+       194,
+       1,
+       2
+      ]
+     ]
+    },
+    "titanAt": 720
+   }
+  }
+ }
+}

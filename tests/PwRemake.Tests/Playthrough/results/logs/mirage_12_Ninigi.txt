@@ -1,0 +1,42 @@
+ok  1. the opening film sc_4025: quest "The Telescope Tower" (1 s, at 1 s)
+ok  2. the army reaches the tower ruin: it becomes the player's (15 s, at 16 s)
+ok  3. the workers repair the telescope tower while the army guards it: quest "The Telescope Tower", film sc_4030 (118 s, at 134 s)
+   teleport (army: ninigi_archer) to 724,269 at 134 s
+   teleport (army: special_eusmilus) to 724,269 at 134 s
+   teleport (army: Bela_s0) to 724,269 at 134 s
+ok  4. quest "The SEAS Storm" (6 s, at 140 s)
+   teleport (army: ninigi_archer) to 736,153 at 360 s
+   teleport (army: ninigi_archer) to 736,153 at 360 s
+   teleport (army: Cole_s0) to 736,153 at 360 s
+   teleport (army: Bela_s0) to 736,153 at 360 s
+   teleport (army: ninigi_archer) to 642,340 at 577 s
+   teleport (army: ninigi_archer) to 642,340 at 577 s
+   teleport (army: ninigi_archer) to 642,340 at 577 s
+   teleport (army: ninigi_archer) to 634,333 at 761 s
+   teleport (army: ninigi_archer) to 742,151 at 1044 s
+   teleport (army: ninigi_archer) to 742,151 at 1044 s
+   teleport (army: special_eusmilus) to 742,151 at 1044 s
+   teleport (army: ninigi_archer) to 634,334 at 1338 s
+   teleport (army: ninigi_archer) to 634,334 at 1338 s
+   teleport (army: Cole_s0) to 634,334 at 1338 s
+   teleport (army: ninigi_archer) to 641,331 at 1429 s
+   teleport (army: ninigi_archer) to 641,331 at 1429 s
+   teleport (army: special_eusmilus) to 724,269 at 1534 s
+   teleport (army: Bela_s0) to 724,269 at 1534 s
+   teleport (army: ninigi_archer) to 634,334 at 2143 s
+   teleport (army: ninigi_archer) to 634,334 at 2143 s
+   teleport (army: ninigi_archer) to 638,316 at 2214 s
+   teleport (army: ninigi_archer) to 638,316 at 2215 s
+   teleport (army: ninigi_archer) to 724,269 at 2226 s
+ok  5. the fleet stops the carrier ships for 40 minutes: film sc_4038, the mission is won (2404 s, at 2544 s)
+ok no exception
+ok QUIT: the mission is won
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Ninigi; game time 42 min; teleports 26; cheat kills 34; top-ups 0
+   triggers fired 129 of 195, 425 firings, 789 actions, warnings 0
+   quests: L12MQ01=done L12MQ02=hidden L12MQ03=done L12SQ01=open L12SQ02=open
+   sequences: sc_4025@1 sc_4030@138 sc_4027@176 sc_4038@2543
+   player: ninigi_archer x4, ninigi_worker x7, Cole_s0 x1, special_eusmilus x1, Bela_s0 x1, ninigi_fire_boat x6; buildings ninigi_dojo ninigi_fireplace ninigi_telescope_tower_ruins ninigi_hunting_lodge ninigi_stone_quarry ninigi_lumbermill ninigi_paddy ninigi_engineer ninigi_harbour; res {"food":515,"wood":1000,"stone":300,"skulls":1315,"power":0}
+   won: {"won":true,"text":""}
+   variables: Carrier=1 Turmstörer=2 Tower_Island=0; warships ninigi_fire_boat ninigi_fire_boat ninigi_fire_boat ninigi_fire_boat ninigi_fire_boat ninigi_fire_boat

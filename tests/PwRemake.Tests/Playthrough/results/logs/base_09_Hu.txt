@@ -1,0 +1,44 @@
+ok  1. the opening film ms_3010: quests "A dangerous Path" and "Survival of the Fittest" (1 s, at 1 s)
+ok  2. the heroes follow the path to the bridge: sequence sc_3025 (the bridge breaks) (64 s, at 65 s)
+ok  3. the heroes reach the Dragon Clan village: dialogue ds_3020, quest "Rescue Mission" (29 s, at 94 s)
+ok  4. the Barbarians attacking the village are beaten: quest "Rescue Mission", sequence sc_3030, the village joins (40 s, at 134 s)
+ok  5. quest "Hunting the Looters" (0 s, at 134 s)
+   teleport (army: hu_warrior) to 177,818 at 205 s
+   teleport (army: hu_warrior) to 246,403 at 206 s
+   teleport (army: Cole_s0) to 716,610 at 207 s
+   teleport (army: hu_warrior) to 716,610 at 207 s
+ok  6. the three parts of the wreck are fetched from the Barbarian altars (74 s, at 208 s)
+ok  7. the airplane is cleared and a tower stands next to it: quest "The Bird of Steel", sequence sc_3033 (73 s, at 281 s)
+ok  8. the film sc_3033: quest "A dangerous Path" accomplished, the launch ramp is the player's (2 s, at 283 s)
+   teleport (army: special_eusmilus) to 748,314 at 421 s
+   teleport (army: Bela_s0) to 748,314 at 422 s
+   teleport (army: hu_warrior) to 748,314 at 422 s
+   teleport (army: Cole_s0) to 748,314 at 476 s
+   teleport (army: special_eusmilus) to 748,314 at 481 s
+   teleport (army: Bela_s0) to 748,314 at 482 s
+   teleport (army: hu_warrior) to 748,314 at 482 s
+   teleport (army: Cole_s0) to 748,314 at 537 s
+   teleport (army: special_eusmilus) to 748,314 at 785 s
+   teleport (army: Bela_s0) to 748,314 at 787 s
+   teleport (army: Cole_s0) to 748,314 at 787 s
+   teleport (army: hu_warrior) to 748,314 at 834 s
+   teleport (army: Bela_s0) to 748,314 at 1078 s
+   teleport (army: special_eusmilus) to 748,314 at 1080 s
+   teleport (army: hu_warrior) to 748,314 at 1082 s
+   teleport (army: Cole_s0) to 748,314 at 1083 s
+   teleport (army: Bela_s0) to 748,314 at 1339 s
+   teleport (army: Cole_s0) to 748,314 at 1343 s
+   teleport (army: special_eusmilus) to 748,314 at 1343 s
+   teleport (army: hu_warrior) to 748,314 at 1343 s
+ok  9. the workers build the launch ramp while the army guards it: quest "Prepare for Start" (1171 s, at 1454 s)
+ok 10. the film ms_3040 ends the mission (2 s, at 1456 s)
+ok no exception
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Hu (mission: Ninigi); game time 24 min; teleports 24; cheat kills 152; top-ups 0
+   triggers fired 98 of 118, 155 firings, 469 actions, warnings 0
+   quests: L09MQ01=done L09MQ03=done L09MQ02=done L09MQ04=done L09MQ05=done L09MQ06=done L09SQ01=failed L09SQ02=failed
+   sequences: ms_3010@0 sc_3025@64 sc_3030@130 sc_3033@282 ms_3040@1455
+   player: ninigi_harvester x1, Bela_s0 x1, Cole_s0 x1, special_eusmilus x1, hu_worker x8, hu_warrior x6, hu_archer x2, hu_druid x1; buildings carrier_launch_pad ninigi_hunting_lodge hu_small_tower hu_arena hu_lumberjack_cottage hu_stone_quarry hu_temple hu_corn_field hu_fireplace hu_warehouse hu_corn_field hu_small_animal_farm hu_harbour; res {"food":500,"wood":900,"stone":800,"skulls":1398,"power":0}
+   won: {"won":true,"text":""}
+   variables: parts_collected=4 mq03_done=1 mq05_done=1 mq06_done=1 reinforcements=1

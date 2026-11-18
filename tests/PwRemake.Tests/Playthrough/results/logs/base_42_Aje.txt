@@ -1,0 +1,21 @@
+ok  1. the opening film sb4201: quests "The Archeologist" and "The Devil's Right Hand" (4 s, at 4 s)
+ok  2. the survivors are rescued from the sabre-tooth cats: dialogue db_4203, they join (Gc03) (60 s, at 64 s)
+ok  3. the party reaches the excavation: dialogue db_4205, quest "The Devil's Left Hand" (70 s, at 134 s)
+ok  4. the pirates are beaten, the film sb4206 gives the player Kleemann's expedition: quest "The Archeologist" (32 s, at 166 s)
+ok  5. quest "The Chevaliers of Fortune" (0 s, at 166 s)
+ok  6. the party crosses the ice caves to the riddle room: film sb4223 (353 s, at 519 s)
+ok  7. Kleemann steps on the five panels of the pentacle in order: the gate opens (dialogue db_4224, quest "The Chevaliers of Fortune") (33 s, at 552 s)
+ok  8. the film sb4225: quest "No Sweet without Sweat" (4 s, at 556 s)
+ok  9. the Avatar is beaten: quests "No Sweet without Sweat", "The Devil's Right / Left Hand" (8 s, at 564 s)
+ok 10. the film hb4229 ends the mission (quit) (2 s, at 566 s)
+ok no exception
+ok the mission is won
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Aje (mission: Hu); game time 9 min; teleports 0; cheat kills 49; top-ups 0
+   triggers fired 103 of 233, 103 firings, 285 actions, warnings 0
+   quests: LB42MQ01=done LB42MQ02=done LB42MQ03=done LB42MQ04=done LB42MQ05=done LB42SQ01=failed
+   sequences: 
+   player: schliemann_s0 x1, aje_flamethrower x4, livingstone_s0 x1, aje_rammer x4, aje_warrior x4, aje_shaman x1; buildings ; res {"food":200,"wood":150,"stone":100,"skulls":1324,"power":0}
+   won: {"won":true,"text":""}
+   variables: mq01_done=1 mq04_done=1 mq05_done=1 panel01=1 panel02=1 panel03=1 panel04=1 panel05=1 avatar_dead=1 red_runes=0 yellow_runes=0 blue_runes=0

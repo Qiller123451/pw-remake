@@ -1,0 +1,64 @@
+ok  1. the opening film sc_7010: quest "The Core of the Problem" (1 s, at 1 s)
+   teleport (army: hu_chariot) to 380,722 at 86 s
+   teleport (army: special_eusmilus) to 380,722 at 90 s
+   teleport (army: hu_chariot) to 380,722 at 90 s
+ok  2. the army reaches the first pumping station: film ms_7026, quest "Countdown of Death" (92 s, at 93 s)
+   teleport (army: hu_chariot) to 458,696 at 94 s
+   teleport (guard1: hu_warrior) to 456,689 at 239 s
+   teleport (guard1: hu_warrior) to 456,689 at 239 s
+   teleport (army: hu_spearman) to 608,551 at 301 s
+   teleport (army: Bela_s0) to 408,464 at 370 s
+   teleport (army: Cole_s0) to 408,464 at 370 s
+   teleport (army: hu_spearman) to 408,464 at 370 s
+   teleport (army: hu_warrior) to 408,464 at 370 s
+   teleport (army: hu_warrior) to 408,464 at 370 s
+   teleport (army: hu_warrior) to 408,464 at 370 s
+   teleport (army: hu_warrior) to 408,464 at 370 s
+   teleport (army: hu_warrior) to 408,464 at 370 s
+   teleport (army: hu_warrior) to 408,464 at 370 s
+   teleport (army: hu_archer) to 408,464 at 370 s
+   teleport (army: hu_warrior) to 408,464 at 370 s
+   teleport (army: hu_warrior) to 408,464 at 370 s
+   teleport (army: hu_spearman) to 408,464 at 370 s
+   teleport (guard2: hu_spearman) to 808,701 at 371 s
+   teleport (army: hu_warrior) to 408,464 at 371 s
+   teleport (army: hu_warrior) to 408,464 at 371 s
+   teleport (army: hu_warrior) to 408,464 at 371 s
+   teleport (army: hu_spearman) to 408,464 at 371 s
+   teleport (guard1: hu_warrior) to 456,689 at 375 s
+   teleport (guard1: hu_warrior) to 456,689 at 484 s
+   teleport (guard4: hu_warrior) to 424,460 at 520 s
+   teleport (guard2: hu_spearman) to 792,688 at 562 s
+   teleport (army: hu_warrior) to 457,694 at 569 s
+   teleport (army: hu_warrior) to 457,694 at 569 s
+   teleport (army: hu_warrior) to 458,693 at 570 s
+   teleport (army: hu_warrior) to 401,462 at 589 s
+   teleport (army: hu_warrior) to 559,724 at 600 s
+   teleport (guard2: hu_chariot) to 792,688 at 631 s
+   teleport (guard2: hu_spearman) to 792,688 at 656 s
+   teleport (army: hu_warrior) to 765,449 at 674 s
+   teleport (army: hu_archer) to 772,450 at 675 s
+   teleport (army: hu_warrior) to 772,450 at 675 s
+   teleport (army: hu_archer) to 772,450 at 675 s
+ok  3. the five pumping stations are taken and held: the countdown stops, sequence sc_7040 (quest "Countdown of Death") (604 s, at 697 s)
+   teleport (heroes: tesla_s0) to 623,138 at 780 s
+   teleport (guard2: hu_chariot) to 792,688 at 786 s
+   teleport (guard2: hu_spearman) to 792,688 at 786 s
+ok  4. Béla, Cole, Stina and Taslow walk into the crater: quest "The Core of the Problem" (118 s, at 815 s)
+ok  5. the film sc_7041 ends the mission (4 s, at 819 s)
+ok no exception
+ok QUIT: the mission is won
+   hero Bela_s0: alive True parked False inside False at (624, 140) task idle
+   hero Cole_s0: alive True parked False inside False at (621, 140) task idle
+   hero special_eusmilus: alive True parked False inside False at (623, 140) task idle
+   hero tesla_s0: alive True parked False inside False at (623, 139) task idle
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Hu; game time 14 min; teleports 43; cheat kills 327; top-ups 7
+   triggers fired 107 of 161, 152 firings, 670 actions, warnings 0
+   quests: L15MQ01=done L15MQ02=done L15SQ01=done L15SQ02=failed L15SQ03=failed
+   sequences: sc_7010@0 ms_7026@87 sc_7030_a@98 sc_7038@369 sc_7040@696 sc_7041@818
+   player: tesla_s0 x1, lovelace_s0 x1, hu_warrior x10, hu_worker x11, Bela_s0 x1, Cole_s0 x1, special_eusmilus x1, hu_chariot x1, hu_spearman x2, hu_archer x4; buildings hu_fireplace hu_stone_cottage hu_arena hu_stone_cottage hu_stone_cottage hu_stone_cottage hu_stone_cottage; res {"food":360,"wood":520,"stone":800,"skulls":3569,"power":0}
+   won: {"won":true,"text":""}
+   population 33/45, epoch 2
+   variables: ctrlpts=5 ctrlpt01=1 ctrlpt02=1 ctrlpt03=1 ctrlpt04=1 ctrlpt05=1 cntdwn_aborted=1 blocker=0

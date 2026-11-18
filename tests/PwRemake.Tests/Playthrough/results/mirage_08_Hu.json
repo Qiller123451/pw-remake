@@ -1,0 +1,21 @@
+{
+  "cfg": "mirage",
+  "mission": 8,
+  "tribe": "Hu",
+  "title": "Mission 8: Valley of the Gods",
+  "steps": 14,
+  "passed": 14,
+  "failedStep": null,
+  "over": true,
+  "won": true,
+  "finished": true,
+  "gameMinutes": 6.4,
+  "wallSeconds": 9,
+  "teleports": 0,
+  "cheatKills": 147,
+  "topUps": 0,
+  "triggerErrors": 0,
+  "fails": 0,
+  "exception": null,
+  "date": "2026-11-02"
+}

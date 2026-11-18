@@ -1,0 +1,22 @@
+ok  1. quest "Back on Earth" from the start (1 s, at 1 s)
+   teleport (army: ninigi_sumo) to 1071,486 at 75 s
+ok  2. the army breaks into the Barbarian main base: quest "Back on Earth" accomplished, the last line of defence appears (75 s, at 76 s)
+   teleport (army: ninigi_archer) to 1075,274 at 79 s
+   teleport (army: ninigi_archer) to 1075,274 at 79 s
+   teleport (army: ninigi_archer) to 1075,289 at 81 s
+   teleport (army: ninigi_spearman) to 1075,289 at 81 s
+   teleport (army: ninigi_spearman) to 1075,289 at 81 s
+   teleport (army: ninigi_spearman) to 1075,289 at 81 s
+   teleport (army: special_eusmilus) to 1075,289 at 81 s
+ok  3. the last line of defence is beaten (or the harbour reached): quest "Barbarian Main Base" accomplished (13 s, at 89 s)
+ok  4. the film ms_2045 ends the mission (0 s, at 89 s)
+ok no exception
+ok QUIT: the mission is won, "Back on Earth" accomplished
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Ninigi (mission: Aje); game time 1 min; teleports 8; cheat kills 20; top-ups 0
+   triggers fired 34 of 148, 34 firings, 53 actions, warnings 0
+   quests: L04MQ01=done L04MQ02=done L04SQ01=open L04SQ02=hidden L04SQ03=hidden L04SQ04=hidden L04SQ05=hidden
+   sequences: ms_2020@0 ms_2045@88
+   player: ninigi_archer x3, ninigi_saltasaurus_archer x1, ninigi_spearman x3, ninigi_worker x7, ninigi_sumo x1, Cole_s0 x1, special_eusmilus x1, Bela_s0 x1; buildings aje_tent aje_tent aje_tent aje_tent aje_tent aje_tent ninigi_fireplace ninigi_fireplace; res {"food":200,"wood":150,"stone":2000,"skulls":99,"power":0}
+   won: {"won":true,"text":""}

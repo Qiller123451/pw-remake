@@ -1,0 +1,1221 @@
+{
+ "id": 4,
+ "title": "Two Banners",
+ "place": "The Riverlands",
+ "setting": "Northland",
+ "briefing": [
+  "Two tribes have been at war across the Riverlands since the spring, and your village stands between them.",
+  "Both want you on their side, and both are sending envoys. Hear them out - and then walk up to the one you will stand with. Choose quickly: they will take silence for an answer."
+ ],
+ "variants": {
+  "Hu": {
+   "foeTribe": "Ninigi",
+   "foe2Tribe": "Aje",
+   "foe": {
+    "tribe": "Ninigi",
+    "name": "Dragon Clan",
+    "behaviour": "Giraffe",
+    "relation": 1,
+    "res": {
+     "food": 2500,
+     "wood": 2500,
+     "stone": 2000
+    }
+   },
+   "foe2": {
+    "tribe": "Aje",
+    "name": "Dustriders",
+    "behaviour": "Giraffe",
+    "relation": 1,
+    "res": {
+     "food": 2500,
+     "wood": 2500,
+     "stone": 2000
+    }
+   },
+   "res": {
+    "food": 800,
+    "wood": 800,
+    "stone": 600
+   },
+   "epoch": 2,
+   "powers": [],
+   "map": {
+    "seed": 3404,
+    "setting": "Northland",
+    "size": 560,
+    "base": 5,
+    "water": 0,
+    "noise": [
+     [
+      0.005,
+      6
+     ],
+     [
+      0.025,
+      1.2
+     ]
+    ],
+    "ground": [
+     0,
+     1,
+     4,
+     3,
+     6,
+     2
+    ],
+    "clear": [
+     [
+      0,
+      200,
+      30
+     ],
+     [
+      -190,
+      -170,
+      30
+     ],
+     [
+      190,
+      -170,
+      30
+     ],
+     [
+      -60,
+      140,
+      12
+     ],
+     [
+      60,
+      140,
+      12
+     ]
+    ],
+    "features": [
+     {
+      "type": "river",
+      "path": [
+       [
+        0,
+        -280
+       ],
+       [
+        10,
+        -150
+       ],
+       [
+        -10,
+        -40
+       ],
+       [
+        0,
+        60
+       ]
+      ],
+      "w": 40,
+      "depth": 2,
+      "bank": 12
+     },
+     {
+      "type": "flat",
+      "x": 0,
+      "z": -95,
+      "r": 22,
+      "h": 3.5,
+      "edge": 8
+     },
+     {
+      "type": "flat",
+      "x": -2,
+      "z": 20,
+      "r": 22,
+      "h": 3.5,
+      "edge": 8
+     },
+     {
+      "type": "flat",
+      "x": 0,
+      "z": 200,
+      "r": 70,
+      "h": 5
+     },
+     {
+      "type": "flat",
+      "x": -190,
+      "z": -170,
+      "r": 60,
+      "h": 5
+     },
+     {
+      "type": "flat",
+      "x": 190,
+      "z": -170,
+      "r": 60,
+      "h": 5
+     }
+    ],
+    "places": [
+     {
+      "kind": "model",
+      "model": "hu_statue",
+      "x": -60,
+      "z": 150,
+      "rot": 0,
+      "r": 3
+     },
+     {
+      "kind": "model",
+      "model": "hu_statue_02",
+      "x": 60,
+      "z": 150,
+      "rot": 0,
+      "r": 3
+     }
+    ],
+    "forests": [
+     {
+      "x": -200,
+      "z": 60,
+      "r": 60,
+      "n": 45
+     },
+     {
+      "x": 200,
+      "z": 60,
+      "r": 60,
+      "n": 45
+     },
+     {
+      "x": -100,
+      "z": -60,
+      "r": 40,
+      "n": 22
+     },
+     {
+      "x": 110,
+      "z": -70,
+      "r": 40,
+      "n": 22
+     }
+    ],
+    "rocks": [
+     {
+      "x": -220,
+      "z": 220,
+      "r": 40,
+      "n": 12
+     },
+     {
+      "x": 220,
+      "z": 220,
+      "r": 40,
+      "n": 12
+     }
+    ],
+    "resources": [
+     {
+      "x": 0,
+      "z": 240,
+      "stone": 8,
+      "food": 8,
+      "wood": 16
+     },
+     {
+      "x": -220,
+      "z": -210,
+      "stone": 6,
+      "food": 6,
+      "wood": 16
+     },
+     {
+      "x": 220,
+      "z": -210,
+      "stone": 6,
+      "food": 6,
+      "wood": 16
+     }
+    ],
+    "shrubs": 260
+   },
+   "start": {
+    "buildings": [
+     [
+      "hu_fireplace",
+      0,
+      200,
+      0
+     ]
+    ],
+    "units": [
+     [
+      "hu_worker",
+      -8,
+      184,
+      6
+     ],
+     [
+      [
+       "Bela_s0"
+      ],
+      10,
+      182,
+      1,
+      2
+     ],
+     [
+      [
+       "hu_warrior"
+      ],
+      16,
+      192,
+      4,
+      2
+     ],
+     [
+      [
+       "hu_archer"
+      ],
+      20,
+      186,
+      3,
+      2
+     ]
+    ]
+   },
+   "models": [
+    "Bela_s0",
+    "hu_colossi",
+    "hu_mammoth",
+    "hu_rhino",
+    "Tarna_s0",
+    "Cole_s0",
+    "aje_tyrannosaurus",
+    "aje_brachiosaurus",
+    "aje_stegosaurus",
+    "aje_triceratops_archer",
+    "Miyagi_s0",
+    "hermit_s0",
+    "ninigi_kong",
+    "ninigi_seismosaurus",
+    "ninigi_triceratops",
+    "ninigi_sumo",
+    "lovelace_s0",
+    "seas_rex",
+    "seas_mobile_suit",
+    "seas_triceratops",
+    "hu_zombie_warrior",
+    "hu_undead_warrior",
+    "hu_zombie_archer",
+    "hu_zombie_killer",
+    "schliemann_zombie"
+   ]
+  },
+  "Aje": {
+   "foeTribe": "Hu",
+   "foe2Tribe": "Ninigi",
+   "foe": {
+    "tribe": "Hu",
+    "name": "Norsemen",
+    "behaviour": "Giraffe",
+    "relation": 1,
+    "res": {
+     "food": 2500,
+     "wood": 2500,
+     "stone": 2000
+    }
+   },
+   "foe2": {
+    "tribe": "Ninigi",
+    "name": "Dragon Clan",
+    "behaviour": "Giraffe",
+    "relation": 1,
+    "res": {
+     "food": 2500,
+     "wood": 2500,
+     "stone": 2000
+    }
+   },
+   "res": {
+    "food": 800,
+    "wood": 800,
+    "stone": 600
+   },
+   "epoch": 2,
+   "powers": [],
+   "map": {
+    "seed": 3404,
+    "setting": "Northland",
+    "size": 560,
+    "base": 5,
+    "water": 0,
+    "noise": [
+     [
+      0.005,
+      6
+     ],
+     [
+      0.025,
+      1.2
+     ]
+    ],
+    "ground": [
+     0,
+     1,
+     4,
+     3,
+     6,
+     2
+    ],
+    "clear": [
+     [
+      0,
+      200,
+      30
+     ],
+     [
+      -190,
+      -170,
+      30
+     ],
+     [
+      190,
+      -170,
+      30
+     ],
+     [
+      -60,
+      140,
+      12
+     ],
+     [
+      60,
+      140,
+      12
+     ]
+    ],
+    "features": [
+     {
+      "type": "river",
+      "path": [
+       [
+        0,
+        -280
+       ],
+       [
+        10,
+        -150
+       ],
+       [
+        -10,
+        -40
+       ],
+       [
+        0,
+        60
+       ]
+      ],
+      "w": 40,
+      "depth": 2,
+      "bank": 12
+     },
+     {
+      "type": "flat",
+      "x": 0,
+      "z": -95,
+      "r": 22,
+      "h": 3.5,
+      "edge": 8
+     },
+     {
+      "type": "flat",
+      "x": -2,
+      "z": 20,
+      "r": 22,
+      "h": 3.5,
+      "edge": 8
+     },
+     {
+      "type": "flat",
+      "x": 0,
+      "z": 200,
+      "r": 70,
+      "h": 5
+     },
+     {
+      "type": "flat",
+      "x": -190,
+      "z": -170,
+      "r": 60,
+      "h": 5
+     },
+     {
+      "type": "flat",
+      "x": 190,
+      "z": -170,
+      "r": 60,
+      "h": 5
+     }
+    ],
+    "places": [
+     {
+      "kind": "model",
+      "model": "hu_statue",
+      "x": -60,
+      "z": 150,
+      "rot": 0,
+      "r": 3
+     },
+     {
+      "kind": "model",
+      "model": "hu_statue_02",
+      "x": 60,
+      "z": 150,
+      "rot": 0,
+      "r": 3
+     }
+    ],
+    "forests": [
+     {
+      "x": -200,
+      "z": 60,
+      "r": 60,
+      "n": 45
+     },
+     {
+      "x": 200,
+      "z": 60,
+      "r": 60,
+      "n": 45
+     },
+     {
+      "x": -100,
+      "z": -60,
+      "r": 40,
+      "n": 22
+     },
+     {
+      "x": 110,
+      "z": -70,
+      "r": 40,
+      "n": 22
+     }
+    ],
+    "rocks": [
+     {
+      "x": -220,
+      "z": 220,
+      "r": 40,
+      "n": 12
+     },
+     {
+      "x": 220,
+      "z": 220,
+      "r": 40,
+      "n": 12
+     }
+    ],
+    "resources": [
+     {
+      "x": 0,
+      "z": 240,
+      "stone": 8,
+      "food": 8,
+      "wood": 16
+     },
+     {
+      "x": -220,
+      "z": -210,
+      "stone": 6,
+      "food": 6,
+      "wood": 16
+     },
+     {
+      "x": 220,
+      "z": -210,
+      "stone": 6,
+      "food": 6,
+      "wood": 16
+     }
+    ],
+    "shrubs": 260
+   },
+   "start": {
+    "buildings": [],
+    "units": [
+     [
+      "aje_resource_collector",
+      0,
+      200,
+      1
+     ],
+     [
+      "aje_worker",
+      -8,
+      184,
+      6
+     ],
+     [
+      [
+       "Tarna_s0",
+       "Cole_s0"
+      ],
+      10,
+      182,
+      1,
+      2
+     ],
+     [
+      [
+       "aje_warrior"
+      ],
+      16,
+      192,
+      4,
+      2
+     ],
+     [
+      [
+       "aje_archer"
+      ],
+      20,
+      186,
+      3,
+      2
+     ]
+    ]
+   },
+   "models": [
+    "Bela_s0",
+    "hu_colossi",
+    "hu_mammoth",
+    "hu_rhino",
+    "Tarna_s0",
+    "Cole_s0",
+    "aje_tyrannosaurus",
+    "aje_brachiosaurus",
+    "aje_stegosaurus",
+    "aje_triceratops_archer",
+    "Miyagi_s0",
+    "hermit_s0",
+    "ninigi_kong",
+    "ninigi_seismosaurus",
+    "ninigi_triceratops",
+    "ninigi_sumo",
+    "lovelace_s0",
+    "seas_rex",
+    "seas_mobile_suit",
+    "seas_triceratops",
+    "hu_zombie_warrior",
+    "hu_undead_warrior",
+    "hu_zombie_archer",
+    "hu_zombie_killer",
+    "schliemann_zombie"
+   ]
+  },
+  "Ninigi": {
+   "foeTribe": "Hu",
+   "foe2Tribe": "Aje",
+   "foe": {
+    "tribe": "Hu",
+    "name": "Norsemen",
+    "behaviour": "Giraffe",
+    "relation": 1,
+    "res": {
+     "food": 2500,
+     "wood": 2500,
+     "stone": 2000
+    }
+   },
+   "foe2": {
+    "tribe": "Aje",
+    "name": "Dustriders",
+    "behaviour": "Giraffe",
+    "relation": 1,
+    "res": {
+     "food": 2500,
+     "wood": 2500,
+     "stone": 2000
+    }
+   },
+   "res": {
+    "food": 800,
+    "wood": 800,
+    "stone": 600
+   },
+   "epoch": 2,
+   "powers": [],
+   "map": {
+    "seed": 3404,
+    "setting": "Northland",
+    "size": 560,
+    "base": 5,
+    "water": 0,
+    "noise": [
+     [
+      0.005,
+      6
+     ],
+     [
+      0.025,
+      1.2
+     ]
+    ],
+    "ground": [
+     0,
+     1,
+     4,
+     3,
+     6,
+     2
+    ],
+    "clear": [
+     [
+      0,
+      200,
+      30
+     ],
+     [
+      -190,
+      -170,
+      30
+     ],
+     [
+      190,
+      -170,
+      30
+     ],
+     [
+      -60,
+      140,
+      12
+     ],
+     [
+      60,
+      140,
+      12
+     ]
+    ],
+    "features": [
+     {
+      "type": "river",
+      "path": [
+       [
+        0,
+        -280
+       ],
+       [
+        10,
+        -150
+       ],
+       [
+        -10,
+        -40
+       ],
+       [
+        0,
+        60
+       ]
+      ],
+      "w": 40,
+      "depth": 2,
+      "bank": 12
+     },
+     {
+      "type": "flat",
+      "x": 0,
+      "z": -95,
+      "r": 22,
+      "h": 3.5,
+      "edge": 8
+     },
+     {
+      "type": "flat",
+      "x": -2,
+      "z": 20,
+      "r": 22,
+      "h": 3.5,
+      "edge": 8
+     },
+     {
+      "type": "flat",
+      "x": 0,
+      "z": 200,
+      "r": 70,
+      "h": 5
+     },
+     {
+      "type": "flat",
+      "x": -190,
+      "z": -170,
+      "r": 60,
+      "h": 5
+     },
+     {
+      "type": "flat",
+      "x": 190,
+      "z": -170,
+      "r": 60,
+      "h": 5
+     }
+    ],
+    "places": [
+     {
+      "kind": "model",
+      "model": "hu_statue",
+      "x": -60,
+      "z": 150,
+      "rot": 0,
+      "r": 3
+     },
+     {
+      "kind": "model",
+      "model": "hu_statue_02",
+      "x": 60,
+      "z": 150,
+      "rot": 0,
+      "r": 3
+     }
+    ],
+    "forests": [
+     {
+      "x": -200,
+      "z": 60,
+      "r": 60,
+      "n": 45
+     },
+     {
+      "x": 200,
+      "z": 60,
+      "r": 60,
+      "n": 45
+     },
+     {
+      "x": -100,
+      "z": -60,
+      "r": 40,
+      "n": 22
+     },
+     {
+      "x": 110,
+      "z": -70,
+      "r": 40,
+      "n": 22
+     }
+    ],
+    "rocks": [
+     {
+      "x": -220,
+      "z": 220,
+      "r": 40,
+      "n": 12
+     },
+     {
+      "x": 220,
+      "z": 220,
+      "r": 40,
+      "n": 12
+     }
+    ],
+    "resources": [
+     {
+      "x": 0,
+      "z": 240,
+      "stone": 8,
+      "food": 8,
+      "wood": 16
+     },
+     {
+      "x": -220,
+      "z": -210,
+      "stone": 6,
+      "food": 6,
+      "wood": 16
+     },
+     {
+      "x": 220,
+      "z": -210,
+      "stone": 6,
+      "food": 6,
+      "wood": 16
+     }
+    ],
+    "shrubs": 260
+   },
+   "start": {
+    "buildings": [
+     [
+      "ninigi_fireplace",
+      0,
+      200,
+      0
+     ]
+    ],
+    "units": [
+     [
+      "ninigi_worker",
+      -8,
+      184,
+      6
+     ],
+     [
+      [
+       "Miyagi_s0",
+       "hermit_s0"
+      ],
+      10,
+      182,
+      1,
+      2
+     ],
+     [
+      [
+       "ninigi_warrior"
+      ],
+      16,
+      192,
+      4,
+      2
+     ],
+     [
+      [
+       "ninigi_archer"
+      ],
+      20,
+      186,
+      3,
+      2
+     ]
+    ]
+   },
+   "models": [
+    "Bela_s0",
+    "hu_colossi",
+    "hu_mammoth",
+    "hu_rhino",
+    "Tarna_s0",
+    "Cole_s0",
+    "aje_tyrannosaurus",
+    "aje_brachiosaurus",
+    "aje_stegosaurus",
+    "aje_triceratops_archer",
+    "Miyagi_s0",
+    "hermit_s0",
+    "ninigi_kong",
+    "ninigi_seismosaurus",
+    "ninigi_triceratops",
+    "ninigi_sumo",
+    "lovelace_s0",
+    "seas_rex",
+    "seas_mobile_suit",
+    "seas_triceratops",
+    "hu_zombie_warrior",
+    "hu_undead_warrior",
+    "hu_zombie_archer",
+    "hu_zombie_killer",
+    "schliemann_zombie"
+   ]
+  },
+  "SEAS": {
+   "foeTribe": "Hu",
+   "foe2Tribe": "Ninigi",
+   "foe": {
+    "tribe": "Hu",
+    "name": "Norsemen",
+    "behaviour": "Giraffe",
+    "relation": 1,
+    "res": {
+     "food": 2500,
+     "wood": 2500,
+     "stone": 2000
+    }
+   },
+   "foe2": {
+    "tribe": "Ninigi",
+    "name": "Dragon Clan",
+    "behaviour": "Giraffe",
+    "relation": 1,
+    "res": {
+     "food": 2500,
+     "wood": 2500,
+     "stone": 2000
+    }
+   },
+   "res": {
+    "food": 800,
+    "wood": 800,
+    "stone": 600
+   },
+   "epoch": 2,
+   "powers": [],
+   "map": {
+    "seed": 3404,
+    "setting": "Northland",
+    "size": 560,
+    "base": 5,
+    "water": 0,
+    "noise": [
+     [
+      0.005,
+      6
+     ],
+     [
+      0.025,
+      1.2
+     ]
+    ],
+    "ground": [
+     0,
+     1,
+     4,
+     3,
+     6,
+     2
+    ],
+    "clear": [
+     [
+      0,
+      200,
+      30
+     ],
+     [
+      -190,
+      -170,
+      30
+     ],
+     [
+      190,
+      -170,
+      30
+     ],
+     [
+      -60,
+      140,
+      12
+     ],
+     [
+      60,
+      140,
+      12
+     ]
+    ],
+    "features": [
+     {
+      "type": "river",
+      "path": [
+       [
+        0,
+        -280
+       ],
+       [
+        10,
+        -150
+       ],
+       [
+        -10,
+        -40
+       ],
+       [
+        0,
+        60
+       ]
+      ],
+      "w": 40,
+      "depth": 2,
+      "bank": 12
+     },
+     {
+      "type": "flat",
+      "x": 0,
+      "z": -95,
+      "r": 22,
+      "h": 3.5,
+      "edge": 8
+     },
+     {
+      "type": "flat",
+      "x": -2,
+      "z": 20,
+      "r": 22,
+      "h": 3.5,
+      "edge": 8
+     },
+     {
+      "type": "flat",
+      "x": 0,
+      "z": 200,
+      "r": 70,
+      "h": 5
+     },
+     {
+      "type": "flat",
+      "x": -190,
+      "z": -170,
+      "r": 60,
+      "h": 5
+     },
+     {
+      "type": "flat",
+      "x": 190,
+      "z": -170,
+      "r": 60,
+      "h": 5
+     }
+    ],
+    "places": [
+     {
+      "kind": "model",
+      "model": "hu_statue",
+      "x": -60,
+      "z": 150,
+      "rot": 0,
+      "r": 3
+     },
+     {
+      "kind": "model",
+      "model": "hu_statue_02",
+      "x": 60,
+      "z": 150,
+      "rot": 0,
+      "r": 3
+     }
+    ],
+    "forests": [
+     {
+      "x": -200,
+      "z": 60,
+      "r": 60,
+      "n": 45
+     },
+     {
+      "x": 200,
+      "z": 60,
+      "r": 60,
+      "n": 45
+     },
+     {
+      "x": -100,
+      "z": -60,
+      "r": 40,
+      "n": 22
+     },
+     {
+      "x": 110,
+      "z": -70,
+      "r": 40,
+      "n": 22
+     }
+    ],
+    "rocks": [
+     {
+      "x": -220,
+      "z": 220,
+      "r": 40,
+      "n": 12
+     },
+     {
+      "x": 220,
+      "z": 220,
+      "r": 40,
+      "n": 12
+     }
+    ],
+    "resources": [
+     {
+      "x": 0,
+      "z": 240,
+      "stone": 8,
+      "food": 8,
+      "wood": 16
+     },
+     {
+      "x": -220,
+      "z": -210,
+      "stone": 6,
+      "food": 6,
+      "wood": 16
+     },
+     {
+      "x": 220,
+      "z": -210,
+      "stone": 6,
+      "food": 6,
+      "wood": 16
+     }
+    ],
+    "shrubs": 260
+   },
+   "start": {
+    "buildings": [
+     [
+      "seas_headquarters",
+      0,
+      200,
+      0
+     ]
+    ],
+    "units": [
+     [
+      "seas_worker",
+      -8,
+      184,
+      6
+     ],
+     [
+      [
+       "lovelace_s0"
+      ],
+      10,
+      182,
+      1,
+      2
+     ],
+     [
+      [
+       "seas_warrior"
+      ],
+      16,
+      192,
+      4,
+      2
+     ],
+     [
+      [
+       "seas_gunner"
+      ],
+      20,
+      186,
+      3,
+      2
+     ]
+    ]
+   },
+   "models": [
+    "Bela_s0",
+    "hu_colossi",
+    "hu_mammoth",
+    "hu_rhino",
+    "Tarna_s0",
+    "Cole_s0",
+    "aje_tyrannosaurus",
+    "aje_brachiosaurus",
+    "aje_stegosaurus",
+    "aje_triceratops_archer",
+    "Miyagi_s0",
+    "hermit_s0",
+    "ninigi_kong",
+    "ninigi_seismosaurus",
+    "ninigi_triceratops",
+    "ninigi_sumo",
+    "lovelace_s0",
+    "seas_rex",
+    "seas_mobile_suit",
+    "seas_triceratops",
+    "hu_zombie_warrior",
+    "hu_undead_warrior",
+    "hu_zombie_archer",
+    "hu_zombie_killer",
+    "schliemann_zombie"
+   ]
+  }
+ }
+}

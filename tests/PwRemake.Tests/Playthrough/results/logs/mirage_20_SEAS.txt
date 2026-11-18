@@ -1,0 +1,41 @@
+ok  1. the opening film sb4101: quests "Breakthrough Part I" and "Part II" (5 s, at 5 s)
+ok  2. the party reaches the place of first contact: dialogue db_4102 (Dustriders and Norsemen fight) (6 s, at 11 s)
+ok  3. the fight is over, dialogue db_4111: quest "The Bridgehead" (epoch 4) (37 s, at 48 s)
+   [48 s] epoch 1, units 9/0, flamethrowers 3 (squad 0), saved 0, fighters 6, workers 3, buildings 0: ; res food 300,wood 300,stone 300,skulls 0,power 0; next epoch: ok (missing )
+   [228 s] epoch 2, units 25/52, flamethrowers 11 (squad 0), saved 0, fighters 14, workers 11, buildings 3: seas_headquartersx1 seas_barracksx1 seas_laboratoryx1; res food 1000,wood 1000,stone 975,skulls 225,power 0; next epoch: ok (missing )
+   teleport (squad: seas_flamethrower) to 1180,330 at 240 s
+   [408 s] epoch 3, units 29/52, flamethrowers 13 (squad 13 at (832, 682) (833, 681) (831, 681)), saved 0, fighters 16, workers 13, buildings 3: seas_headquartersx1 seas_barracksx1 seas_laboratoryx1; res food 1200,wood 1200,stone 1200,skulls 810,power 0; next epoch: ok (missing )
+   teleport (squad: seas_flamethrower) to 1180,330 at 445 s
+   teleport (squad: seas_flamethrower) to 1180,330 at 445 s
+   teleport (squad: seas_flamethrower) to 1180,330 at 446 s
+   teleport (squad: seas_flamethrower) to 1180,330 at 446 s
+   teleport (squad: seas_flamethrower) to 1180,330 at 446 s
+   teleport (squad: seas_flamethrower) to 1180,330 at 446 s
+   teleport (squad: seas_flamethrower) to 1180,330 at 446 s
+   teleport (squad: seas_flamethrower) to 1180,330 at 447 s
+   teleport (squad: seas_flamethrower) to 1180,330 at 447 s
+ok  4. the base reaches epoch 4: quest "The Bridgehead" (402 s, at 450 s)
+   teleport (squad: seas_flamethrower) to 1180,330 at 510 s
+   [589 s] epoch 4, units 29/52, flamethrowers 13 (squad 10 at (555, 860) (553, 860) (556, 860)), saved 10, fighters 16, workers 13, buildings 3: seas_headquartersx1 seas_barracksx1 seas_laboratoryx1; res food 600,wood 1000,stone 1200,skulls 1448,power 0
+   teleport (defence: seas_flamethrower) to 280,677 at 652 s
+   [770 s] epoch 4, units 29/52, flamethrowers 13 (squad 10 at (1247, 757) (1247, 756) (1247, 753)), saved 10, fighters 16, workers 13, buildings 3: seas_headquartersx1 seas_barracksx1 seas_laboratoryx1; res food 600,wood 1000,stone 1200,skulls 2164,power 0
+   teleport (squad: seas_flamethrower) to 1180,330 at 800 s
+ok  5. 20 flamethrowers reach the rendezvous point: quest "Breakthrough Part I" (407 s, at 857 s)
+   [951 s] epoch 4, units 20/52, flamethrowers 4 (squad 0), saved 20, fighters 7, workers 13, buildings 3: seas_headquartersx1 seas_barracksx1 seas_laboratoryx1; res food 1000,wood 1000,stone 1200,skulls 2582,power 0
+   teleport (defence: seas_flamethrower) to 280,676 at 1040 s
+   teleport (defence: seas_flamethrower) to 280,676 at 1040 s
+   teleport (defence: seas_flamethrower) to 280,676 at 1040 s
+ok  6. Leighton reaches the rendezvous point, boards the carrier: film sb4108 (quest "Breakthrough Part II") (273 s, at 1130 s)
+ok  7. the film sb4108 ends the mission (QUIT) (12 s, at 1142 s)
+ok no exception
+ok QUIT: the mission is won
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe SEAS; game time 19 min; teleports 16; cheat kills 249; top-ups 30
+   triggers fired 92 of 171, 123 firings, 344 actions, warnings 0
+   quests: LB41MQ01=done LB41MQ02=done LB41MQ03=done LB41SQ01=open LB41SQ02=hidden LB41SQ03=done
+   sequences: 
+   player: seas_worker x13, seas_marksman x2, seas_flamethrower x4; buildings seas_headquarters seas_barracks seas_laboratory; res {"food":1000,"wood":1000,"stone":1200,"skulls":3196,"power":0}
+   won: {"won":true,"text":""}
+   epoch 4, flamethrowers 4 (seas_flamethrower), population 19/52
+   variables: Flamer_Fugees=20 MQ01=1 MQ02=1 MQ03=1 Bases_seen=1 Ho_Destroyed=0 Need_For_Speed_Failed=0

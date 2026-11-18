@@ -1,0 +1,1229 @@
+{
+ "id": 1,
+ "title": "The Great Hunt",
+ "place": "The Valley of Bones",
+ "setting": "Savanna",
+ "briefing": [
+  "Every hundred years the clans meet for the Great Hunt. Five legendary beasts roam the Valley of Bones: Old Tusk the mammoth, Threehorn, Whitefang and his pack, Skyneck the giant - and the King of Teeth.",
+  "The tribe that brings down three of them first wins the valley for a hundred years. A rival tribe has made camp on the far side, and its hunters are already sharpening their spears."
+ ],
+ "variants": {
+  "Hu": {
+   "foeTribe": "Ninigi",
+   "foe": {
+    "tribe": "Ninigi",
+    "name": "The Dragon Clan hunters",
+    "behaviour": "Schnecke",
+    "res": {
+     "food": 2000,
+     "wood": 2000,
+     "stone": 1500
+    }
+   },
+   "creatures": [
+    "Mammoth",
+    "Woolly_Rhino",
+    "Triceratops",
+    "Smilodon",
+    "Brachiosaurus",
+    "Stegosaurus",
+    "Tarbosaurus",
+    "Velociraptor"
+   ],
+   "res": {
+    "food": 700,
+    "wood": 600,
+    "stone": 500
+   },
+   "epoch": 2,
+   "powers": [],
+   "map": {
+    "seed": 3101,
+    "setting": "Savanna",
+    "size": 560,
+    "base": 6,
+    "noise": [
+     [
+      0.004,
+      7
+     ],
+     [
+      0.02,
+      1.4
+     ]
+    ],
+    "ground": [
+     0,
+     1,
+     4,
+     3,
+     6,
+     5
+    ],
+    "clear": [
+     [
+      -200,
+      200,
+      30
+     ],
+     [
+      200,
+      -200,
+      30
+     ],
+     [
+      0,
+      0,
+      26
+     ],
+     [
+      170,
+      170,
+      22
+     ],
+     [
+      -170,
+      -170,
+      22
+     ],
+     [
+      -150,
+      40,
+      20
+     ],
+     [
+      40,
+      -150,
+      20
+     ]
+    ],
+    "features": [
+     {
+      "type": "flat",
+      "x": -200,
+      "z": 200,
+      "r": 60,
+      "h": 6
+     },
+     {
+      "type": "flat",
+      "x": 200,
+      "z": -200,
+      "r": 60,
+      "h": 6
+     },
+     {
+      "type": "mesa",
+      "x": -60,
+      "z": 90,
+      "r": 40,
+      "h": 16
+     },
+     {
+      "type": "mesa",
+      "x": 90,
+      "z": -60,
+      "r": 40,
+      "h": 16
+     },
+     {
+      "type": "hill",
+      "x": 0,
+      "z": 0,
+      "r": 70,
+      "h": 8
+     }
+    ],
+    "places": [
+     {
+      "kind": "model",
+      "model": "sav_skeleton_01",
+      "x": -12,
+      "z": 6,
+      "rot": -12,
+      "r": 3,
+      "block": false
+     },
+     {
+      "kind": "model",
+      "model": "sav_skeleton_01",
+      "x": 10,
+      "z": -14,
+      "rot": 10,
+      "r": 3,
+      "block": false
+     },
+     {
+      "kind": "model",
+      "model": "sav_skeleton_01",
+      "x": 16,
+      "z": 12,
+      "rot": 16,
+      "r": 3,
+      "block": false
+     },
+     {
+      "kind": "model",
+      "model": "graveyard_skull_01",
+      "x": 168,
+      "z": 160,
+      "rot": 0,
+      "r": 2,
+      "block": false
+     },
+     {
+      "kind": "model",
+      "model": "graveyard_skull_02",
+      "x": -160,
+      "z": -168,
+      "rot": 0,
+      "r": 2,
+      "block": false
+     }
+    ],
+    "forests": [
+     {
+      "x": -200,
+      "z": 60,
+      "r": 50,
+      "n": 30
+     },
+     {
+      "x": 60,
+      "z": -200,
+      "r": 50,
+      "n": 30
+     },
+     {
+      "x": -60,
+      "z": -60,
+      "r": 40,
+      "n": 20
+     },
+     {
+      "x": 110,
+      "z": 110,
+      "r": 40,
+      "n": 20
+     }
+    ],
+    "rocks": [
+     {
+      "x": -220,
+      "z": -40,
+      "r": 40,
+      "n": 14
+     },
+     {
+      "x": -40,
+      "z": -220,
+      "r": 40,
+      "n": 14
+     }
+    ],
+    "resources": [
+     {
+      "x": -200,
+      "z": 160,
+      "stone": 6,
+      "food": 8,
+      "wood": 20
+     },
+     {
+      "x": 160,
+      "z": -200,
+      "stone": 6,
+      "food": 8,
+      "wood": 20
+     }
+    ],
+    "shrubs": 300
+   },
+   "start": {
+    "buildings": [
+     [
+      "hu_fireplace",
+      -200,
+      200,
+      0
+     ]
+    ],
+    "units": [
+     [
+      "hu_worker",
+      -208,
+      184,
+      6
+     ],
+     [
+      [
+       "Bela_s0"
+      ],
+      -190,
+      182,
+      1,
+      2
+     ],
+     [
+      [
+       "hu_warrior"
+      ],
+      -184,
+      192,
+      4,
+      2
+     ],
+     [
+      [
+       "hu_archer"
+      ],
+      -180,
+      186,
+      3,
+      2
+     ]
+    ]
+   },
+   "models": [
+    "Bela_s0",
+    "hu_colossi",
+    "hu_mammoth",
+    "hu_rhino",
+    "Tarna_s0",
+    "Cole_s0",
+    "aje_tyrannosaurus",
+    "aje_brachiosaurus",
+    "aje_stegosaurus",
+    "aje_triceratops_archer",
+    "Miyagi_s0",
+    "hermit_s0",
+    "ninigi_kong",
+    "ninigi_seismosaurus",
+    "ninigi_triceratops",
+    "ninigi_sumo",
+    "lovelace_s0",
+    "seas_rex",
+    "seas_mobile_suit",
+    "seas_triceratops",
+    "hu_zombie_warrior",
+    "hu_undead_warrior",
+    "hu_zombie_archer",
+    "hu_zombie_killer",
+    "schliemann_zombie"
+   ]
+  },
+  "Aje": {
+   "foeTribe": "Ninigi",
+   "foe": {
+    "tribe": "Ninigi",
+    "name": "The Dragon Clan hunters",
+    "behaviour": "Schnecke",
+    "res": {
+     "food": 2000,
+     "wood": 2000,
+     "stone": 1500
+    }
+   },
+   "creatures": [
+    "Mammoth",
+    "Woolly_Rhino",
+    "Triceratops",
+    "Smilodon",
+    "Brachiosaurus",
+    "Stegosaurus",
+    "Tarbosaurus",
+    "Velociraptor"
+   ],
+   "res": {
+    "food": 700,
+    "wood": 600,
+    "stone": 500
+   },
+   "epoch": 2,
+   "powers": [],
+   "map": {
+    "seed": 3101,
+    "setting": "Savanna",
+    "size": 560,
+    "base": 6,
+    "noise": [
+     [
+      0.004,
+      7
+     ],
+     [
+      0.02,
+      1.4
+     ]
+    ],
+    "ground": [
+     0,
+     1,
+     4,
+     3,
+     6,
+     5
+    ],
+    "clear": [
+     [
+      -200,
+      200,
+      30
+     ],
+     [
+      200,
+      -200,
+      30
+     ],
+     [
+      0,
+      0,
+      26
+     ],
+     [
+      170,
+      170,
+      22
+     ],
+     [
+      -170,
+      -170,
+      22
+     ],
+     [
+      -150,
+      40,
+      20
+     ],
+     [
+      40,
+      -150,
+      20
+     ]
+    ],
+    "features": [
+     {
+      "type": "flat",
+      "x": -200,
+      "z": 200,
+      "r": 60,
+      "h": 6
+     },
+     {
+      "type": "flat",
+      "x": 200,
+      "z": -200,
+      "r": 60,
+      "h": 6
+     },
+     {
+      "type": "mesa",
+      "x": -60,
+      "z": 90,
+      "r": 40,
+      "h": 16
+     },
+     {
+      "type": "mesa",
+      "x": 90,
+      "z": -60,
+      "r": 40,
+      "h": 16
+     },
+     {
+      "type": "hill",
+      "x": 0,
+      "z": 0,
+      "r": 70,
+      "h": 8
+     }
+    ],
+    "places": [
+     {
+      "kind": "model",
+      "model": "sav_skeleton_01",
+      "x": -12,
+      "z": 6,
+      "rot": -12,
+      "r": 3,
+      "block": false
+     },
+     {
+      "kind": "model",
+      "model": "sav_skeleton_01",
+      "x": 10,
+      "z": -14,
+      "rot": 10,
+      "r": 3,
+      "block": false
+     },
+     {
+      "kind": "model",
+      "model": "sav_skeleton_01",
+      "x": 16,
+      "z": 12,
+      "rot": 16,
+      "r": 3,
+      "block": false
+     },
+     {
+      "kind": "model",
+      "model": "graveyard_skull_01",
+      "x": 168,
+      "z": 160,
+      "rot": 0,
+      "r": 2,
+      "block": false
+     },
+     {
+      "kind": "model",
+      "model": "graveyard_skull_02",
+      "x": -160,
+      "z": -168,
+      "rot": 0,
+      "r": 2,
+      "block": false
+     }
+    ],
+    "forests": [
+     {
+      "x": -200,
+      "z": 60,
+      "r": 50,
+      "n": 30
+     },
+     {
+      "x": 60,
+      "z": -200,
+      "r": 50,
+      "n": 30
+     },
+     {
+      "x": -60,
+      "z": -60,
+      "r": 40,
+      "n": 20
+     },
+     {
+      "x": 110,
+      "z": 110,
+      "r": 40,
+      "n": 20
+     }
+    ],
+    "rocks": [
+     {
+      "x": -220,
+      "z": -40,
+      "r": 40,
+      "n": 14
+     },
+     {
+      "x": -40,
+      "z": -220,
+      "r": 40,
+      "n": 14
+     }
+    ],
+    "resources": [
+     {
+      "x": -200,
+      "z": 160,
+      "stone": 6,
+      "food": 8,
+      "wood": 20
+     },
+     {
+      "x": 160,
+      "z": -200,
+      "stone": 6,
+      "food": 8,
+      "wood": 20
+     }
+    ],
+    "shrubs": 300
+   },
+   "start": {
+    "buildings": [],
+    "units": [
+     [
+      "aje_resource_collector",
+      -200,
+      200,
+      1
+     ],
+     [
+      "aje_worker",
+      -208,
+      184,
+      6
+     ],
+     [
+      [
+       "Tarna_s0",
+       "Cole_s0"
+      ],
+      -190,
+      182,
+      1,
+      2
+     ],
+     [
+      [
+       "aje_warrior"
+      ],
+      -184,
+      192,
+      4,
+      2
+     ],
+     [
+      [
+       "aje_archer"
+      ],
+      -180,
+      186,
+      3,
+      2
+     ]
+    ]
+   },
+   "models": [
+    "Bela_s0",
+    "hu_colossi",
+    "hu_mammoth",
+    "hu_rhino",
+    "Tarna_s0",
+    "Cole_s0",
+    "aje_tyrannosaurus",
+    "aje_brachiosaurus",
+    "aje_stegosaurus",
+    "aje_triceratops_archer",
+    "Miyagi_s0",
+    "hermit_s0",
+    "ninigi_kong",
+    "ninigi_seismosaurus",
+    "ninigi_triceratops",
+    "ninigi_sumo",
+    "lovelace_s0",
+    "seas_rex",
+    "seas_mobile_suit",
+    "seas_triceratops",
+    "hu_zombie_warrior",
+    "hu_undead_warrior",
+    "hu_zombie_archer",
+    "hu_zombie_killer",
+    "schliemann_zombie"
+   ]
+  },
+  "Ninigi": {
+   "foeTribe": "Hu",
+   "foe": {
+    "tribe": "Hu",
+    "name": "The Norsemen hunters",
+    "behaviour": "Schnecke",
+    "res": {
+     "food": 2000,
+     "wood": 2000,
+     "stone": 1500
+    }
+   },
+   "creatures": [
+    "Mammoth",
+    "Woolly_Rhino",
+    "Triceratops",
+    "Smilodon",
+    "Brachiosaurus",
+    "Stegosaurus",
+    "Tarbosaurus",
+    "Velociraptor"
+   ],
+   "res": {
+    "food": 700,
+    "wood": 600,
+    "stone": 500
+   },
+   "epoch": 2,
+   "powers": [],
+   "map": {
+    "seed": 3101,
+    "setting": "Savanna",
+    "size": 560,
+    "base": 6,
+    "noise": [
+     [
+      0.004,
+      7
+     ],
+     [
+      0.02,
+      1.4
+     ]
+    ],
+    "ground": [
+     0,
+     1,
+     4,
+     3,
+     6,
+     5
+    ],
+    "clear": [
+     [
+      -200,
+      200,
+      30
+     ],
+     [
+      200,
+      -200,
+      30
+     ],
+     [
+      0,
+      0,
+      26
+     ],
+     [
+      170,
+      170,
+      22
+     ],
+     [
+      -170,
+      -170,
+      22
+     ],
+     [
+      -150,
+      40,
+      20
+     ],
+     [
+      40,
+      -150,
+      20
+     ]
+    ],
+    "features": [
+     {
+      "type": "flat",
+      "x": -200,
+      "z": 200,
+      "r": 60,
+      "h": 6
+     },
+     {
+      "type": "flat",
+      "x": 200,
+      "z": -200,
+      "r": 60,
+      "h": 6
+     },
+     {
+      "type": "mesa",
+      "x": -60,
+      "z": 90,
+      "r": 40,
+      "h": 16
+     },
+     {
+      "type": "mesa",
+      "x": 90,
+      "z": -60,
+      "r": 40,
+      "h": 16
+     },
+     {
+      "type": "hill",
+      "x": 0,
+      "z": 0,
+      "r": 70,
+      "h": 8
+     }
+    ],
+    "places": [
+     {
+      "kind": "model",
+      "model": "sav_skeleton_01",
+      "x": -12,
+      "z": 6,
+      "rot": -12,
+      "r": 3,
+      "block": false
+     },
+     {
+      "kind": "model",
+      "model": "sav_skeleton_01",
+      "x": 10,
+      "z": -14,
+      "rot": 10,
+      "r": 3,
+      "block": false
+     },
+     {
+      "kind": "model",
+      "model": "sav_skeleton_01",
+      "x": 16,
+      "z": 12,
+      "rot": 16,
+      "r": 3,
+      "block": false
+     },
+     {
+      "kind": "model",
+      "model": "graveyard_skull_01",
+      "x": 168,
+      "z": 160,
+      "rot": 0,
+      "r": 2,
+      "block": false
+     },
+     {
+      "kind": "model",
+      "model": "graveyard_skull_02",
+      "x": -160,
+      "z": -168,
+      "rot": 0,
+      "r": 2,
+      "block": false
+     }
+    ],
+    "forests": [
+     {
+      "x": -200,
+      "z": 60,
+      "r": 50,
+      "n": 30
+     },
+     {
+      "x": 60,
+      "z": -200,
+      "r": 50,
+      "n": 30
+     },
+     {
+      "x": -60,
+      "z": -60,
+      "r": 40,
+      "n": 20
+     },
+     {
+      "x": 110,
+      "z": 110,
+      "r": 40,
+      "n": 20
+     }
+    ],
+    "rocks": [
+     {
+      "x": -220,
+      "z": -40,
+      "r": 40,
+      "n": 14
+     },
+     {
+      "x": -40,
+      "z": -220,
+      "r": 40,
+      "n": 14
+     }
+    ],
+    "resources": [
+     {
+      "x": -200,
+      "z": 160,
+      "stone": 6,
+      "food": 8,
+      "wood": 20
+     },
+     {
+      "x": 160,
+      "z": -200,
+      "stone": 6,
+      "food": 8,
+      "wood": 20
+     }
+    ],
+    "shrubs": 300
+   },
+   "start": {
+    "buildings": [
+     [
+      "ninigi_fireplace",
+      -200,
+      200,
+      0
+     ]
+    ],
+    "units": [
+     [
+      "ninigi_worker",
+      -208,
+      184,
+      6
+     ],
+     [
+      [
+       "Miyagi_s0",
+       "hermit_s0"
+      ],
+      -190,
+      182,
+      1,
+      2
+     ],
+     [
+      [
+       "ninigi_warrior"
+      ],
+      -184,
+      192,
+      4,
+      2
+     ],
+     [
+      [
+       "ninigi_archer"
+      ],
+      -180,
+      186,
+      3,
+      2
+     ]
+    ]
+   },
+   "models": [
+    "Bela_s0",
+    "hu_colossi",
+    "hu_mammoth",
+    "hu_rhino",
+    "Tarna_s0",
+    "Cole_s0",
+    "aje_tyrannosaurus",
+    "aje_brachiosaurus",
+    "aje_stegosaurus",
+    "aje_triceratops_archer",
+    "Miyagi_s0",
+    "hermit_s0",
+    "ninigi_kong",
+    "ninigi_seismosaurus",
+    "ninigi_triceratops",
+    "ninigi_sumo",
+    "lovelace_s0",
+    "seas_rex",
+    "seas_mobile_suit",
+    "seas_triceratops",
+    "hu_zombie_warrior",
+    "hu_undead_warrior",
+    "hu_zombie_archer",
+    "hu_zombie_killer",
+    "schliemann_zombie"
+   ]
+  },
+  "SEAS": {
+   "foeTribe": "Ninigi",
+   "foe": {
+    "tribe": "Ninigi",
+    "name": "The Dragon Clan hunters",
+    "behaviour": "Schnecke",
+    "res": {
+     "food": 2000,
+     "wood": 2000,
+     "stone": 1500
+    }
+   },
+   "creatures": [
+    "Mammoth",
+    "Woolly_Rhino",
+    "Triceratops",
+    "Smilodon",
+    "Brachiosaurus",
+    "Stegosaurus",
+    "Tarbosaurus",
+    "Velociraptor"
+   ],
+   "res": {
+    "food": 700,
+    "wood": 600,
+    "stone": 500
+   },
+   "epoch": 2,
+   "powers": [],
+   "map": {
+    "seed": 3101,
+    "setting": "Savanna",
+    "size": 560,
+    "base": 6,
+    "noise": [
+     [
+      0.004,
+      7
+     ],
+     [
+      0.02,
+      1.4
+     ]
+    ],
+    "ground": [
+     0,
+     1,
+     4,
+     3,
+     6,
+     5
+    ],
+    "clear": [
+     [
+      -200,
+      200,
+      30
+     ],
+     [
+      200,
+      -200,
+      30
+     ],
+     [
+      0,
+      0,
+      26
+     ],
+     [
+      170,
+      170,
+      22
+     ],
+     [
+      -170,
+      -170,
+      22
+     ],
+     [
+      -150,
+      40,
+      20
+     ],
+     [
+      40,
+      -150,
+      20
+     ]
+    ],
+    "features": [
+     {
+      "type": "flat",
+      "x": -200,
+      "z": 200,
+      "r": 60,
+      "h": 6
+     },
+     {
+      "type": "flat",
+      "x": 200,
+      "z": -200,
+      "r": 60,
+      "h": 6
+     },
+     {
+      "type": "mesa",
+      "x": -60,
+      "z": 90,
+      "r": 40,
+      "h": 16
+     },
+     {
+      "type": "mesa",
+      "x": 90,
+      "z": -60,
+      "r": 40,
+      "h": 16
+     },
+     {
+      "type": "hill",
+      "x": 0,
+      "z": 0,
+      "r": 70,
+      "h": 8
+     }
+    ],
+    "places": [
+     {
+      "kind": "model",
+      "model": "sav_skeleton_01",
+      "x": -12,
+      "z": 6,
+      "rot": -12,
+      "r": 3,
+      "block": false
+     },
+     {
+      "kind": "model",
+      "model": "sav_skeleton_01",
+      "x": 10,
+      "z": -14,
+      "rot": 10,
+      "r": 3,
+      "block": false
+     },
+     {
+      "kind": "model",
+      "model": "sav_skeleton_01",
+      "x": 16,
+      "z": 12,
+      "rot": 16,
+      "r": 3,
+      "block": false
+     },
+     {
+      "kind": "model",
+      "model": "graveyard_skull_01",
+      "x": 168,
+      "z": 160,
+      "rot": 0,
+      "r": 2,
+      "block": false
+     },
+     {
+      "kind": "model",
+      "model": "graveyard_skull_02",
+      "x": -160,
+      "z": -168,
+      "rot": 0,
+      "r": 2,
+      "block": false
+     }
+    ],
+    "forests": [
+     {
+      "x": -200,
+      "z": 60,
+      "r": 50,
+      "n": 30
+     },
+     {
+      "x": 60,
+      "z": -200,
+      "r": 50,
+      "n": 30
+     },
+     {
+      "x": -60,
+      "z": -60,
+      "r": 40,
+      "n": 20
+     },
+     {
+      "x": 110,
+      "z": 110,
+      "r": 40,
+      "n": 20
+     }
+    ],
+    "rocks": [
+     {
+      "x": -220,
+      "z": -40,
+      "r": 40,
+      "n": 14
+     },
+     {
+      "x": -40,
+      "z": -220,
+      "r": 40,
+      "n": 14
+     }
+    ],
+    "resources": [
+     {
+      "x": -200,
+      "z": 160,
+      "stone": 6,
+      "food": 8,
+      "wood": 20
+     },
+     {
+      "x": 160,
+      "z": -200,
+      "stone": 6,
+      "food": 8,
+      "wood": 20
+     }
+    ],
+    "shrubs": 300
+   },
+   "start": {
+    "buildings": [
+     [
+      "seas_headquarters",
+      -200,
+      200,
+      0
+     ]
+    ],
+    "units": [
+     [
+      "seas_worker",
+      -208,
+      184,
+      6
+     ],
+     [
+      [
+       "lovelace_s0"
+      ],
+      -190,
+      182,
+      1,
+      2
+     ],
+     [
+      [
+       "seas_warrior"
+      ],
+      -184,
+      192,
+      4,
+      2
+     ],
+     [
+      [
+       "seas_gunner"
+      ],
+      -180,
+      186,
+      3,
+      2
+     ]
+    ]
+   },
+   "models": [
+    "Bela_s0",
+    "hu_colossi",
+    "hu_mammoth",
+    "hu_rhino",
+    "Tarna_s0",
+    "Cole_s0",
+    "aje_tyrannosaurus",
+    "aje_brachiosaurus",
+    "aje_stegosaurus",
+    "aje_triceratops_archer",
+    "Miyagi_s0",
+    "hermit_s0",
+    "ninigi_kong",
+    "ninigi_seismosaurus",
+    "ninigi_triceratops",
+    "ninigi_sumo",
+    "lovelace_s0",
+    "seas_rex",
+    "seas_mobile_suit",
+    "seas_triceratops",
+    "hu_zombie_warrior",
+    "hu_undead_warrior",
+    "hu_zombie_archer",
+    "hu_zombie_killer",
+    "schliemann_zombie"
+   ]
+  }
+ }
+}

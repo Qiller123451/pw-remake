@@ -1,0 +1,40 @@
+ok  1. the opening film sc_4025: quest "The Telescope Tower" (1 s, at 1 s)
+ok  2. the army reaches the tower ruin: it becomes the player's (15 s, at 16 s)
+   teleport (army: hu_chariot) to 789,402 at 100 s
+   teleport (army: hu_chariot) to 789,402 at 101 s
+   teleport (army: hu_chariot) to 789,402 at 104 s
+ok  3. the workers repair the telescope tower while the army guards it: quest "The Telescope Tower", film sc_4030 (117 s, at 133 s)
+   teleport (army: hu_chariot) to 725,296 at 133 s
+   teleport (army: Cole_s0) to 725,296 at 133 s
+   teleport (army: Bela_s0) to 725,296 at 133 s
+ok  4. quest "The SEAS Storm" (6 s, at 139 s)
+   teleport (fleet: hu_dragon_boat) to 785,1166 at 541 s
+   teleport (fleet: hu_dragon_boat) to 251,281 at 609 s
+   teleport (fleet: hu_dragon_boat) to 416,768 at 1200 s
+   teleport (fleet: hu_dragon_boat) to 793,1165 at 1302 s
+   teleport (fleet: hu_dragon_boat) to 734,1172 at 1379 s
+   teleport (fleet: hu_dragon_boat) to 805,1129 at 1792 s
+   teleport (fleet: hu_dragon_boat) to 805,1129 at 1792 s
+   teleport (fleet: hu_dragon_boat) to 805,1129 at 1792 s
+   teleport (fleet: hu_dragon_boat) to 805,1129 at 1792 s
+   teleport (fleet: hu_dragon_boat) to 805,1129 at 1792 s
+   teleport (fleet: hu_dragon_boat) to 805,1129 at 1792 s
+   teleport (fleet: hu_dragon_boat) to 805,1129 at 1792 s
+   teleport (fleet: hu_dragon_boat) to 805,1129 at 1792 s
+   teleport (army: hu_chariot) to 660,378 at 1888 s
+   teleport (army: hu_chariot) to 660,378 at 1888 s
+   teleport (army: Cole_s0) to 660,378 at 1888 s
+   teleport (army: special_eusmilus) to 660,378 at 1888 s
+   teleport (army: Bela_s0) to 660,378 at 1888 s
+ok  5. the fleet stops the carrier ships for 40 minutes: film sc_4038, the mission is won (2405 s, at 2544 s)
+ok no exception
+ok QUIT: the mission is won
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Hu (mission: Ninigi); game time 42 min; teleports 24; cheat kills 52; top-ups 0
+   triggers fired 119 of 184, 429 firings, 813 actions, warnings 0
+   quests: L12MQ01=done L12MQ02=hidden L12MQ03=done L12SQ01=done L12SQ02=open
+   sequences: sc_4025@1 sc_4030@138 sc_4027@350 sc_4038@2543
+   player: hu_chariot x4, hu_worker x12, Cole_s0 x1, special_eusmilus x1, Bela_s0 x1, hu_dragon_boat x8; buildings hu_arena hu_fireplace ninigi_hunting_lodge hu_lumberjack_cottage hu_stone_quarry hu_harbour hu_stone_cottage hu_stone_cottage hu_stone_cottage; res {"food":500,"wood":400,"stone":600,"skulls":1630,"power":0}
+   won: {"won":true,"text":""}
+   variables: Carrier=0 Turmstörer=2 Tower_Island=3; warships hu_dragon_boat hu_dragon_boat hu_dragon_boat hu_dragon_boat hu_dragon_boat hu_dragon_boat hu_dragon_boat hu_dragon_boat

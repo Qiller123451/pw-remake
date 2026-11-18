@@ -1,0 +1,70 @@
+ok  1. the opening film sc_4025: quest "The Telescope Tower" (1 s, at 1 s)
+ok  2. the army reaches the tower ruin: it becomes the player's (15 s, at 16 s)
+   teleport (army: aje_triceratops_archer) to 789,402 at 101 s
+ok  3. the workers repair the telescope tower while the army guards it: quest "The Telescope Tower", film sc_4030 (117 s, at 133 s)
+   teleport (army: aje_triceratops_archer) to 724,268 at 133 s
+   teleport (army: aje_triceratops_archer) to 724,268 at 133 s
+   teleport (army: aje_triceratops_archer) to 724,268 at 133 s
+   teleport (army: Cole_s0) to 724,268 at 133 s
+   teleport (army: special_eusmilus) to 724,268 at 133 s
+   teleport (army: Bela_s0) to 724,268 at 133 s
+ok  4. quest "The SEAS Storm" (6 s, at 139 s)
+   teleport (army: aje_triceratops_archer) to 764,159 at 724 s
+   teleport (army: aje_triceratops_archer) to 640,336 at 1992 s
+   teleport (army: aje_triceratops_archer) to 640,336 at 1992 s
+   teleport (army: aje_triceratops_archer) to 641,332 at 2054 s
+   teleport (army: aje_triceratops_archer) to 641,332 at 2054 s
+   teleport (army: special_eusmilus) to 641,331 at 2061 s
+   teleport (army: aje_triceratops_archer) to 641,331 at 2069 s
+   teleport (army: Cole_s0) to 641,331 at 2072 s
+   teleport (army: aje_triceratops_archer) to 641,331 at 2079 s
+   teleport (army: Bela_s0) to 641,331 at 2093 s
+   teleport (army: aje_triceratops_archer) to 641,331 at 2114 s
+   teleport (army: special_eusmilus) to 641,331 at 2121 s
+   teleport (army: aje_triceratops_archer) to 641,331 at 2129 s
+   teleport (army: Cole_s0) to 641,331 at 2132 s
+   teleport (army: aje_triceratops_archer) to 641,331 at 2139 s
+   teleport (army: Bela_s0) to 641,331 at 2153 s
+   teleport (army: aje_triceratops_archer) to 641,331 at 2160 s
+   teleport (army: aje_triceratops_archer) to 641,331 at 2174 s
+   teleport (army: special_eusmilus) to 641,331 at 2181 s
+   teleport (army: aje_triceratops_archer) to 641,331 at 2189 s
+   teleport (army: Cole_s0) to 641,331 at 2192 s
+   teleport (army: aje_triceratops_archer) to 641,331 at 2199 s
+   teleport (army: Bela_s0) to 641,331 at 2213 s
+   teleport (army: aje_triceratops_archer) to 641,331 at 2220 s
+   teleport (army: aje_triceratops_archer) to 641,331 at 2234 s
+   teleport (army: special_eusmilus) to 641,331 at 2241 s
+   teleport (army: aje_triceratops_archer) to 641,331 at 2249 s
+   teleport (army: Cole_s0) to 641,331 at 2252 s
+   teleport (army: aje_triceratops_archer) to 641,331 at 2259 s
+   teleport (army: Bela_s0) to 641,331 at 2273 s
+   teleport (army: aje_triceratops_archer) to 641,331 at 2280 s
+   teleport (army: aje_triceratops_archer) to 641,331 at 2294 s
+   teleport (army: special_eusmilus) to 643,333 at 2301 s
+   teleport (army: aje_triceratops_archer) to 643,333 at 2309 s
+   teleport (army: Cole_s0) to 643,333 at 2312 s
+   teleport (army: aje_triceratops_archer) to 643,333 at 2319 s
+   teleport (army: Bela_s0) to 643,333 at 2333 s
+   teleport (army: aje_triceratops_archer) to 643,333 at 2340 s
+   teleport (army: aje_triceratops_archer) to 643,333 at 2354 s
+   teleport (army: special_eusmilus) to 642,333 at 2361 s
+   teleport (army: aje_triceratops_archer) to 641,332 at 2369 s
+   teleport (army: aje_triceratops_archer) to 641,332 at 2379 s
+   teleport (fleet: aje_cronosaurus) to 251,281 at 2536 s
+   teleport (fleet: aje_cronosaurus) to 251,281 at 2538 s
+   teleport (fleet: aje_cronosaurus) to 251,281 at 2538 s
+   teleport (fleet: aje_cronosaurus) to 251,281 at 2538 s
+   teleport (fleet: aje_cronosaurus) to 251,281 at 2539 s
+ok  5. the fleet stops the carrier ships for 40 minutes: film sc_4038, the mission is won (2404 s, at 2543 s)
+ok no exception
+ok QUIT: the mission is won
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Aje (mission: Ninigi); game time 42 min; teleports 54; cheat kills 77; top-ups 0
+   triggers fired 126 of 184, 395 firings, 743 actions, warnings 0
+   quests: L12MQ01=done L12MQ02=hidden L12MQ03=done L12SQ01=done L12SQ02=open
+   sequences: sc_4025@1 sc_4030@138 sc_4027@335 sc_4038@2543
+   player: aje_resource_collector x1, aje_triceratops_archer x4, aje_worker x10, Cole_s0 x1, special_eusmilus x1, Bela_s0 x1, aje_cronosaurus x12; buildings aje_rodeo ninigi_hunting_lodge ninigi_lumbermill ninigi_stone_quarry aje_tent aje_tent aje_tent aje_tent aje_tent aje_tent; res {"food":315,"wood":430,"stone":1000,"skulls":940,"power":0}
+   won: {"won":true,"text":""}
+   variables: Carrier=0 Turmstörer=2 Tower_Island=3; warships aje_cronosaurus aje_cronosaurus aje_cronosaurus aje_cronosaurus aje_cronosaurus aje_cronosaurus aje_cronosaurus aje_cronosaurus aje_cronosaurus aje_cronosaurus aje_cronosaurus aje_cronosaurus

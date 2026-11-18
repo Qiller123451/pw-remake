@@ -1,0 +1,43 @@
+ok  1. the camera lessons: scroll, zoom, turn (62 s, at 62 s)
+ok  2. the heroes are the player's and walk to the marker (91 s, at 153 s)
+ok  3. the Smilodon in the village is killed (12 s, at 165 s)
+ok  4. the heroes follow Ada: chapter 1 is over (54 s, at 219 s)
+ok  5. the workers harvest 90 food (63 s, at 282 s)
+ok  6. 3 more workers (45 s, at 327 s)
+ok  7. a hero finds the stones (17 s, at 344 s)
+ok  8. a stone quarry next to the stones (48 s, at 392 s)
+ok  9. a forester's lodge next to the woods (15 s, at 407 s)
+ok 10. 300 food, wood and stone (87 s, at 494 s)
+ok 11. the town centre and the cottage are repaired (92 s, at 586 s)
+ok 12. Béla is hired in the tavern (49 s, at 635 s)
+ok 13. two more cottages (37 s, at 672 s)
+ok 14. epoch 2 in the town centre (110 s, at 782 s)
+ok 15. a barracks (6 s, at 788 s)
+ok 16. 4 spearmen (68 s, at 856 s)
+   teleport (all: Cole_s0) to 456,535 at 924 s
+   teleport (all: Stina_s0) to 456,535 at 924 s
+   teleport (all: Bela_s0) to 456,535 at 924 s
+   teleport (all: ninigi_spearman) to 456,535 at 924 s
+   teleport (all: ninigi_spearman) to 456,535 at 924 s
+ok 17. the heroes and spearmen find the nest (69 s, at 925 s)
+ok 18. the Smilodons and their nest are destroyed (22 s, at 947 s)
+ok 19. a unit is promoted (1 s, at 948 s)
+ok 20. back to Ada at the second gate (56 s, at 1004 s)
+ok 21. an animal farm (20 s, at 1024 s)
+ok 22. a chariot (5 s, at 1029 s)
+ok 23. an archer (8 s, at 1037 s)
+ok 24. the archer boards the chariot (0 s, at 1037 s)
+ok 25. the thief: caught or escaped (34 s, at 1071 s)
+ok 26. 10 fighters at the third gate (56 s, at 1127 s)
+ok 27. the artifact is picked up (32 s, at 1159 s)
+ok 28. the attackers are beaten (18 s, at 1177 s)
+ok 29. the final sequence and QUIT (10 s, at 1187 s)
+ok no exception
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Ninigi (mission: Hu); game time 20 min; teleports 5; cheat kills 7; top-ups 2
+   triggers fired 422 of 594, 444 firings, 997 actions, warnings 0
+   quests: T00G1MQ01=done T00C1MQ01=done T00C1MQ02=done T00C1MQ03=done T00C2MQ01=done T00C2MQ02=done T00C2MQ03=done T00C2MQ04=done T00C2MQ06=done T00C2MQ07=done T00C2MQ05=done T00C2MQ08=done T00C2MQ09=hidden T00C3MQ01=done T00C3MQ02=done T00C3MQ03=done T00C3MQ04=done T00C3MQ05=done T00C3MQ06=done T00C3MQ07=done T00C3MQ08=done T00C4MQ01=done T00C4MQ02=done T00C4MQ03=done T00C4MQ04=done T00C4MQ05=done T00C4MQ06=done T00C4SQ01=failed L01MQ00b_coles_dea=done
+   sequences: ms_1000_1000a@0 sc_0103@77 sc_0215@588 sc_0300@794 sc_0326@1005 sc_0409@1037 sc_0410@1070 sc_0416@1169 sc_0418@1186
+   player: Cole_s0 x1, Stina_s0 x1, ninigi_worker x9, Bela_s0 x1, ninigi_spearman x4, ninigi_archer x1, ninigi_warrior x4; buildings hu_stone_cottage ninigi_fireplace ninigi_stone_quarry ninigi_lumbermill ninigi_teahouse ninigi_dojo ninigi_engineer ninigi_harbour ninigi_paddy; res {"food":300,"wood":390,"stone":358,"skulls":44,"power":0}
+   won: {"won":true,"text":""}

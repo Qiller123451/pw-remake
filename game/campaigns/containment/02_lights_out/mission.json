@@ -1,0 +1,251 @@
+{
+ "id": 2,
+ "title": "Lights Out",
+ "place": "Black Canyon Generating Station",
+ "date": "June 21, 1964",
+ "unlocks": [
+  "sq_power_pole",
+  "sq_generator",
+  "sq_windmill",
+  "sq_searchlight",
+  "sq_shock_trooper"
+ ],
+ "briefing": [
+  "Taslov's stabilizers need power - more than any field generator can give. The Black Canyon station feeds half of Nevada, and tonight two rifts opened in the canyon above it.",
+  "Hold the generating station until dawn. The creatures hate light: searchlight towers will dazzle anything that walks into the beam.",
+  "And put the station to work for us: workers in the turbine hall, and a line of power poles to the base. Searchlights, nets and Taslov's new toys all run on electricity."
+ ],
+ "night": true,
+ "creatures": [
+  "Velociraptor",
+  "Deinonychus",
+  "Allosaurus",
+  "Carnotaurus",
+  "Smilodon"
+ ],
+ "powers": [
+  "supply",
+  "recon",
+  "airdrop"
+ ],
+ "res": {
+  "food": 600,
+  "wood": 700,
+  "stone": 500,
+  "power": 60
+ },
+ "map": {
+  "seed": 2121,
+  "clear": [
+   [
+    20,
+    40,
+    28
+   ],
+   [
+    -120,
+    -150,
+    22
+   ],
+   [
+    130,
+    -160,
+    22
+   ]
+  ],
+  "setting": "Savanna",
+  "size": 440,
+  "base": 4,
+  "noise": [
+   [
+    0.005,
+    6
+   ],
+   [
+    0.025,
+    1.2
+   ]
+  ],
+  "ground": [
+   7,
+   0,
+   4,
+   3,
+   6,
+   2
+  ],
+  "features": [
+   {
+    "type": "ridge",
+    "path": [
+     [
+      -220,
+      -40
+     ],
+     [
+      -60,
+      -60
+     ]
+    ],
+    "w": 70,
+    "h": 30
+   },
+   {
+    "type": "ridge",
+    "path": [
+     [
+      60,
+      -60
+     ],
+     [
+      220,
+      -30
+     ]
+    ],
+    "w": 70,
+    "h": 30
+   },
+   {
+    "type": "mesa",
+    "x": -150,
+    "z": 140,
+    "r": 60,
+    "h": 20
+   },
+   {
+    "type": "mesa",
+    "x": 170,
+    "z": 150,
+    "r": 50,
+    "h": 22
+   },
+   {
+    "type": "flat",
+    "x": 0,
+    "z": 40,
+    "r": 90,
+    "h": 4
+   }
+  ],
+  "roads": [
+   {
+    "path": [
+     [
+      0,
+      220
+     ],
+     [
+      0,
+      60
+     ],
+     [
+      -10,
+      -60
+     ],
+     [
+      0,
+      -220
+     ]
+    ],
+    "width": 8,
+    "kind": "highway"
+   }
+  ],
+  "places": [
+   {
+    "kind": "industry",
+    "x": 20,
+    "z": 40,
+    "rot": 0
+   },
+   {
+    "kind": "camp",
+    "x": -60,
+    "z": 120,
+    "rot": 0
+   }
+  ],
+  "rocks": [
+   {
+    "x": -140,
+    "z": -120,
+    "r": 70,
+    "n": 30
+   },
+   {
+    "x": 140,
+    "z": -120,
+    "r": 70,
+    "n": 30
+   }
+  ],
+  "resources": [
+   {
+    "x": -40,
+    "z": 170,
+    "stone": 6,
+    "food": 6,
+    "wood": 26
+   }
+  ],
+  "forests": [
+   {
+    "x": 120,
+    "z": 180,
+    "r": 40,
+    "n": 20
+   }
+  ],
+  "shrubs": 200
+ },
+ "start": {
+  "buildings": [
+   [
+    "seas_headquarters",
+    -70,
+    170,
+    0
+   ],
+   [
+    "seas_barracks",
+    -38,
+    174,
+    0
+   ]
+  ],
+  "units": [
+   [
+    "sq_halloran",
+    -82,
+    148,
+    1
+   ],
+   [
+    "seas_worker",
+    -74,
+    152,
+    6
+   ],
+   [
+    "sq_trooper",
+    14,
+    76,
+    4,
+    2
+   ],
+   [
+    "seas_marksman",
+    20,
+    70,
+    2,
+    2
+   ],
+   [
+    "sq_taslov",
+    -60,
+    150,
+    1
+   ]
+  ]
+ }
+}

@@ -1,0 +1,236 @@
+{
+ "id": 9,
+ "title": "The Dustriders",
+ "place": "Monument Valley, Arizona",
+ "date": "February 11, 1965",
+ "briefing": [
+  "The satellite has found something new: a rift that stayed open, and a camp beside it. Not of dinosaurs - of people. Riders in bone armour, with war-dinosaurs and a chieftain called Tala.",
+  "Crane's hunters are on their way to capture them. Decide for yourself who the enemy is."
+ ],
+ "tribes": [
+  "Aje"
+ ],
+ "aje": {
+  "behaviour": "Turtle"
+ },
+ "crane": {
+  "behaviour": "Giraffe"
+ },
+ "creatures": [
+  "Velociraptor",
+  "Allosaurus"
+ ],
+ "powers": [
+  "supply",
+  "recon",
+  "airdrop",
+  "artillery"
+ ],
+ "res": {
+  "food": 1000,
+  "wood": 1000,
+  "stone": 1000
+ },
+ "map": {
+  "seed": 2111,
+  "clear": [
+   [
+    170,
+    -160,
+    44
+   ],
+   [
+    180,
+    190,
+    44
+   ]
+  ],
+  "setting": "Savanna",
+  "size": 540,
+  "base": 6,
+  "noise": [
+   [
+    0.004,
+    7
+   ],
+   [
+    0.02,
+    1.4
+   ]
+  ],
+  "ground": [
+   4,
+   0,
+   2,
+   3,
+   6,
+   7
+  ],
+  "features": [
+   {
+    "type": "mesa",
+    "x": 0,
+    "z": -40,
+    "r": 50,
+    "h": 34,
+    "edge": 6
+   },
+   {
+    "type": "mesa",
+    "x": 120,
+    "z": 120,
+    "r": 40,
+    "h": 30,
+    "edge": 6
+   },
+   {
+    "type": "mesa",
+    "x": -120,
+    "z": -160,
+    "r": 45,
+    "h": 32,
+    "edge": 6
+   },
+   {
+    "type": "flat",
+    "x": 170,
+    "z": -170,
+    "r": 80,
+    "h": 6
+   },
+   {
+    "type": "flat",
+    "x": -180,
+    "z": 180,
+    "r": 70,
+    "h": 6
+   },
+   {
+    "type": "flat",
+    "x": 180,
+    "z": 190,
+    "r": 60,
+    "h": 6
+   }
+  ],
+  "roads": [
+   {
+    "path": [
+     [
+      -270,
+      200
+     ],
+     [
+      -120,
+      120
+     ],
+     [
+      60,
+      200
+     ],
+     [
+      270,
+      190
+     ]
+    ],
+    "width": 8,
+    "kind": "dirt"
+   }
+  ],
+  "places": [],
+  "rocks": [
+   {
+    "x": 0,
+    "z": 100,
+    "r": 120,
+    "n": 50
+   }
+  ],
+  "resources": [
+   {
+    "x": -180,
+    "z": 180,
+    "stone": 6,
+    "food": 6,
+    "wood": 26
+   }
+  ],
+  "forests": [
+   {
+    "x": -220,
+    "z": 60,
+    "r": 40,
+    "n": 24
+   }
+  ],
+  "shrubs": 300
+ },
+ "start": {
+  "buildings": [
+   [
+    "seas_headquarters",
+    -180,
+    190,
+    0
+   ],
+   [
+    "seas_barracks",
+    -148,
+    194,
+    0
+   ],
+   [
+    "seas_garage",
+    -182,
+    228,
+    0
+   ]
+  ],
+  "units": [
+   [
+    "sq_halloran",
+    -192,
+    168,
+    1
+   ],
+   [
+    "seas_worker",
+    -184,
+    172,
+    6
+   ],
+   [
+    "sq_trooper",
+    -170,
+    170,
+    4,
+    2
+   ],
+   [
+    "seas_marksman",
+    -164,
+    164,
+    2,
+    2
+   ],
+   [
+    "sq_taslov",
+    -160,
+    160,
+    1
+   ],
+   [
+    "sq_booker",
+    -150,
+    160,
+    1
+   ],
+   [
+    "seas_triceratops",
+    -140,
+    150,
+    2
+   ]
+  ]
+ }
+}

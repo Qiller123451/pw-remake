@@ -1,0 +1,21 @@
+{
+  "cfg": "base",
+  "mission": 13,
+  "tribe": "Ninigi",
+  "title": "Mission 13: The Rush",
+  "steps": 5,
+  "passed": 5,
+  "failedStep": null,
+  "over": true,
+  "won": true,
+  "finished": true,
+  "gameMinutes": 50.2,
+  "wallSeconds": 82,
+  "teleports": 58,
+  "cheatKills": 205,
+  "topUps": 0,
+  "triggerErrors": 0,
+  "fails": 0,
+  "exception": null,
+  "date": "2026-11-02"
+}

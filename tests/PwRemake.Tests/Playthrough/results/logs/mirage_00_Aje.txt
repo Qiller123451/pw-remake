@@ -1,0 +1,42 @@
+ok  1. the camera lessons: scroll, zoom, turn (62 s, at 62 s)
+ok  2. the heroes are the player's and walk to the marker (91 s, at 153 s)
+ok  3. the Smilodon in the village is killed (12 s, at 165 s)
+ok  4. the heroes follow Ada: chapter 1 is over (53 s, at 218 s)
+ok  5. the workers harvest 90 food (63 s, at 281 s)
+ok  6. 3 more workers (46 s, at 327 s)
+ok  7. a hero finds the stones (17 s, at 344 s)
+ok  8. a stone quarry next to the stones (16 s, at 360 s)
+ok  9. a forester's lodge next to the woods (0 s, at 360 s)
+ok 10. 300 food, wood and stone (126 s, at 486 s)
+ok 11. the town centre and the cottage are repaired (17 s, at 503 s)
+ok 12. Béla is hired in the tavern (49 s, at 552 s)
+ok 13. two more cottages (46 s, at 598 s)
+ok 14. epoch 2 in the town centre (66 s, at 664 s)
+ok 15. a barracks (32 s, at 696 s)
+ok 16. 4 spearmen (43 s, at 739 s)
+   teleport (all: Cole_s0) to 456,535 at 807 s
+   teleport (all: Stina_s0) to 456,535 at 807 s
+   teleport (all: Bela_s0) to 456,535 at 807 s
+   teleport (all: aje_spearman) to 456,535 at 807 s
+ok 17. the heroes and spearmen find the nest (69 s, at 808 s)
+ok 18. the Smilodons and their nest are destroyed (17 s, at 825 s)
+ok 19. a unit is promoted (1 s, at 826 s)
+ok 20. back to Ada at the second gate (58 s, at 884 s)
+ok 21. an animal farm (45 s, at 929 s)
+ok 22. a chariot (5 s, at 934 s)
+ok 23. an archer (15 s, at 949 s)
+ok 24. the archer boards the chariot (0 s, at 949 s)
+ok 25. the thief: caught or escaped (35 s, at 984 s)
+ok 26. 10 fighters at the third gate (47 s, at 1031 s)
+ok 27. the artifact is picked up (32 s, at 1063 s)
+ok 28. the attackers are beaten (18 s, at 1081 s)
+ok 29. the final sequence and QUIT (10 s, at 1091 s)
+ok no exception
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Aje (mission: Hu); game time 18 min; teleports 4; cheat kills 8; top-ups 2
+   triggers fired 425 of 597, 447 firings, 1015 actions, warnings 0
+   quests: T00G1MQ01=done T00C1MQ01=done T00C1MQ02=done T00C1MQ03=done T00C2MQ01=done T00C2MQ02=done T00C2MQ03=done T00C2MQ04=done T00C2MQ06=done T00C2MQ07=done T00C2MQ05=done T00C2MQ08=done T00C2MQ09=hidden T00C3MQ01=done T00C3MQ02=done T00C3MQ03=done T00C3MQ04=done T00C3MQ05=done T00C3MQ06=done T00C3MQ07=done T00C3MQ08=done T00C4MQ01=done T00C4MQ02=done T00C4MQ03=done T00C4MQ04=done T00C4MQ05=done T00C4MQ06=done T00C4SQ01=failed L01MQ00b_coles_dea=done
+   sequences: ms_1000_1000a@0 sc_0103@77 sc_0215@505 sc_0300@676 sc_0326@885 sc_0409@950 sc_0410@983 sc_0416@1073 sc_0418@1090
+   player: Cole_s0 x1, Stina_s0 x1, aje_worker x9, aje_resource_collector x1, Bela_s0 x1, aje_spearman x4, aje_archer x1, aje_warrior x2; buildings aje_tent aje_tent aje_cook_house aje_tent aje_tent aje_rodeo aje_floating_harbour aje_small_farm; res {"food":500,"wood":500,"stone":444,"skulls":50,"power":0}
+   won: {"won":true,"text":""}

@@ -1,0 +1,113 @@
+ok  1. the opening film sc_4070: quest "Hold the Fort" (1 s, at 1 s)
+   teleport (squad1: ninigi_archer) to 999,534 at 187 s
+   teleport (squad1: ninigi_warrior) to 999,534 at 187 s
+   teleport (squad0: ninigi_spearman) to 636,322 at 265 s
+   teleport (squad0: ninigi_warrior) to 636,322 at 265 s
+   teleport (squad0: ninigi_archer) to 636,322 at 449 s
+   teleport (squad0: ninigi_archer) to 636,322 at 449 s
+   teleport (squad0: ninigi_warrior) to 636,322 at 449 s
+   teleport (squad0: ninigi_archer) to 636,322 at 449 s
+   teleport (squad0: ninigi_warrior) to 636,322 at 450 s
+   teleport (squad0: ninigi_warrior) to 636,322 at 450 s
+   teleport (squad1: ninigi_archer) to 962,587 at 562 s
+   teleport (squad1: Cole_s0) to 962,587 at 562 s
+   teleport (squad1: ninigi_spearman) to 962,587 at 562 s
+   teleport (squad1: ninigi_warrior) to 962,587 at 562 s
+   teleport (squad1: ninigi_warrior) to 962,587 at 562 s
+   teleport (squad1: ninigi_archer) to 962,587 at 562 s
+   teleport (squad0: ninigi_archer) to 636,322 at 796 s
+   teleport (squad0: ninigi_archer) to 636,322 at 797 s
+   teleport (squad0: ninigi_spearman) to 636,322 at 797 s
+   teleport (squad0: ninigi_warrior) to 636,322 at 797 s
+   teleport (squad0: ninigi_warrior) to 636,322 at 797 s
+   teleport (squad0: ninigi_archer) to 636,322 at 797 s
+   teleport (squad0: ninigi_warrior) to 636,322 at 797 s
+   teleport (squad1: ninigi_warrior) to 959,587 at 912 s
+   teleport (squad0: ninigi_archer) to 636,322 at 1044 s
+   teleport (squad0: ninigi_archer) to 636,322 at 1044 s
+   teleport (squad0: ninigi_spearman) to 636,322 at 1044 s
+   teleport (squad0: ninigi_warrior) to 636,322 at 1044 s
+   teleport (squad0: ninigi_warrior) to 636,322 at 1044 s
+   teleport (squad0: ninigi_archer) to 636,322 at 1044 s
+   teleport (squad0: ninigi_warrior) to 636,322 at 1044 s
+   teleport (squad1: ninigi_warrior) to 982,579 at 1238 s
+   teleport (squad1: ninigi_warrior) to 982,579 at 1238 s
+   teleport (squad2: ninigi_spearman) to 969,450 at 1248 s
+   teleport (squad2: ninigi_warrior) to 969,450 at 1248 s
+   teleport (squad0: ninigi_archer) to 636,322 at 1342 s
+   teleport (squad0: ninigi_archer) to 636,322 at 1342 s
+   teleport (squad0: ninigi_spearman) to 636,322 at 1342 s
+   teleport (squad0: ninigi_warrior) to 636,322 at 1342 s
+   teleport (squad0: ninigi_warrior) to 636,322 at 1342 s
+   teleport (squad0: ninigi_archer) to 636,322 at 1342 s
+   teleport (squad0: ninigi_warrior) to 636,322 at 1342 s
+   teleport (squad1: ninigi_archer) to 974,465 at 1553 s
+   teleport (squad1: ninigi_warrior) to 974,465 at 1553 s
+   teleport (squad1: ninigi_warrior) to 974,465 at 1553 s
+   teleport (squad1: ninigi_archer) to 974,465 at 1553 s
+   teleport (squad1: ninigi_archer) to 974,465 at 1553 s
+   teleport (squad1: ninigi_warrior) to 974,465 at 1553 s
+   teleport (squad2: ninigi_archer) to 968,450 at 1567 s
+   teleport (squad2: ninigi_archer) to 968,450 at 1567 s
+   teleport (squad2: ninigi_warrior) to 968,450 at 1567 s
+   teleport (squad0: ninigi_archer) to 636,322 at 1599 s
+   teleport (squad0: ninigi_warrior) to 636,322 at 1599 s
+   teleport (squad0: ninigi_archer) to 636,322 at 1600 s
+   teleport (squad0: ninigi_archer) to 636,322 at 1600 s
+   teleport (squad0: ninigi_warrior) to 636,322 at 1600 s
+   teleport (squad1: ninigi_archer) to 984,580 at 1841 s
+   teleport (squad1: ninigi_warrior) to 984,580 at 1841 s
+   teleport (squad0: ninigi_archer) to 636,322 at 2005 s
+   teleport (squad0: ninigi_archer) to 636,322 at 2005 s
+   teleport (squad0: ninigi_spearman) to 636,322 at 2005 s
+   teleport (squad0: ninigi_warrior) to 636,322 at 2005 s
+   teleport (squad0: ninigi_archer) to 636,322 at 2005 s
+   teleport (squad0: ninigi_warrior) to 636,322 at 2005 s
+   teleport (squad2: ninigi_archer) to 968,447 at 2156 s
+   teleport (squad2: ninigi_spearman) to 968,447 at 2156 s
+   teleport (squad2: ninigi_warrior) to 968,447 at 2156 s
+   teleport (squad2: ninigi_archer) to 968,447 at 2156 s
+   teleport (squad2: ninigi_warrior) to 968,447 at 2156 s
+   teleport (squad0: ninigi_spearman) to 636,322 at 2280 s
+   teleport (squad0: ninigi_warrior) to 636,322 at 2280 s
+   teleport (squad0: ninigi_archer) to 636,322 at 2280 s
+   teleport (squad1: ninigi_archer) to 947,530 at 2280 s
+   teleport (squad1: ninigi_spearman) to 947,530 at 2280 s
+   teleport (squad1: ninigi_warrior) to 947,530 at 2280 s
+   teleport (squad1: ninigi_warrior) to 947,530 at 2280 s
+   teleport (squad1: ninigi_warrior) to 947,530 at 2280 s
+   teleport (squad1: ninigi_warrior) to 976,586 at 2748 s
+   teleport (squad1: ninigi_archer) to 976,586 at 2748 s
+   teleport (squad2: Bela_s0) to 955,456 at 2762 s
+   teleport (squad2: ninigi_warrior) to 955,456 at 2762 s
+   teleport (squad2: ninigi_archer) to 955,456 at 2762 s
+ok  2. the army waits in front of the gate until the big SEAS attack is beaten: quest "Hold the Fort" (2866 s, at 2867 s)
+ok  3. quest "Counter Attack" (25 s, at 2892 s)
+   teleport (army: ninigi_archer) to 633,908 at 2892 s
+   teleport (army: Bela_s0) to 633,908 at 2892 s
+   teleport (army: ninigi_spearman) to 633,908 at 2892 s
+   teleport (army: ninigi_warrior) to 633,908 at 2892 s
+   teleport (army: ninigi_warrior) to 633,908 at 2892 s
+   teleport (army: ninigi_archer) to 633,908 at 2892 s
+   teleport (army: ninigi_archer) to 633,908 at 2892 s
+   teleport (army: ninigi_warrior) to 633,908 at 2892 s
+   teleport (army: ninigi_warrior) to 633,908 at 2892 s
+   teleport (army: ninigi_archer) to 633,908 at 2892 s
+ok  4. the army breaks the SEAS headquarters on the plateau: quest "Counter Attack" (14 s, at 2906 s)
+ok  5. the film ms_6020 ends the mission (5 s, at 2911 s)
+ok no exception
+ok QUIT: the mission is won
+   group team_mainbase: 0 alive 
+   group team_outpost01: 0 alive 
+   group team_outpost02: 1 alive seas_wehrspinne@1021,533:attackmove
+   group team_outpost03: 2 alive seas_wehrspinne@1023,619:attackmove seas_wehrspinne@1019,614:attackmove
+   city wall pieces left: 19 of 20 (lost: hcl13_city_wall_87)
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Ninigi; game time 49 min; teleports 92; cheat kills 265; top-ups 0
+   triggers fired 79 of 206, 79 firings, 201 actions, warnings 0
+   quests: L13MQ01=done L13MQ02=done L13SQ01=hidden L13SQ02=hidden L13SQ03=hidden L13SQ04=hidden L13SQ05=hidden L13SQ06=hidden L13SQ07=hidden
+   sequences: sc_4070@0 sc_4080@2878 ms_6020@2910
+   player: darwin_s0 x1, ninigi_archer x7, ninigi_worker x15, Cole_s0 x1, special_eusmilus x1, Bela_s0 x1, ninigi_spearman x2, ninigi_warrior x10; buildings ninigi_snare_trap ninigi_snare_trap ninigi_defense_skewer ninigi_paddy ninigi_defense_skewer_gate ninigi_defense_skewer ninigi_snare_trap ninigi_snare_trap ninigi_snare_trap ninigi_snare_trap ninigi_small_tower ninigi_small_tower ninigi_small_tower ninigi_defense_skewer ninigi_defense_skewer_gate ninigi_defense_skewer ninigi_stone_quarry ninigi_lumbermill ninigi_paddy ninigi_paddy ninigi_hunting_lodge ninigi_teahouse ninigi_animal_farm ninigi_dojo ninigi_engineer ninigi_fireplace ninigi_fireplace ninigi_small_tower ninigi_small_tower ninigi_defense_skewer ninigi_snare_trap ninigi_telescope_tower ninigi_defense_skewer ninigi_snare_trap ninigi_small_tower; res {"food":1380,"wood":1500,"stone":300,"skulls":3854,"power":0}
+   won: {"won":true,"text":""}
+   variables: init_main_attack=1 main_attack_done=1 team_mainbase_def=1 team_outpost01_def=1 team_outpost02_def=1 team_outpost03_def=1

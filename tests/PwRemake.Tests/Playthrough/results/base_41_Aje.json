@@ -1,0 +1,21 @@
+{
+  "cfg": "base",
+  "mission": 41,
+  "tribe": "Aje",
+  "title": "Mission 4-1: The Devil\u0027s Advocate",
+  "steps": 7,
+  "passed": 7,
+  "failedStep": null,
+  "over": true,
+  "won": true,
+  "finished": true,
+  "gameMinutes": 40.3,
+  "wallSeconds": 134,
+  "teleports": 19,
+  "cheatKills": 453,
+  "topUps": 45,
+  "triggerErrors": 0,
+  "fails": 0,
+  "exception": null,
+  "date": "2026-11-02"
+}

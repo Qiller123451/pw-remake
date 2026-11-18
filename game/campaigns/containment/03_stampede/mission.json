@@ -1,0 +1,251 @@
+{
+ "id": 3,
+ "title": "Stampede on Route 66",
+ "place": "Route 66, east of Flagstaff, Arizona",
+ "date": "July 2, 1964",
+ "unlocks": [
+  "sq_tranq",
+  "sq_capture_truck",
+  "sq_jeep"
+ ],
+ "briefing": [
+  "A rift in the Painted Desert has spilled a herd of horned giants onto Route 66, and they are walking west - straight into Flagstaff.",
+  "Sergeant Booker of the handlers' corps has a better idea than shooting them: tranquilizer marksmen put them to sleep, capture trucks haul them to the pens. A tame triceratops is worth a platoon."
+ ],
+ "creatures": [
+  "Triceratops",
+  "Pentaceratops",
+  "Styracosaurus",
+  "Velociraptor"
+ ],
+ "powers": [
+  "supply",
+  "recon",
+  "airdrop"
+ ],
+ "res": {
+  "food": 700,
+  "wood": 700,
+  "stone": 500
+ },
+ "map": {
+  "seed": 6666,
+  "clear": [
+   [
+    -170,
+    140,
+    22
+   ],
+   [
+    230,
+    -60,
+    22
+   ]
+  ],
+  "setting": "Savanna",
+  "size": 520,
+  "base": 5,
+  "noise": [
+   [
+    0.004,
+    7
+   ],
+   [
+    0.02,
+    1.5
+   ]
+  ],
+  "ground": [
+   1,
+   0,
+   4,
+   3,
+   6,
+   5
+  ],
+  "features": [
+   {
+    "type": "mesa",
+    "x": 60,
+    "z": -170,
+    "r": 70,
+    "h": 20
+   },
+   {
+    "type": "mesa",
+    "x": 160,
+    "z": 170,
+    "r": 60,
+    "h": 18
+   },
+   {
+    "type": "flat",
+    "x": -200,
+    "z": 0,
+    "r": 70,
+    "h": 5
+   }
+  ],
+  "roads": [
+   {
+    "path": [
+     [
+      -260,
+      0
+     ],
+     [
+      -120,
+      10
+     ],
+     [
+      0,
+      -10
+     ],
+     [
+      120,
+      10
+     ],
+     [
+      260,
+      0
+     ]
+    ],
+    "width": 10,
+    "kind": "highway"
+   }
+  ],
+  "places": [
+   {
+    "kind": "town",
+    "x": -220,
+    "z": 10,
+    "rot": 1.5707963267948966,
+    "blocks": 1,
+    "len": 90,
+    "landmarks": false
+   },
+   {
+    "kind": "strip",
+    "x": 40,
+    "z": 30,
+    "rot": 3.141592653589793
+   },
+   {
+    "kind": "farm",
+    "x": -60,
+    "z": 140,
+    "rot": 0.3
+   }
+  ],
+  "rocks": [
+   {
+    "x": 120,
+    "z": -90,
+    "r": 60,
+    "n": 26
+   }
+  ],
+  "forests": [
+   {
+    "x": -120,
+    "z": -150,
+    "r": 50,
+    "n": 26
+   }
+  ],
+  "resources": [
+   {
+    "x": -140,
+    "z": 80,
+    "stone": 6,
+    "food": 6,
+    "wood": 26
+   }
+  ],
+  "shrubs": 300
+ },
+ "start": {
+  "buildings": [
+   [
+    "seas_headquarters",
+    -150,
+    70,
+    0
+   ],
+   [
+    "seas_barracks",
+    -118,
+    74,
+    0
+   ],
+   [
+    "seas_garage",
+    -152,
+    108,
+    0
+   ]
+  ],
+  "units": [
+   [
+    "sq_halloran",
+    -162,
+    48,
+    1
+   ],
+   [
+    "seas_worker",
+    -154,
+    52,
+    6
+   ],
+   [
+    "sq_trooper",
+    -140,
+    50,
+    4,
+    2
+   ],
+   [
+    "seas_marksman",
+    -134,
+    44,
+    2,
+    2
+   ],
+   [
+    "sq_booker",
+    -130,
+    40,
+    1
+   ],
+   [
+    "sq_tranq",
+    -130,
+    50,
+    4,
+    2
+   ],
+   [
+    "sq_capture_truck",
+    -100,
+    60,
+    2
+   ]
+  ]
+ },
+ "zones": [
+  {
+   "name": "pen",
+   "x": -170,
+   "z": 150,
+   "r": 12,
+   "kind": "pen"
+  },
+  {
+   "name": "town",
+   "x": -230,
+   "z": 10,
+   "r": 45
+  }
+ ]
+}

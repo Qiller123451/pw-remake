@@ -1,0 +1,67 @@
+ok  1. the opening film sc_7010: quest "The Core of the Problem" (1 s, at 1 s)
+   teleport (army: special_eusmilus) to 380,722 at 93 s
+   teleport (army: Bela_s0) to 380,722 at 99 s
+ok  2. the army reaches the first pumping station: film ms_7026, quest "Countdown of Death" (99 s, at 100 s)
+   teleport (army: ninigi_archer) to 464,698 at 101 s
+   teleport (army: ninigi_spearman) to 464,698 at 101 s
+   teleport (guard1: ninigi_warrior) to 456,689 at 221 s
+   teleport (guard1: ninigi_warrior) to 456,689 at 221 s
+   teleport (guard3: ninigi_warrior) to 624,553 at 288 s
+   teleport (guard3: ninigi_archer) to 624,553 at 289 s
+   teleport (army: ninigi_archer) to 785,697 at 289 s
+   teleport (army: ninigi_archer) to 785,696 at 299 s
+   teleport (army: ninigi_spearman) to 785,697 at 311 s
+   teleport (army: Bela_s0) to 399,479 at 317 s
+   teleport (guard2: ninigi_spearman) to 802,697 at 331 s
+   teleport (army: Cole_s0) to 406,468 at 385 s
+   teleport (guard4: ninigi_archer) to 400,472 at 395 s
+   teleport (guard4: ninigi_archer) to 420,470 at 406 s
+   teleport (army: ninigi_archer) to 618,549 at 493 s
+   teleport (guard1: ninigi_warrior) to 456,689 at 528 s
+   teleport (guard3: ninigi_spearman) to 624,553 at 533 s
+   teleport (guard2: ninigi_spearman) to 792,688 at 534 s
+   teleport (guard2: ninigi_spearman) to 792,688 at 621 s
+   teleport (guard2: ninigi_spearman) to 792,688 at 724 s
+   teleport (guard1: ninigi_warrior) to 456,689 at 743 s
+   teleport (guard1: ninigi_warrior) to 456,689 at 743 s
+   teleport (army: ninigi_spearman) to 587,551 at 807 s
+   teleport (guard1: ninigi_warrior) to 432,699 at 878 s
+   teleport (guard3: ninigi_archer) to 624,553 at 917 s
+   teleport (guard1: ninigi_warrior) to 456,689 at 950 s
+   teleport (guard4: ninigi_archer) to 400,472 at 958 s
+   teleport (guard4: ninigi_archer) to 400,472 at 958 s
+   teleport (guard2: ninigi_spearman) to 792,688 at 995 s
+   teleport (army: ninigi_archer) to 847,480 at 1058 s
+   teleport (army: ninigi_archer) to 847,481 at 1059 s
+   teleport (guard1: ninigi_warrior) to 456,689 at 1075 s
+   teleport (guard1: ninigi_warrior) to 456,689 at 1075 s
+   teleport (army: special_eusmilus) to 847,480 at 1082 s
+   teleport (army: Cole_s0) to 847,457 at 1093 s
+ok  3. the five pumping stations are taken and held: the countdown stops, sequence sc_7040 (quest "Countdown of Death") (996 s, at 1096 s)
+   teleport (guard5: ninigi_archer) to 847,467 at 1153 s
+   teleport (guard5: ninigi_archer) to 847,467 at 1162 s
+   teleport (guard3: ninigi_archer) to 624,553 at 1177 s
+   teleport (guard3: ninigi_archer) to 624,553 at 1178 s
+   teleport (heroes: Bela_s0) to 623,138 at 1178 s
+   teleport (heroes: tesla_s0) to 623,138 at 1185 s
+   teleport (heroes: special_eusmilus) to 623,138 at 1194 s
+   teleport (guard4: ninigi_archer) to 425,459 at 1200 s
+   teleport (heroes: Cole_s0) to 623,138 at 1200 s
+ok  4. Béla, Cole, Stina and Taslow walk into the crater: quest "The Core of the Problem" (105 s, at 1201 s)
+ok  5. the film sc_7041 ends the mission (3 s, at 1204 s)
+ok no exception
+ok QUIT: the mission is won
+   hero Bela_s0: alive True parked False inside False at (624, 139) task idle
+   hero Cole_s0: alive True parked False inside False at (623, 138) task idle
+   hero special_eusmilus: alive True parked False inside False at (624, 138) task idle
+   hero tesla_s0: alive True parked False inside False at (622, 138) task idle
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Ninigi (mission: Hu); game time 20 min; teleports 46; cheat kills 417; top-ups 8
+   triggers fired 105 of 163, 206 firings, 1234 actions, warnings 0
+   quests: L15MQ01=done L15MQ02=done L15SQ01=done L15SQ02=failed L15SQ03=failed
+   sequences: sc_7010@0 ms_7026@93 sc_7030_a@105 sc_7038@316 sc_7040@1095 sc_7041@1203
+   player: tesla_s0 x1, lovelace_s0 x1, ninigi_warrior x2, ninigi_worker x5, Bela_s0 x1, Cole_s0 x1, special_eusmilus x1, ninigi_spearman x2, ninigi_archer x6; buildings ninigi_fireplace ninigi_lumbermill ninigi_dojo ninigi_paddy ninigi_engineer ninigi_warehouse ninigi_temple ninigi_weapon_maker ninigi_bamboofarm; res {"food":500,"wood":1000,"stone":1075,"skulls":4232,"power":0}
+   won: {"won":true,"text":""}
+   population 20/20, epoch 4
+   variables: ctrlpts=5 ctrlpt01=1 ctrlpt02=1 ctrlpt03=1 ctrlpt04=1 ctrlpt05=1 cntdwn_aborted=1 blocker=0

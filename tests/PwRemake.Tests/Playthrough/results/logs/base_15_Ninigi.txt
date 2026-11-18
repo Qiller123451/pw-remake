@@ -1,0 +1,53 @@
+ok  1. the opening film sc_7010: quest "The Core of the Problem" (1 s, at 1 s)
+   teleport (army: ninigi_spearman) to 380,722 at 100 s
+   teleport (army: ninigi_warrior) to 380,722 at 101 s
+   teleport (army: Cole_s0) to 380,722 at 101 s
+   teleport (army: special_eusmilus) to 380,722 at 101 s
+   teleport (army: ninigi_archer) to 380,722 at 101 s
+   teleport (army: ninigi_archer) to 380,722 at 101 s
+   teleport (army: ninigi_warrior) to 380,722 at 102 s
+   teleport (army: Bela_s0) to 380,722 at 102 s
+   teleport (army: ninigi_spearman) to 380,722 at 102 s
+   teleport (army: ninigi_warrior) to 380,722 at 103 s
+   teleport (army: ninigi_archer) to 380,722 at 103 s
+   teleport (army: ninigi_spearman) to 380,722 at 103 s
+ok  2. the army reaches the first pumping station: film ms_7026, quest "Countdown of Death" (106 s, at 107 s)
+   teleport (guard1: ninigi_warrior) to 456,689 at 252 s
+   teleport (guard1: ninigi_warrior) to 456,689 at 252 s
+   teleport (guard1: ninigi_warrior) to 456,689 at 333 s
+   teleport (guard2: ninigi_spearman) to 792,688 at 354 s
+   teleport (army: ninigi_warrior) to 408,464 at 393 s
+   teleport (army: ninigi_spearman) to 405,464 at 398 s
+   teleport (guard1: ninigi_spearman) to 456,689 at 451 s
+   teleport (guard3: ninigi_archer) to 624,553 at 494 s
+   teleport (guard2: ninigi_spearman) to 792,688 at 519 s
+   teleport (guard1: ninigi_spearman) to 456,689 at 556 s
+   teleport (army: ninigi_warrior) to 419,464 at 579 s
+   teleport (guard4: ninigi_warrior) to 400,472 at 592 s
+   teleport (guard1: ninigi_spearman) to 456,689 at 640 s
+   teleport (guard4: ninigi_archer) to 414,464 at 653 s
+   teleport (army: ninigi_warrior) to 840,465 at 662 s
+ok  3. the five pumping stations are taken and held: the countdown stops, sequence sc_7040 (quest "Countdown of Death") (567 s, at 674 s)
+   teleport (guard2: ninigi_spearman) to 792,688 at 682 s
+   teleport (guard2: ninigi_spearman) to 792,688 at 768 s
+   teleport (heroes: tesla_s0) to 623,138 at 792 s
+   teleport (guard3: ninigi_warrior) to 624,553 at 795 s
+   teleport (guard3: ninigi_warrior) to 624,553 at 812 s
+ok  4. Béla, Cole, Stina and Taslow walk into the crater: quest "The Core of the Problem" (178 s, at 852 s)
+ok  5. the film sc_7041 ends the mission (4 s, at 856 s)
+ok no exception
+ok QUIT: the mission is won
+   hero Bela_s0: alive True parked False inside False at (624, 140) task idle
+   hero Cole_s0: alive True parked False inside False at (621, 140) task idle
+   hero special_eusmilus: alive True parked False inside False at (623, 140) task idle
+   hero tesla_s0: alive True parked False inside False at (621, 137) task idle
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Ninigi (mission: Hu); game time 14 min; teleports 32; cheat kills 304; top-ups 6
+   triggers fired 105 of 161, 117 firings, 453 actions, warnings 0
+   quests: L15MQ01=done L15MQ02=done L15SQ01=done L15SQ02=failed L15SQ03=failed
+   sequences: sc_7010@0 ms_7026@100 sc_7030_a@122 sc_7038@242 sc_7040@673 sc_7041@855
+   player: tesla_s0 x1, lovelace_s0 x1, ninigi_worker x6, Bela_s0 x1, Cole_s0 x1, special_eusmilus x1, ninigi_archer x2, ninigi_spearman x2, ninigi_warrior x5; buildings ninigi_fireplace ninigi_lumbermill ninigi_dojo; res {"food":800,"wood":800,"stone":800,"skulls":3595,"power":0}
+   won: {"won":true,"text":""}
+   population 20/20, epoch 2
+   variables: ctrlpts=5 ctrlpt01=1 ctrlpt02=1 ctrlpt03=1 ctrlpt04=1 ctrlpt05=1 cntdwn_aborted=1 blocker=0

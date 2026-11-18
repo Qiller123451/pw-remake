@@ -1,0 +1,136 @@
+ok  1. the opening film sc_4070: quest "Hold the Fort" (1 s, at 1 s)
+   teleport (squad1: Cole_s0) to 999,534 at 187 s
+   teleport (squad1: seas_spearman) to 999,534 at 187 s
+   teleport (squad1: seas_warrior) to 999,534 at 187 s
+   teleport (squad1: seas_marksman) to 999,534 at 187 s
+   teleport (squad0: seas_warrior) to 636,322 at 254 s
+   teleport (squad0: seas_marksman) to 636,322 at 488 s
+   teleport (squad0: seas_warrior) to 636,322 at 488 s
+   teleport (squad0: seas_warrior) to 636,322 at 488 s
+   teleport (squad1: seas_marksman) to 962,587 at 562 s
+   teleport (squad1: seas_marksman) to 962,587 at 562 s
+   teleport (squad1: Cole_s0) to 971,461 at 646 s
+   teleport (squad1: seas_spearman) to 971,461 at 646 s
+   teleport (squad1: seas_warrior) to 971,461 at 646 s
+   teleport (squad1: seas_warrior) to 971,461 at 646 s
+   teleport (squad2: special_eusmilus) to 967,445 at 712 s
+   teleport (squad2: seas_warrior) to 967,445 at 712 s
+   teleport (squad2: seas_marksman) to 967,445 at 712 s
+   teleport (squad0: seas_marksman) to 636,322 at 721 s
+   teleport (squad0: seas_marksman) to 636,322 at 721 s
+   teleport (squad0: seas_warrior) to 636,322 at 721 s
+   teleport (squad0: seas_marksman) to 636,322 at 721 s
+   teleport (squad0: seas_warrior) to 636,322 at 721 s
+   teleport (squad0: seas_warrior) to 636,322 at 722 s
+   teleport (squad2: seas_marksman) to 967,447 at 813 s
+   teleport (squad2: seas_marksman) to 967,447 at 813 s
+   teleport (squad2: seas_warrior) to 967,447 at 813 s
+   teleport (squad1: seas_marksman) to 980,465 at 905 s
+   teleport (squad1: Cole_s0) to 980,465 at 905 s
+   teleport (squad1: seas_spearman) to 980,465 at 905 s
+   teleport (squad1: seas_warrior) to 980,465 at 905 s
+   teleport (squad1: seas_warrior) to 980,465 at 905 s
+   teleport (squad1: seas_marksman) to 980,465 at 905 s
+   teleport (squad1: seas_warrior) to 980,465 at 905 s
+   teleport (squad0: seas_marksman) to 636,322 at 981 s
+   teleport (squad0: seas_spearman) to 636,322 at 981 s
+   teleport (squad0: seas_warrior) to 636,322 at 981 s
+   teleport (squad0: seas_warrior) to 636,322 at 981 s
+   teleport (squad0: seas_warrior) to 636,322 at 981 s
+   teleport (squad0: seas_marksman) to 636,322 at 981 s
+   teleport (squad0: seas_warrior) to 636,322 at 981 s
+   teleport (squad1: Cole_s0) to 982,579 at 1238 s
+   teleport (squad1: seas_warrior) to 982,579 at 1238 s
+   teleport (squad1: seas_marksman) to 982,579 at 1238 s
+   teleport (squad1: seas_warrior) to 982,579 at 1238 s
+   teleport (squad0: seas_marksman) to 636,322 at 1250 s
+   teleport (squad0: seas_marksman) to 636,322 at 1250 s
+   teleport (squad0: seas_spearman) to 636,322 at 1250 s
+   teleport (squad0: seas_warrior) to 636,322 at 1250 s
+   teleport (squad0: seas_warrior) to 636,322 at 1250 s
+   teleport (squad0: seas_warrior) to 636,322 at 1250 s
+   teleport (squad0: seas_warrior) to 636,322 at 1250 s
+   teleport (squad1: seas_warrior) to 975,535 at 1254 s
+   teleport (squad1: seas_warrior) to 975,535 at 1254 s
+   teleport (squad0: seas_marksman) to 636,322 at 1432 s
+   teleport (squad0: seas_marksman) to 636,322 at 1432 s
+   teleport (squad0: seas_spearman) to 636,322 at 1432 s
+   teleport (squad0: seas_warrior) to 636,322 at 1432 s
+   teleport (squad1: seas_marksman) to 974,465 at 1553 s
+   teleport (squad1: Cole_s0) to 974,465 at 1553 s
+   teleport (squad1: seas_warrior) to 974,465 at 1553 s
+   teleport (squad0: seas_warrior) to 636,322 at 1679 s
+   teleport (squad0: seas_marksman) to 636,322 at 1680 s
+   teleport (squad0: seas_marksman) to 636,322 at 1680 s
+   teleport (squad0: seas_spearman) to 636,322 at 1680 s
+   teleport (squad0: seas_marksman) to 636,322 at 1680 s
+   teleport (squad0: seas_warrior) to 636,322 at 1680 s
+   teleport (squad0: seas_marksman) to 636,322 at 1680 s
+   teleport (squad0: seas_warrior) to 636,322 at 1680 s
+   teleport (squad1: seas_marksman) to 984,580 at 1841 s
+   teleport (squad1: Cole_s0) to 984,580 at 1841 s
+   teleport (squad1: seas_spearman) to 984,580 at 1841 s
+   teleport (squad1: seas_warrior) to 984,580 at 1841 s
+   teleport (squad1: seas_marksman) to 984,580 at 1841 s
+   teleport (squad1: seas_warrior) to 984,580 at 1841 s
+   teleport (squad1: seas_warrior) to 984,580 at 1841 s
+   teleport (squad0: seas_spearman) to 636,322 at 1884 s
+   teleport (squad0: seas_warrior) to 636,322 at 1884 s
+   teleport (squad0: seas_marksman) to 636,322 at 1884 s
+   teleport (squad0: seas_warrior) to 636,322 at 1884 s
+   teleport (squad0: seas_warrior) to 636,322 at 1885 s
+   teleport (squad1: seas_warrior) to 800,370 at 1970 s
+   teleport (squad0: seas_marksman) to 636,322 at 2128 s
+   teleport (squad0: seas_marksman) to 636,322 at 2129 s
+   teleport (squad0: seas_spearman) to 636,322 at 2129 s
+   teleport (squad0: seas_marksman) to 636,322 at 2129 s
+   teleport (squad2: seas_spearman) to 962,449 at 2156 s
+   teleport (squad2: seas_warrior) to 962,449 at 2156 s
+   teleport (squad1: seas_marksman) to 917,585 at 2283 s
+   teleport (squad1: seas_spearman) to 917,585 at 2283 s
+   teleport (squad1: seas_warrior) to 917,585 at 2283 s
+   teleport (squad1: seas_warrior) to 917,585 at 2283 s
+   teleport (squad1: seas_marksman) to 917,585 at 2283 s
+   teleport (squad1: seas_warrior) to 917,585 at 2283 s
+   teleport (squad2: seas_marksman) to 930,370 at 2283 s
+   teleport (squad2: seas_warrior) to 930,370 at 2283 s
+   teleport (squad2: seas_marksman) to 930,370 at 2283 s
+   teleport (squad2: seas_marksman) to 930,370 at 2283 s
+   teleport (squad1: seas_marksman) to 963,587 at 2453 s
+   teleport (squad1: seas_spearman) to 963,587 at 2453 s
+   teleport (squad1: seas_warrior) to 963,587 at 2453 s
+   teleport (squad1: seas_marksman) to 963,587 at 2453 s
+   teleport (squad1: seas_marksman) to 962,587 at 2690 s
+   teleport (squad1: seas_spearman) to 800,370 at 2691 s
+   teleport (squad1: seas_warrior) to 800,370 at 2691 s
+   teleport (squad1: seas_marksman) to 958,587 at 2717 s
+   teleport (squad1: seas_warrior) to 958,587 at 2717 s
+   teleport (squad2: seas_warrior) to 953,454 at 2762 s
+ok  2. the army waits in front of the gate until the big SEAS attack is beaten: quest "Hold the Fort" (2832 s, at 2833 s)
+ok  3. quest "Counter Attack" (25 s, at 2858 s)
+   teleport (army: seas_marksman) to 633,908 at 2858 s
+   teleport (army: seas_marksman) to 633,908 at 2858 s
+   teleport (army: seas_spearman) to 633,908 at 2858 s
+   teleport (army: seas_warrior) to 633,908 at 2858 s
+   teleport (army: seas_warrior) to 633,908 at 2858 s
+   teleport (army: seas_marksman) to 633,908 at 2858 s
+   teleport (army: seas_warrior) to 633,908 at 2858 s
+   teleport (army: seas_warrior) to 633,908 at 2858 s
+ok  4. the army breaks the SEAS headquarters on the plateau: quest "Counter Attack" (17 s, at 2875 s)
+ok  5. the film ms_6020 ends the mission (5 s, at 2880 s)
+ok no exception
+ok QUIT: the mission is won
+   group team_mainbase: 0 alive 
+   group team_outpost01: 0 alive 
+   group team_outpost02: 1 alive seas_wehrspinne@924,532:attack
+   group team_outpost03: 2 alive seas_wehrspinne@957,557:attack seas_wehrspinne@957,556:attack
+   city wall pieces left: 19 of 20 (lost: hcl13_city_wall_87)
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe SEAS (mission: Ninigi); game time 48 min; teleports 115; cheat kills 231; top-ups 0
+   triggers fired 79 of 206, 79 firings, 197 actions, warnings 0
+   quests: L13MQ01=done L13MQ02=done L13SQ01=hidden L13SQ02=hidden L13SQ03=hidden L13SQ04=hidden L13SQ05=hidden L13SQ06=hidden L13SQ07=hidden
+   sequences: sc_4070@0 sc_4080@2844 ms_6020@2879
+   player: darwin_s0 x1, seas_marksman x6, seas_worker x14, Cole_s0 x1, special_eusmilus x1, Bela_s0 x1, seas_spearman x3, seas_warrior x13; buildings ninigi_snare_trap ninigi_snare_trap seas_fence seas_greenhouse seas_gate seas_fence ninigi_snare_trap ninigi_snare_trap ninigi_snare_trap ninigi_snare_trap seas_turret_tower seas_fence seas_turret_tower seas_turret_tower seas_fence seas_gate seas_fence seas_steelwork seas_steelwork seas_greenhouse seas_greenhouse seas_steelwork seas_pub seas_garage seas_barracks seas_garage seas_headquarters seas_headquarters seas_turret_tower seas_fence ninigi_snare_trap seas_turret_tower seas_fence ninigi_snare_trap seas_turret_tower; res {"food":2780,"wood":4000,"stone":4000,"skulls":4321,"power":0}
+   won: {"won":true,"text":""}
+   variables: init_main_attack=1 main_attack_done=1 team_mainbase_def=1 team_outpost01_def=1 team_outpost02_def=1 team_outpost03_def=1

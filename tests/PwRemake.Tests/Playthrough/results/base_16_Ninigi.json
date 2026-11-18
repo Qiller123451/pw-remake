@@ -1,0 +1,21 @@
+{
+  "cfg": "base",
+  "mission": 16,
+  "tribe": "Ninigi",
+  "title": "Mission 16: Showdown!",
+  "steps": 6,
+  "passed": 6,
+  "failedStep": null,
+  "over": true,
+  "won": true,
+  "finished": true,
+  "gameMinutes": 6.5,
+  "wallSeconds": 1,
+  "teleports": 0,
+  "cheatKills": 53,
+  "topUps": 0,
+  "triggerErrors": 0,
+  "fails": 0,
+  "exception": null,
+  "date": "2026-11-02"
+}

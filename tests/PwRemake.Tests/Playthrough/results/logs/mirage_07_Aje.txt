@@ -1,0 +1,21 @@
+ok  1. quest "The Chase" from the start (1 s, at 1 s)
+ok  2. the heroes reach Taslow's house (question mark 1): film ms_2560, Taslow joins (39 s, at 40 s)
+   teleport (heroes: special_eusmilus) to 824,676 at 138 s
+   teleport (heroes: Cole_s0) to 824,676 at 152 s
+   teleport (heroes: Bela_s0) to 824,676 at 153 s
+   teleport (heroes: tesla_s0) to 824,676 at 154 s
+ok  3. Cole, Béla, Stina and Taslow reach the Water Temple: sequence sc_2567, quest "The Water Temple" (115 s, at 155 s)
+   teleport (army: Cole_s0) to 673,937 at 457 s
+   teleport (army: tesla_s0) to 673,937 at 457 s
+ok  4. the Black Widows and the hovercraft convoy of the SEAS are beaten: quest "Spider Attack" (346 s, at 501 s)
+ok  5. the film ms_2580 ends the mission (3 s, at 504 s)
+ok no exception
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Aje; game time 8 min; teleports 6; cheat kills 35; top-ups 0
+   triggers fired 101 of 182, 101 firings, 253 actions, warnings 0
+   quests: L07MQ01=done L07MQ02=done L07MQ03=done L07SQ01=open L07SQ02=open L07SQ06=hidden L07SQ03=hidden L07SQ04=hidden L07SQ05=open
+   sequences: sc_2558@0 ms_2560@39 sc_2567@154 ms_2580@503
+   player: aje_worker x6, Bela_s0 x1, Cole_s0 x1, special_eusmilus x1, aje_resource_collector x1, tesla_s0 x1; buildings aje_tent aje_tent aje_tesla_tower aje_tesla_tower aje_tesla_tower aje_tesla_tower; res {"food":300,"wood":300,"stone":300,"skulls":560,"power":0}
+   won: {"won":true,"text":""}
+   variables: all_Wehrspinnen_disembarked=3 Wehrspinnen_zerstört=1 WehrspinnenConvoi_destroyed=0 fire_NS2567=1

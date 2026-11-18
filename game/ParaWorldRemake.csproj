@@ -1,0 +1,19 @@
+<Project Sdk="Godot.NET.Sdk/4.7.2">
+  <!-- The Godot project: drawing, sound, interface, the app around the simulation (src/Sim). -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <RootNamespace>PwRemake</RootNamespace>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <!-- optimized also in Debug: Godot's Play (F5) builds and runs Debug, whose unoptimized JIT code made every frame's
+         C# work (entities, view, the HUD) much slower; breakpoints still work, locals may show as optimized away -->
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../src/Sim/PwRemake.Sim.csproj" />
+    <ProjectReference Include="../src/Net/PwRemake.Net.csproj" />
+  </ItemGroup>
+</Project>

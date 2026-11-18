@@ -1,0 +1,21 @@
+{
+  "cfg": "base",
+  "mission": 42,
+  "tribe": "Hu",
+  "title": "Mission 4-2: A Cold Day In Hell",
+  "steps": 10,
+  "passed": 10,
+  "failedStep": null,
+  "over": true,
+  "won": true,
+  "finished": true,
+  "gameMinutes": 9.4,
+  "wallSeconds": 6,
+  "teleports": 0,
+  "cheatKills": 52,
+  "topUps": 0,
+  "triggerErrors": 0,
+  "fails": 0,
+  "exception": null,
+  "date": "2026-11-02"
+}

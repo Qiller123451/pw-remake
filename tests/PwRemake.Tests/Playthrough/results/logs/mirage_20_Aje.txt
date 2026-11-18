@@ -1,0 +1,48 @@
+ok  1. the opening film sb4101: quests "Breakthrough Part I" and "Part II" (5 s, at 5 s)
+ok  2. the party reaches the place of first contact: dialogue db_4102 (Dustriders and Norsemen fight) (6 s, at 11 s)
+ok  3. the fight is over, dialogue db_4111: quest "The Bridgehead" (epoch 4) (37 s, at 48 s)
+   [48 s] epoch 1, units 9/0, flamethrowers 3 (squad 0), saved 0, fighters 6, workers 3, buildings 0: ; res food 300,wood 300,stone 300,skulls 0,power 0; no small farm
+   [228 s] epoch 1, units 9/5, flamethrowers 3 (squad 3 at (628, 870) (633, 870) (631, 870)), saved 0, fighters 6, workers 3, buildings 2: aje_tentx1 aje_small_farmx1; res food 300,wood 300,stone 200,skulls 0,power 0; farm built True, queue 0: Build/aje_resource_collector=ok; queue: housing
+   teleport (squad: aje_flamethrower) to 1180,330 at 371 s
+   teleport (squad: aje_flamethrower) to 1180,330 at 371 s
+   teleport (squad: aje_flamethrower) to 1180,330 at 371 s
+   [408 s] epoch 1, units 6/5, flamethrowers 0 (squad 0), saved 3, fighters 3, workers 3, buildings 2: aje_tentx1 aje_small_farmx1; res food 300,wood 300,stone 200,skulls 316,power 0; farm built True, queue 0: Build/aje_resource_collector=ok; queue: housing
+   [589 s] epoch 1, units 5/5, flamethrowers 0 (squad 0), saved 3, fighters 2, workers 3, buildings 2: aje_tentx1 aje_small_farmx1; res food 300,wood 300,stone 200,skulls 449,power 0; farm built True, queue 0: Build/aje_resource_collector=ok; queue: housing
+   [770 s] epoch 1, units 8/21, flamethrowers 3 (squad 0), saved 3, fighters 5, workers 2, buildings 3: aje_tentx1 aje_small_farmx1 aje_weapons_builderx1; res food 500,wood 500,stone 275,skulls 541,power 0; next epoch: ok (missing )
+   [951 s] epoch 3, units 27/31, flamethrowers 14 (squad 12 at (399, 723) (399, 724) (399, 717)), saved 3, fighters 16, workers 10, buildings 5: aje_tentx3 aje_small_farmx1 aje_weapons_builderx1; res food 1700,wood 1500,stone 500,skulls 926,power 0; next epoch: ok (missing )
+   teleport (squad: aje_flamethrower) to 1180,330 at 1040 s
+   teleport (defence: aje_archer) to 277,662 at 1063 s
+ok  4. the base reaches epoch 4: quest "The Bridgehead" (1035 s, at 1083 s)
+   [1132 s] epoch 4, units 29/31, flamethrowers 14 (squad 13 at (551, 860) (563, 862) (550, 859)), saved 4, fighters 16, workers 12, buildings 5: aje_tentx3 aje_small_farmx1 aje_weapons_builderx1; res food 1700,wood 1500,stone 500,skulls 1916,power 0
+   teleport (defence: aje_archer) to 277,662 at 1225 s
+   [1313 s] epoch 4, units 29/31, flamethrowers 14 (squad 11 at (749, 847) (756, 839) (757, 837)), saved 4, fighters 16, workers 12, buildings 5: aje_tentx3 aje_small_farmx1 aje_weapons_builderx1; res food 1460,wood 1200,stone 500,skulls 2839,power 0
+   [1494 s] epoch 4, units 29/31, flamethrowers 14 (squad 14 at (867, 791) (867, 791) (868, 793)), saved 4, fighters 16, workers 12, buildings 5: aje_tentx3 aje_small_farmx1 aje_weapons_builderx1; res food 1460,wood 1200,stone 500,skulls 3909,power 0
+   [1675 s] epoch 4, units 29/31, flamethrowers 14 (squad 14 at (1038, 765) (1037, 764) (1040, 764)), saved 4, fighters 16, workers 12, buildings 5: aje_tentx3 aje_small_farmx1 aje_weapons_builderx1; res food 1460,wood 1200,stone 500,skulls 4680,power 0
+   teleport (defence: aje_archer) to 277,661 at 1786 s
+   [1856 s] epoch 4, units 19/31, flamethrowers 4 (squad 2 at (349, 702) (348, 702)), saved 18, fighters 6, workers 12, buildings 5: aje_tentx3 aje_small_farmx1 aje_weapons_builderx1; res food 900,wood 500,stone 500,skulls 4741,power 0
+   [2037 s] epoch 4, units 17/31, flamethrowers 2 (squad 2 at (355, 702) (358, 703)), saved 18, fighters 4, workers 12, buildings 5: aje_tentx3 aje_small_farmx1 aje_weapons_builderx1; res food 900,wood 500,stone 500,skulls 5823,power 0
+   teleport (defence: aje_archer) to 278,667 at 2170 s
+   [2217 s] epoch 4, units 20/31, flamethrowers 5 (squad 2 at (281, 674) (410, 717)), saved 18, fighters 7, workers 12, buildings 5: aje_tentx3 aje_small_farmx1 aje_weapons_builderx1; res food 420,wood 500,stone 500,skulls 6304,power 0
+   teleport (defence: aje_archer) to 375,721 at 2302 s
+   [2397 s] epoch 4, units 20/26, flamethrowers 6 (squad 2 at (446, 733) (446, 734)), saved 18, fighters 7, workers 12, buildings 4: aje_tentx2 aje_small_farmx1 aje_weapons_builderx1; res food 500,wood 500,stone 500,skulls 6809,power 0
+   teleport (squad: aje_flamethrower) to 1180,330 at 2549 s
+   teleport (squad: aje_flamethrower) to 1180,330 at 2549 s
+ok  5. 20 flamethrowers reach the rendezvous point: quest "Breakthrough Part I" (1468 s, at 2551 s)
+   [2577 s] epoch 4, units 19/26, flamethrowers 4 (squad 2 at (468, 751) (468, 751)), saved 20, fighters 5, workers 13, buildings 4: aje_tentx2 aje_small_farmx1 aje_weapons_builderx1; res food 500,wood 500,stone 500,skulls 7535,power 0
+   teleport (defence: aje_flamethrower) to 356,721 at 2586 s
+   teleport (defence: aje_flamethrower) to 356,721 at 2586 s
+   [2757 s] epoch 4, units 19/26, flamethrowers 4 (squad 2 at (853, 788) (1085, 621)), saved 20, fighters 5, workers 13, buildings 4: aje_tentx2 aje_small_farmx1 aje_weapons_builderx1; res food 500,wood 500,stone 500,skulls 8299,power 0
+ok  6. Leighton reaches the rendezvous point, boards the carrier: film sb4108 (quest "Breakthrough Part II") (248 s, at 2799 s)
+ok  7. the film sb4108 ends the mission (QUIT) (12 s, at 2811 s)
+ok no exception
+ok QUIT: the mission is won
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Aje (mission: SEAS); game time 47 min; teleports 13; cheat kills 595; top-ups 49
+   triggers fired 96 of 171, 10450 firings, 97353 actions, warnings 0
+   quests: LB41MQ01=done LB41MQ02=done LB41MQ03=done LB41SQ01=open LB41SQ02=hidden LB41SQ03=done
+   sequences: 
+   player: aje_worker x13, aje_resource_collector x1, aje_flamethrower x3; buildings aje_tent aje_small_farm aje_weapons_builder aje_tent; res {"food":500,"wood":500,"stone":500,"skulls":8567,"power":0}
+   won: {"won":true,"text":""}
+   epoch 4, flamethrowers 3 (aje_flamethrower), population 17/26
+   variables: Flamer_Fugees=20 MQ01=1 MQ02=1 MQ03=1 Bases_seen=1 Ho_Destroyed=0 Need_For_Speed_Failed=0

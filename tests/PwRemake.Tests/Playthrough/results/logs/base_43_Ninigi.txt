@@ -1,0 +1,34 @@
+ok  1. the opening film sb4301, dialogue db_4301: quest "Tabula Rasa" (7 s, at 7 s)
+ok  2. the Dustriders' camp at the bay is broken (their counter-attack and buildings): quest "Tabula Rasa" (106 s, at 113 s)
+ok  3. the film sb4305: quest "The Agony of Choice" (4 s, at 117 s)
+   teleport (army: ninigi_archer) to 455,152 at 250 s
+   teleport (army: ninigi_archer) to 455,152 at 250 s
+   teleport (army: ninigi_archer) to 455,152 at 250 s
+   teleport (army: ninigi_archer) to 455,152 at 250 s
+   teleport (army: ninigi_warrior) to 455,152 at 250 s
+   teleport (army: ninigi_warrior) to 455,152 at 250 s
+   teleport (army: ninigi_warrior) to 455,152 at 250 s
+   teleport (army: ninigi_warrior) to 455,152 at 250 s
+   teleport (army: schliemann_s0) to 455,152 at 250 s
+   teleport (army: ninigi_spearman) to 455,152 at 250 s
+   teleport (army: ninigi_spearman) to 455,152 at 250 s
+   teleport (army: ninigi_spearman) to 455,152 at 250 s
+   teleport (army: ninigi_spearman) to 455,152 at 250 s
+   teleport (army: ninigi_icespearman) to 455,152 at 250 s
+   teleport (army: ninigi_icespearman) to 455,152 at 250 s
+   teleport (army: ninigi_icespearman) to 455,152 at 250 s
+   teleport (army: ninigi_icespearman) to 455,152 at 250 s
+ok  4. a unit reaches the Norsemen's horn: quest "The Agony of Choice" (134 s, at 251 s)
+ok  5. the film sb4302a ends the mission (quit) (3 s, at 254 s)
+ok no exception
+ok the mission is won
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Ninigi; game time 4 min; teleports 17; cheat kills 32; top-ups 0
+   triggers fired 57 of 109, 57 firings, 135 actions, warnings 0
+   quests: LB43MQ01=done LB43MQ02=done LB43SQ01=open LB43SQ02=hidden LB43SQ03=hidden
+   sequences: 
+   player: ninigi_archer x6, ninigi_warrior x4, schliemann_s0 x1, ninigi_spearman x4, ninigi_saltasaurus_archer x2, ninigi_icespearman x4, ninigi_worker x8; buildings ; res {"food":600,"wood":600,"stone":150,"skulls":738,"power":0}
+   won: {"won":true,"text":""}
+   variables: mq01_done=1 mq02_set=1 mq02_done=1 victory_condition=1
+   Dustrider buildings left in the bay: 

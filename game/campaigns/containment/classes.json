@@ -1,0 +1,652 @@
+{
+ "classes": {
+  "sq_trooper": {
+   "from": "seas_gunner",
+   "desc": "Containment Trooper",
+   "hp": 1,
+   "weapons": {
+    "damage": 1
+   },
+   "build": {
+    "at": "seas_barracks",
+    "cost": {
+     "food": 60,
+     "wood": 20
+    },
+    "age": 1
+   }
+  },
+  "sq_tranq": {
+   "from": "seas_marksman",
+   "desc": "Tranquilizer Marksman",
+   "weapons": {
+    "damage": 1,
+    "only": {
+     "regex": "_l$"
+    }
+   },
+   "tags": [
+    "tranq"
+   ],
+   "build": {
+    "at": "seas_barracks",
+    "cost": {
+     "food": 60,
+     "wood": 30
+    },
+    "age": 1
+   }
+  },
+  "sq_shock_trooper": {
+   "from": "seas_gunner",
+   "desc": "Shock Trooper",
+   "hp": 1.1,
+   "weapons": {
+    "damage": 1.15
+   },
+   "tags": [
+    "shock"
+   ],
+   "build": {
+    "at": "seas_barracks",
+    "cost": {
+     "food": 60,
+     "power": 40
+    },
+    "age": 1
+   }
+  },
+  "sq_jeep": {
+   "from": "seas_mechanical_walker",
+   "desc": "Recon Jeep",
+   "set": {
+    "gfx": "sq_jeep",
+    "defaultspeed": "4",
+    "maxspeed": "4",
+    "FOW": "55.000000",
+    "can_harvest": "0",
+    "can_build": "0"
+   },
+   "hp": 0.7,
+   "weapons": {
+    "from": [
+     "seas_helicopter_weapon_c",
+     "seas_helicopter_weapon_d",
+     "seas_helicopter_weapon_e"
+    ],
+    "damage": 0.8,
+    "level": 1
+   },
+   "build": {
+    "at": "seas_garage",
+    "cost": {
+     "food": 40,
+     "wood": 80,
+     "stone": 40
+    },
+    "time": 20,
+    "age": 1
+   }
+  },
+  "sq_capture_truck": {
+   "from": "seas_mechanical_walker",
+   "desc": "Capture Truck",
+   "set": {
+    "gfx": "sq_capture_truck",
+    "defaultspeed": "3",
+    "maxspeed": "3",
+    "can_harvest": "0",
+    "can_build": "0"
+   },
+   "hp": 1.4,
+   "weapons": "none",
+   "tags": [
+    "capture"
+   ],
+   "build": {
+    "at": "seas_garage",
+    "cost": {
+     "food": 60,
+     "wood": 120,
+     "stone": 60
+    },
+    "time": 25,
+    "age": 1
+   }
+  },
+  "sq_aa_halftrack": {
+   "from": "seas_mobile_suit",
+   "desc": "Flak Halftrack",
+   "set": {
+    "gfx": "sq_aa_halftrack",
+    "defaultspeed": "3",
+    "maxspeed": "3",
+    "FOW": "50.000000"
+   },
+   "hp": 0.9,
+   "weapons": {
+    "from": [
+     "seas_hq_machinegun_nest_weapon"
+    ],
+    "damage": 1.6,
+    "range": 40,
+    "level": 1
+   },
+   "build": {
+    "at": "seas_garage",
+    "cost": {
+     "food": 80,
+     "wood": 150,
+     "stone": 120
+    },
+    "time": 30,
+    "age": 2
+   }
+  },
+  "sq_arc_halftrack": {
+   "from": "seas_mobile_suit",
+   "desc": "Arc Halftrack",
+   "set": {
+    "gfx": "sq_arc_halftrack",
+    "defaultspeed": "3",
+    "maxspeed": "3",
+    "FOW": "45.000000"
+   },
+   "hp": 1,
+   "tags": [
+    "shock",
+    "chain"
+   ],
+   "weapons": {
+    "from": [
+     "aje_tesla_tower_weapon"
+    ],
+    "damage": 0.3,
+    "range": 32,
+    "level": 1
+   },
+   "build": {
+    "at": "seas_garage",
+    "cost": {
+     "wood": 100,
+     "stone": 100,
+     "power": 120
+    },
+    "time": 30,
+    "age": 2
+   }
+  },
+  "sq_stabilizer": {
+   "from": "seas_turret_tower",
+   "desc": "Rift Stabilizer",
+   "set": {
+    "gfx": "sq_stabilizer",
+    "FOW": "30.000000"
+   },
+   "hp": 0.6,
+   "weapons": "none",
+   "tags": [
+    "stabilizer"
+   ],
+   "build": {
+    "cost": {
+     "wood": 150,
+     "stone": 200
+    },
+    "time": 30,
+    "age": 1,
+    "menupos": 3
+   }
+  },
+  "sq_searchlight": {
+   "from": "seas_turret_tower",
+   "desc": "Searchlight Tower",
+   "set": {
+    "gfx": "sq_searchlight",
+    "FOW": "70.000000"
+   },
+   "hp": 0.3,
+   "weapons": "none",
+   "tags": [
+    "searchlight"
+   ],
+   "build": {
+    "cost": {
+     "wood": 60,
+     "power": 40
+    },
+    "time": 15,
+    "age": 1,
+    "menupos": 4
+   }
+  },
+  "sq_flak": {
+   "from": "seas_turret_tower",
+   "desc": "Gun Emplacement",
+   "set": {
+    "gfx": "sq_flak",
+    "FOW": "45.000000"
+   },
+   "hp": 0.5,
+   "weapons": {
+    "from": [
+     "seas_hq_machinegun_nest_weapon"
+    ],
+    "damage": 1.4,
+    "range": 38
+   },
+   "build": {
+    "cost": {
+     "wood": 120,
+     "stone": 100
+    },
+    "time": 20,
+    "age": 1,
+    "menupos": 5
+   }
+  },
+  "sq_radar": {
+   "from": "seas_turret_tower",
+   "desc": "Radar Station",
+   "set": {
+    "gfx": "sq_radar",
+    "FOW": "140.000000"
+   },
+   "hp": 0.4,
+   "weapons": "none",
+   "build": {
+    "cost": {
+     "wood": 100,
+     "stone": 150
+    },
+    "time": 25,
+    "age": 2,
+    "menupos": 6
+   }
+  },
+  "sq_field_hq": {
+   "from": "seas_turret_tower",
+   "desc": "Field Command Post",
+   "set": {
+    "gfx": "sq_field_hq",
+    "FOW": "45.000000"
+   },
+   "hp": 0.5,
+   "weapons": "none",
+   "tags": [
+    "commandpost"
+   ],
+   "build": false
+  },
+  "sq_power_station": {
+   "from": "seas_turret_tower",
+   "desc": "Generating Station",
+   "set": {
+    "gfx": "sq_power_station_b",
+    "FOW": "40.000000",
+    "unlimited": {
+     "power": "1"
+    },
+    "maxworkers": "6"
+   },
+   "hp": 2.5,
+   "weapons": "none",
+   "build": false
+  },
+  "sq_power_pole": {
+   "from": "seas_turret_tower",
+   "desc": "Power Pole",
+   "set": {
+    "gfx": "sq_power_pole",
+    "FOW": "15.000000"
+   },
+   "hp": 0.12,
+   "weapons": "none",
+   "tags": [
+    "pole"
+   ],
+   "build": {
+    "cost": {
+     "wood": 40
+    },
+    "time": 6,
+    "age": 1,
+    "menupos": 8
+   }
+  },
+  "sq_generator": {
+   "from": "seas_turret_tower",
+   "desc": "Diesel Generator",
+   "set": {
+    "gfx": "sq_generator",
+    "FOW": "20.000000",
+    "unlimited": {
+     "power": "1"
+    },
+    "maxworkers": "2"
+   },
+   "hp": 0.4,
+   "weapons": "none",
+   "build": {
+    "cost": {
+     "wood": 120,
+     "stone": 60
+    },
+    "time": 20,
+    "age": 1,
+    "menupos": 9
+   }
+  },
+  "sq_windmill": {
+   "from": "seas_turret_tower",
+   "desc": "Wind Charger",
+   "set": {
+    "gfx": "sq_windmill",
+    "FOW": "25.000000"
+   },
+   "hp": 0.3,
+   "weapons": "none",
+   "build": {
+    "cost": {
+     "wood": 150,
+     "stone": 40
+    },
+    "time": 25,
+    "age": 1,
+    "menupos": 10
+   }
+  },
+  "sq_watermill": {
+   "from": "seas_turret_tower",
+   "desc": "Water Wheel",
+   "set": {
+    "gfx": "sq_watermill",
+    "FOW": "25.000000",
+    "coastal": "1",
+    "unlimited": {
+     "power": "1"
+    },
+    "maxworkers": "2"
+   },
+   "hp": 0.6,
+   "weapons": "none",
+   "build": {
+    "cost": {
+     "wood": 200,
+     "stone": 80
+    },
+    "time": 30,
+    "age": 1,
+    "menupos": 11
+   }
+  },
+  "sq_tesla_coil": {
+   "from": "seas_turret_tower",
+   "desc": "Tesla Coil",
+   "set": {
+    "gfx": "sq_tesla_coil",
+    "FOW": "45.000000"
+   },
+   "hp": 0.7,
+   "tags": [
+    "chain"
+   ],
+   "weapons": {
+    "from": [
+     "aje_tesla_tower_weapon"
+    ],
+    "damage": 0.45,
+    "range": 40,
+    "level": 1
+   },
+   "build": {
+    "cost": {
+     "stone": 120,
+     "power": 150
+    },
+    "time": 25,
+    "age": 2,
+    "menupos": 12
+   }
+  },
+  "sq_launch_pad": {
+   "from": "seas_turret_tower",
+   "desc": "Launch Complex 34",
+   "set": {
+    "gfx": "sq_launch_pad",
+    "FOW": "40.000000"
+   },
+   "hp": 2,
+   "weapons": "none",
+   "build": false
+  },
+  "sq_gate_machine": {
+   "from": "seas_turret_tower",
+   "desc": "Gate Machine",
+   "set": {
+    "gfx": "sq_gate_machine",
+    "FOW": "50.000000"
+   },
+   "hp": 4,
+   "weapons": "none",
+   "build": false
+  },
+  "sq_rift": {
+   "from": "seas_turret_tower",
+   "desc": "Rift",
+   "set": {
+    "gfx": "sq_rift_b",
+    "FOW": "20.000000"
+   },
+   "hp": 5,
+   "weapons": "none",
+   "tags": [
+    "rift"
+   ],
+   "build": false
+  },
+  "sq_electric_net": {
+   "from": "seas_turret_tower",
+   "desc": "Electrified Net",
+   "set": {
+    "gfx": "sq_electric_net",
+    "FOW": "20.000000"
+   },
+   "hp": 0.5,
+   "weapons": "none",
+   "tags": [
+    "net"
+   ],
+   "build": {
+    "cost": {
+     "wood": 60,
+     "power": 80
+    },
+    "time": 20,
+    "age": 1,
+    "menupos": 7
+   }
+  },
+  "sq_civilian_1": {
+   "from": "seas_worker",
+   "desc": "Civilian",
+   "set": {
+    "gfx": "hc_citizen_01",
+    "can_build": "0",
+    "can_harvest": "0"
+   },
+   "hp": 0.6,
+   "weapons": "none",
+   "tags": [
+    "civilian"
+   ],
+   "build": false
+  },
+  "sq_civilian_2": {
+   "from": "seas_worker",
+   "desc": "Civilian",
+   "set": {
+    "gfx": "hc_citizen_02",
+    "can_build": "0",
+    "can_harvest": "0"
+   },
+   "hp": 0.6,
+   "weapons": "none",
+   "tags": [
+    "civilian"
+   ],
+   "build": false
+  },
+  "sq_civilian_3": {
+   "from": "seas_worker",
+   "desc": "Civilian",
+   "set": {
+    "gfx": "hc_citizen_03",
+    "can_build": "0",
+    "can_harvest": "0"
+   },
+   "hp": 0.6,
+   "weapons": "none",
+   "tags": [
+    "civilian"
+   ],
+   "build": false
+  },
+  "sq_civilian_4": {
+   "from": "seas_worker",
+   "desc": "Civilian",
+   "set": {
+    "gfx": "hc_citizen_04",
+    "can_build": "0",
+    "can_harvest": "0"
+   },
+   "hp": 0.6,
+   "weapons": "none",
+   "tags": [
+    "civilian"
+   ],
+   "build": false
+  },
+  "sq_big_tooth": {
+   "from": "Gigantosaurus",
+   "tribe": "World",
+   "desc": "Big Tooth",
+   "hp": 9,
+   "weapons": {
+    "damage": 2.2
+   },
+   "tags": [
+    "boss"
+   ]
+  },
+  "sq_old_scar": {
+   "from": "Atroxosaurus",
+   "tribe": "World",
+   "desc": "Old Scar",
+   "hp": 4.2,
+   "weapons": {
+    "damage": 1.7
+   },
+   "tags": [
+    "boss"
+   ]
+  },
+  "sq_cargo_truck": {
+   "from": "seas_mechanical_walker",
+   "desc": "Convoy Truck",
+   "set": {
+    "gfx": "sq_army_truck",
+    "defaultspeed": "2",
+    "maxspeed": "2",
+    "FOW": "35.000000",
+    "can_harvest": "0",
+    "can_build": "0"
+   },
+   "hp": 2.2,
+   "weapons": "none",
+   "tags": [
+    "convoy"
+   ],
+   "build": false
+  },
+  "sq_rift_engine": {
+   "from": "seas_turret_tower",
+   "desc": "Rift Engine",
+   "set": {
+    "gfx": "sq_gate_machine",
+    "FOW": "40.000000"
+   },
+   "hp": 1.4,
+   "weapons": "none",
+   "tags": [
+    "engine"
+   ],
+   "build": false
+  },
+  "sq_relay_mast": {
+   "from": "seas_turret_tower",
+   "desc": "Relay Mast",
+   "set": {
+    "gfx": "sq_radar",
+    "FOW": "40.000000"
+   },
+   "hp": 0.8,
+   "weapons": "none",
+   "tags": [
+    "relay"
+   ],
+   "build": false
+  },
+  "sq_behemoth": {
+   "from": "seas_wehrspinne",
+   "desc": "The Behemoth",
+   "hp": 7,
+   "weapons": {
+    "damage": 1.6
+   },
+   "tags": [
+    "boss"
+   ],
+   "build": false
+  }
+ },
+ "heroes": {
+  "sq_halloran": {
+   "from": "lovelace_s0",
+   "desc": "Col. Margaret Halloran",
+   "hp": 1.6,
+   "weapons": {
+    "damage": 1.3
+   }
+  },
+  "sq_taslov": {
+   "from": "tesla_s0",
+   "desc": "Dr. Lev Taslov",
+   "hp": 1
+  },
+  "sq_booker": {
+   "from": "Cole_s0",
+   "desc": "Sgt. Elijah Booker",
+   "hp": 1.4,
+   "weapons": {
+    "damage": 1.2
+   }
+  },
+  "sq_tala": {
+   "from": "Stina_s0",
+   "desc": "Tala of the Dustriders",
+   "hp": 1.3,
+   "weapons": {
+    "damage": 1.2
+   }
+  },
+  "sq_crane": {
+   "from": "babbage_s0",
+   "desc": "Augustus Crane",
+   "hp": 2.5,
+   "weapons": {
+    "damage": 1.4
+   }
+  }
+ }
+}

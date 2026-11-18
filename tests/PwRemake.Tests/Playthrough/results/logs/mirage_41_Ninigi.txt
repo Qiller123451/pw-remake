@@ -1,0 +1,67 @@
+ok  1. the opening film sb4101: quests "Breakthrough Part I" and "Part II" (5 s, at 5 s)
+ok  2. the party reaches the place of first contact: dialogue db_4102 (Dustriders and Norsemen fight) (6 s, at 11 s)
+ok  3. the fight is over, dialogue db_4111: quest "The Bridgehead" (epoch 4) (37 s, at 48 s)
+   [48 s] epoch 1, units 7/0, flamethrowers 3 (squad 0), saved 0, fighters 4, workers 3, buildings 0: ; res food 300,wood 300,stone 300,skulls 0,power 0; next epoch: req (missing ninigi_lumbermill,ninigi_dojo)
+   teleport (squad: ninigi_flamethrower) to 1180,330 at 168 s
+   [228 s] epoch 2, units 15/15, flamethrowers 3 (squad 3 at (625, 870) (624, 869) (1187, 330)), saved 0, fighters 4, workers 11, buildings 6: ninigi_fireplacex1 ninigi_lumbermillx1 ninigi_dojox1 ninigi_paddyx1 ninigi_engineerx1 ninigi_weapon_makerx1; res food 900,wood 1000,stone 900,skulls 225,power 0; next epoch: req (missing ninigi_paddy,ninigi_engineer)
+   teleport (squad: ninigi_flamethrower) to 1180,330 at 229 s
+   teleport (defence: ninigi_flamethrower) to 275,652 at 388 s
+   teleport (defence: ninigi_flamethrower) to 275,652 at 388 s
+   teleport (defence: ninigi_flamethrower) to 275,652 at 388 s
+   teleport (defence: ninigi_flamethrower) to 275,652 at 388 s
+   teleport (defence: ninigi_flamethrower) to 275,652 at 388 s
+   teleport (squad: ninigi_flamethrower) to 1180,330 at 392 s
+   [408 s] epoch 3, units 20/20, flamethrowers 8 (squad 3 at (1187, 330) (832, 685) (1186, 340)), saved 0, fighters 9, workers 11, buildings 8: ninigi_fireplacex1 ninigi_lumbermillx1 ninigi_dojox1 ninigi_paddyx1 ninigi_engineerx1 ninigi_weapon_makerx1 ninigi_warehousex1 ninigi_templex1; res food 1200,wood 1200,stone 1200,skulls 733,power 0; next epoch: req (missing ninigi_warehouse)
+   teleport (squad: ninigi_flamethrower) to 1180,330 at 413 s
+   teleport (defence: ninigi_flamethrower) to 369,721 at 524 s
+   teleport (defence: ninigi_flamethrower) to 369,721 at 524 s
+ok  4. the base reaches epoch 4: quest "The Bridgehead" (486 s, at 534 s)
+   [589 s] epoch 4, units 20/20, flamethrowers 8 (squad 0), saved 3, fighters 9, workers 11, buildings 8: ninigi_fireplacex1 ninigi_lumbermillx1 ninigi_dojox1 ninigi_paddyx1 ninigi_engineerx1 ninigi_weapon_makerx1 ninigi_warehousex1 ninigi_templex1; res food 1500,wood 2000,stone 1300,skulls 1305,power 0
+   [770 s] epoch 4, units 20/20, flamethrowers 8 (squad 8 at (620, 872) (612, 868) (619, 871)), saved 3, fighters 9, workers 11, buildings 8: ninigi_fireplacex1 ninigi_lumbermillx1 ninigi_dojox1 ninigi_paddyx1 ninigi_engineerx1 ninigi_weapon_makerx1 ninigi_warehousex1 ninigi_templex1; res food 1500,wood 2000,stone 1500,skulls 1897,power 0
+   [951 s] epoch 4, units 20/20, flamethrowers 8 (squad 6 at (825, 776) (826, 776) (827, 776)), saved 3, fighters 9, workers 11, buildings 8: ninigi_fireplacex1 ninigi_lumbermillx1 ninigi_dojox1 ninigi_paddyx1 ninigi_engineerx1 ninigi_weapon_makerx1 ninigi_warehousex1 ninigi_templex1; res food 1480,wood 2000,stone 1500,skulls 2943,power 0
+   teleport (squad: ninigi_flamethrower) to 1180,330 at 1025 s
+   teleport (squad: ninigi_flamethrower) to 1180,330 at 1025 s
+   teleport (squad: ninigi_flamethrower) to 1180,330 at 1087 s
+   teleport (squad: ninigi_flamethrower) to 1180,330 at 1087 s
+   [1132 s] epoch 4, units 20/20, flamethrowers 8 (squad 8 at (1187, 330) (1129, 540) (1120, 542)), saved 3, fighters 9, workers 11, buildings 7: ninigi_fireplacex1 ninigi_lumbermillx1 ninigi_dojox1 ninigi_paddyx1 ninigi_engineerx1 ninigi_weapon_makerx1 ninigi_warehousex1; res food 1500,wood 2000,stone 1500,skulls 3576,power 0
+   teleport (squad: ninigi_flamethrower) to 1180,330 at 1148 s
+   teleport (squad: ninigi_flamethrower) to 1180,330 at 1148 s
+   [1313 s] epoch 4, units 20/20, flamethrowers 8 (squad 0), saved 11, fighters 9, workers 11, buildings 7: ninigi_fireplacex1 ninigi_lumbermillx1 ninigi_dojox1 ninigi_paddyx1 ninigi_engineerx1 ninigi_weapon_makerx1 ninigi_warehousex1; res food 1065,wood 2000,stone 1500,skulls 3936,power 0
+   teleport (squad: ninigi_flamethrower) to 1180,330 at 1398 s
+   teleport (squad: ninigi_flamethrower) to 1180,330 at 1398 s
+   teleport (squad: ninigi_flamethrower) to 1180,330 at 1398 s
+   teleport (squad: ninigi_flamethrower) to 1180,330 at 1398 s
+   teleport (squad: ninigi_flamethrower) to 1180,330 at 1460 s
+   teleport (squad: ninigi_flamethrower) to 1180,330 at 1460 s
+   teleport (squad: ninigi_flamethrower) to 1180,330 at 1460 s
+   teleport (squad: ninigi_flamethrower) to 1180,330 at 1460 s
+   [1494 s] epoch 4, units 20/20, flamethrowers 8 (squad 8 at (1186, 329) (844, 777) (1187, 329)), saved 11, fighters 9, workers 11, buildings 6: ninigi_fireplacex1 ninigi_lumbermillx1 ninigi_dojox1 ninigi_engineerx1 ninigi_weapon_makerx1 ninigi_warehousex1; res food 1290,wood 2000,stone 1500,skulls 3991,power 0
+   teleport (squad: ninigi_flamethrower) to 1180,330 at 1521 s
+   teleport (squad: ninigi_flamethrower) to 1180,330 at 1521 s
+   teleport (squad: ninigi_flamethrower) to 1180,330 at 1521 s
+   teleport (squad: ninigi_flamethrower) to 1180,330 at 1521 s
+   teleport (squad: ninigi_flamethrower) to 1180,330 at 1582 s
+   teleport (squad: ninigi_flamethrower) to 1180,330 at 1582 s
+   teleport (squad: ninigi_flamethrower) to 1180,330 at 1582 s
+   teleport (squad: ninigi_flamethrower) to 1180,330 at 1582 s
+   [1675 s] epoch 4, units 16/20, flamethrowers 4 (squad 1 at (518, 886)), saved 19, fighters 5, workers 11, buildings 6: ninigi_fireplacex1 ninigi_lumbermillx1 ninigi_dojox1 ninigi_engineerx1 ninigi_weapon_makerx1 ninigi_warehousex1; res food 1010,wood 2000,stone 1500,skulls 4256,power 0
+ok  5. 20 flamethrowers reach the rendezvous point: quest "Breakthrough Part I" (1316 s, at 1850 s)
+   [1856 s] epoch 4, units 17/20, flamethrowers 5 (squad 1 at (327, 722)), saved 20, fighters 6, workers 11, buildings 6: ninigi_fireplacex1 ninigi_lumbermillx1 ninigi_dojox1 ninigi_engineerx1 ninigi_weapon_makerx1 ninigi_warehousex1; res food 1010,wood 2000,stone 1500,skulls 4256,power 0
+   teleport (defence: ninigi_flamethrower) to 275,672 at 1930 s
+   teleport (defence: ninigi_flamethrower) to 275,672 at 1930 s
+   teleport (defence: ninigi_flamethrower) to 275,672 at 1930 s
+   [2037 s] epoch 4, units 17/20, flamethrowers 5 (squad 1 at (558, 864)), saved 20, fighters 6, workers 11, buildings 6: ninigi_fireplacex1 ninigi_lumbermillx1 ninigi_dojox1 ninigi_engineerx1 ninigi_weapon_makerx1 ninigi_warehousex1; res food 1010,wood 2000,stone 1500,skulls 4549,power 0
+ok  6. Leighton reaches the rendezvous point, boards the carrier: film sb4108 (quest "Breakthrough Part II") (209 s, at 2059 s)
+ok  7. the film sb4108 ends the mission (QUIT) (12 s, at 2071 s)
+ok no exception
+ok QUIT: the mission is won
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Ninigi (mission: Hu); game time 35 min; teleports 36; cheat kills 313; top-ups 25
+   triggers fired 106 of 171, 159 firings, 506 actions, warnings 0
+   quests: LB41MQ01=done LB41MQ02=done LB41MQ03=done LB41SQ01=done LB41SQ02=open LB41SQ03=done
+   sequences: 
+   player: ninigi_worker x11, ninigi_flamethrower x5; buildings ninigi_fireplace ninigi_lumbermill ninigi_dojo ninigi_engineer ninigi_weapon_maker ninigi_warehouse; res {"food":1010,"wood":2000,"stone":1500,"skulls":4549,"power":0}
+   won: {"won":true,"text":""}
+   epoch 4, flamethrowers 5 (ninigi_flamethrower), population 16/20
+   variables: Flamer_Fugees=20 MQ01=1 MQ02=1 MQ03=1 Bases_seen=1 Ho_Destroyed=1 Need_For_Speed_Failed=0

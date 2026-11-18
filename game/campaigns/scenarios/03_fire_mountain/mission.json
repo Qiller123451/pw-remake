@@ -1,0 +1,1341 @@
+{
+ "id": 3,
+ "title": "Fire Mountain",
+ "place": "The Ash Valley",
+ "setting": "Ashvalley",
+ "briefing": [
+  "The fire mountain has woken, and the tribe that holds its summit when the spirits speak will be blessed for a generation. Two other tribes have come to take it.",
+  "Hold the summit alone - no enemy beside you - for five minutes in all. Mind the mountain: when it rumbles, rocks of fire fall where the ground is marked."
+ ],
+ "variants": {
+  "Hu": {
+   "foeTribe": "Aje",
+   "foe2Tribe": "Ninigi",
+   "foe": {
+    "tribe": "Aje",
+    "name": "Dustriders",
+    "behaviour": "Schnecke",
+    "res": {
+     "food": 1500,
+     "wood": 1500,
+     "stone": 1200
+    }
+   },
+   "foe2": {
+    "tribe": "Ninigi",
+    "name": "Dragon Clan",
+    "behaviour": "Schnecke",
+    "res": {
+     "food": 1500,
+     "wood": 1500,
+     "stone": 1200
+    }
+   },
+   "res": {
+    "food": 800,
+    "wood": 700,
+    "stone": 600
+   },
+   "epoch": 2,
+   "powers": [],
+   "map": {
+    "seed": 3303,
+    "setting": "Ashvalley",
+    "size": 540,
+    "base": 6,
+    "noise": [
+     [
+      0.005,
+      6
+     ],
+     [
+      0.025,
+      1.3
+     ]
+    ],
+    "ground": [
+     0,
+     7,
+     2,
+     3,
+     4,
+     5
+    ],
+    "clear": [
+     [
+      0,
+      0,
+      30
+     ],
+     [
+      0,
+      210,
+      30
+     ],
+     [
+      -185,
+      -110,
+      30
+     ],
+     [
+      185,
+      -110,
+      30
+     ]
+    ],
+    "features": [
+     {
+      "type": "hill",
+      "x": 0,
+      "z": 0,
+      "r": 150,
+      "h": 26
+     },
+     {
+      "type": "flat",
+      "x": 0,
+      "z": 0,
+      "r": 26,
+      "h": 31,
+      "edge": 16
+     },
+     {
+      "type": "flat",
+      "x": 0,
+      "z": 210,
+      "r": 55,
+      "h": 6
+     },
+     {
+      "type": "flat",
+      "x": -185,
+      "z": -110,
+      "r": 55,
+      "h": 6
+     },
+     {
+      "type": "flat",
+      "x": 185,
+      "z": -110,
+      "r": 55,
+      "h": 6
+     }
+    ],
+    "places": [
+     {
+      "kind": "model",
+      "model": "ash_crater02_fire",
+      "x": -34,
+      "z": -8,
+      "rot": 0,
+      "r": 3,
+      "block": false
+     },
+     {
+      "kind": "model",
+      "model": "ash_chimney_01_fire",
+      "x": 30,
+      "z": 16,
+      "rot": 1,
+      "r": 3,
+      "block": false
+     },
+     {
+      "kind": "model",
+      "model": "ash_crater04_fire",
+      "x": 6,
+      "z": -36,
+      "rot": 2,
+      "r": 3,
+      "block": false
+     },
+     {
+      "kind": "model",
+      "model": "ash_chimney_03_fire",
+      "x": -14,
+      "z": 34,
+      "rot": 3,
+      "r": 3,
+      "block": false
+     },
+     {
+      "kind": "model",
+      "model": "ash_rocktooth01",
+      "x": -90,
+      "z": 60,
+      "rot": 0,
+      "r": 4
+     },
+     {
+      "kind": "model",
+      "model": "ash_rocktooth02",
+      "x": 80,
+      "z": 70,
+      "rot": 1,
+      "r": 4
+     },
+     {
+      "kind": "model",
+      "model": "ash_rocktooth03",
+      "x": 0,
+      "z": -110,
+      "rot": 2,
+      "r": 4
+     },
+     {
+      "kind": "model",
+      "model": "ash_rocktooth04",
+      "x": -120,
+      "z": -20,
+      "rot": 3,
+      "r": 4
+     },
+     {
+      "kind": "model",
+      "model": "ash_rocktooth01",
+      "x": 120,
+      "z": -10,
+      "rot": 4,
+      "r": 4
+     },
+     {
+      "kind": "model",
+      "model": "ash_lava_glow_01",
+      "x": 0,
+      "z": 0,
+      "rot": 0,
+      "r": 0,
+      "block": false
+     }
+    ],
+    "forests": [
+     {
+      "x": -200,
+      "z": 120,
+      "r": 50,
+      "n": 28
+     },
+     {
+      "x": 200,
+      "z": 120,
+      "r": 50,
+      "n": 28
+     },
+     {
+      "x": 0,
+      "z": -230,
+      "r": 50,
+      "n": 28
+     }
+    ],
+    "rocks": [
+     {
+      "x": -100,
+      "z": 180,
+      "r": 40,
+      "n": 12
+     },
+     {
+      "x": 100,
+      "z": 180,
+      "r": 40,
+      "n": 12
+     }
+    ],
+    "resources": [
+     {
+      "x": 0,
+      "z": 240,
+      "stone": 8,
+      "food": 8,
+      "wood": 16
+     },
+     {
+      "x": -220,
+      "z": -140,
+      "stone": 6,
+      "food": 6,
+      "wood": 16
+     },
+     {
+      "x": 220,
+      "z": -140,
+      "stone": 6,
+      "food": 6,
+      "wood": 16
+     }
+    ],
+    "shrubs": 220
+   },
+   "start": {
+    "buildings": [
+     [
+      "hu_fireplace",
+      0,
+      210,
+      0
+     ]
+    ],
+    "units": [
+     [
+      "hu_worker",
+      -8,
+      194,
+      6
+     ],
+     [
+      [
+       "Bela_s0"
+      ],
+      10,
+      192,
+      1,
+      2
+     ],
+     [
+      [
+       "hu_warrior"
+      ],
+      16,
+      202,
+      4,
+      2
+     ],
+     [
+      [
+       "hu_archer"
+      ],
+      20,
+      196,
+      3,
+      2
+     ]
+    ]
+   },
+   "models": [
+    "Bela_s0",
+    "hu_colossi",
+    "hu_mammoth",
+    "hu_rhino",
+    "Tarna_s0",
+    "Cole_s0",
+    "aje_tyrannosaurus",
+    "aje_brachiosaurus",
+    "aje_stegosaurus",
+    "aje_triceratops_archer",
+    "Miyagi_s0",
+    "hermit_s0",
+    "ninigi_kong",
+    "ninigi_seismosaurus",
+    "ninigi_triceratops",
+    "ninigi_sumo",
+    "lovelace_s0",
+    "seas_rex",
+    "seas_mobile_suit",
+    "seas_triceratops",
+    "hu_zombie_warrior",
+    "hu_undead_warrior",
+    "hu_zombie_archer",
+    "hu_zombie_killer",
+    "schliemann_zombie"
+   ]
+  },
+  "Aje": {
+   "foeTribe": "Ninigi",
+   "foe2Tribe": "SEAS",
+   "foe": {
+    "tribe": "Ninigi",
+    "name": "Dragon Clan",
+    "behaviour": "Schnecke",
+    "res": {
+     "food": 1500,
+     "wood": 1500,
+     "stone": 1200
+    }
+   },
+   "foe2": {
+    "tribe": "SEAS",
+    "name": "SEAS",
+    "behaviour": "Schnecke",
+    "res": {
+     "food": 1500,
+     "wood": 1500,
+     "stone": 1200
+    }
+   },
+   "res": {
+    "food": 800,
+    "wood": 700,
+    "stone": 600
+   },
+   "epoch": 2,
+   "powers": [],
+   "map": {
+    "seed": 3303,
+    "setting": "Ashvalley",
+    "size": 540,
+    "base": 6,
+    "noise": [
+     [
+      0.005,
+      6
+     ],
+     [
+      0.025,
+      1.3
+     ]
+    ],
+    "ground": [
+     0,
+     7,
+     2,
+     3,
+     4,
+     5
+    ],
+    "clear": [
+     [
+      0,
+      0,
+      30
+     ],
+     [
+      0,
+      210,
+      30
+     ],
+     [
+      -185,
+      -110,
+      30
+     ],
+     [
+      185,
+      -110,
+      30
+     ]
+    ],
+    "features": [
+     {
+      "type": "hill",
+      "x": 0,
+      "z": 0,
+      "r": 150,
+      "h": 26
+     },
+     {
+      "type": "flat",
+      "x": 0,
+      "z": 0,
+      "r": 26,
+      "h": 31,
+      "edge": 16
+     },
+     {
+      "type": "flat",
+      "x": 0,
+      "z": 210,
+      "r": 55,
+      "h": 6
+     },
+     {
+      "type": "flat",
+      "x": -185,
+      "z": -110,
+      "r": 55,
+      "h": 6
+     },
+     {
+      "type": "flat",
+      "x": 185,
+      "z": -110,
+      "r": 55,
+      "h": 6
+     }
+    ],
+    "places": [
+     {
+      "kind": "model",
+      "model": "ash_crater02_fire",
+      "x": -34,
+      "z": -8,
+      "rot": 0,
+      "r": 3,
+      "block": false
+     },
+     {
+      "kind": "model",
+      "model": "ash_chimney_01_fire",
+      "x": 30,
+      "z": 16,
+      "rot": 1,
+      "r": 3,
+      "block": false
+     },
+     {
+      "kind": "model",
+      "model": "ash_crater04_fire",
+      "x": 6,
+      "z": -36,
+      "rot": 2,
+      "r": 3,
+      "block": false
+     },
+     {
+      "kind": "model",
+      "model": "ash_chimney_03_fire",
+      "x": -14,
+      "z": 34,
+      "rot": 3,
+      "r": 3,
+      "block": false
+     },
+     {
+      "kind": "model",
+      "model": "ash_rocktooth01",
+      "x": -90,
+      "z": 60,
+      "rot": 0,
+      "r": 4
+     },
+     {
+      "kind": "model",
+      "model": "ash_rocktooth02",
+      "x": 80,
+      "z": 70,
+      "rot": 1,
+      "r": 4
+     },
+     {
+      "kind": "model",
+      "model": "ash_rocktooth03",
+      "x": 0,
+      "z": -110,
+      "rot": 2,
+      "r": 4
+     },
+     {
+      "kind": "model",
+      "model": "ash_rocktooth04",
+      "x": -120,
+      "z": -20,
+      "rot": 3,
+      "r": 4
+     },
+     {
+      "kind": "model",
+      "model": "ash_rocktooth01",
+      "x": 120,
+      "z": -10,
+      "rot": 4,
+      "r": 4
+     },
+     {
+      "kind": "model",
+      "model": "ash_lava_glow_01",
+      "x": 0,
+      "z": 0,
+      "rot": 0,
+      "r": 0,
+      "block": false
+     }
+    ],
+    "forests": [
+     {
+      "x": -200,
+      "z": 120,
+      "r": 50,
+      "n": 28
+     },
+     {
+      "x": 200,
+      "z": 120,
+      "r": 50,
+      "n": 28
+     },
+     {
+      "x": 0,
+      "z": -230,
+      "r": 50,
+      "n": 28
+     }
+    ],
+    "rocks": [
+     {
+      "x": -100,
+      "z": 180,
+      "r": 40,
+      "n": 12
+     },
+     {
+      "x": 100,
+      "z": 180,
+      "r": 40,
+      "n": 12
+     }
+    ],
+    "resources": [
+     {
+      "x": 0,
+      "z": 240,
+      "stone": 8,
+      "food": 8,
+      "wood": 16
+     },
+     {
+      "x": -220,
+      "z": -140,
+      "stone": 6,
+      "food": 6,
+      "wood": 16
+     },
+     {
+      "x": 220,
+      "z": -140,
+      "stone": 6,
+      "food": 6,
+      "wood": 16
+     }
+    ],
+    "shrubs": 220
+   },
+   "start": {
+    "buildings": [],
+    "units": [
+     [
+      "aje_resource_collector",
+      0,
+      210,
+      1
+     ],
+     [
+      "aje_worker",
+      -8,
+      194,
+      6
+     ],
+     [
+      [
+       "Tarna_s0",
+       "Cole_s0"
+      ],
+      10,
+      192,
+      1,
+      2
+     ],
+     [
+      [
+       "aje_warrior"
+      ],
+      16,
+      202,
+      4,
+      2
+     ],
+     [
+      [
+       "aje_archer"
+      ],
+      20,
+      196,
+      3,
+      2
+     ]
+    ]
+   },
+   "models": [
+    "Bela_s0",
+    "hu_colossi",
+    "hu_mammoth",
+    "hu_rhino",
+    "Tarna_s0",
+    "Cole_s0",
+    "aje_tyrannosaurus",
+    "aje_brachiosaurus",
+    "aje_stegosaurus",
+    "aje_triceratops_archer",
+    "Miyagi_s0",
+    "hermit_s0",
+    "ninigi_kong",
+    "ninigi_seismosaurus",
+    "ninigi_triceratops",
+    "ninigi_sumo",
+    "lovelace_s0",
+    "seas_rex",
+    "seas_mobile_suit",
+    "seas_triceratops",
+    "hu_zombie_warrior",
+    "hu_undead_warrior",
+    "hu_zombie_archer",
+    "hu_zombie_killer",
+    "schliemann_zombie"
+   ]
+  },
+  "Ninigi": {
+   "foeTribe": "Aje",
+   "foe2Tribe": "SEAS",
+   "foe": {
+    "tribe": "Aje",
+    "name": "Dustriders",
+    "behaviour": "Schnecke",
+    "res": {
+     "food": 1500,
+     "wood": 1500,
+     "stone": 1200
+    }
+   },
+   "foe2": {
+    "tribe": "SEAS",
+    "name": "SEAS",
+    "behaviour": "Schnecke",
+    "res": {
+     "food": 1500,
+     "wood": 1500,
+     "stone": 1200
+    }
+   },
+   "res": {
+    "food": 800,
+    "wood": 700,
+    "stone": 600
+   },
+   "epoch": 2,
+   "powers": [],
+   "map": {
+    "seed": 3303,
+    "setting": "Ashvalley",
+    "size": 540,
+    "base": 6,
+    "noise": [
+     [
+      0.005,
+      6
+     ],
+     [
+      0.025,
+      1.3
+     ]
+    ],
+    "ground": [
+     0,
+     7,
+     2,
+     3,
+     4,
+     5
+    ],
+    "clear": [
+     [
+      0,
+      0,
+      30
+     ],
+     [
+      0,
+      210,
+      30
+     ],
+     [
+      -185,
+      -110,
+      30
+     ],
+     [
+      185,
+      -110,
+      30
+     ]
+    ],
+    "features": [
+     {
+      "type": "hill",
+      "x": 0,
+      "z": 0,
+      "r": 150,
+      "h": 26
+     },
+     {
+      "type": "flat",
+      "x": 0,
+      "z": 0,
+      "r": 26,
+      "h": 31,
+      "edge": 16
+     },
+     {
+      "type": "flat",
+      "x": 0,
+      "z": 210,
+      "r": 55,
+      "h": 6
+     },
+     {
+      "type": "flat",
+      "x": -185,
+      "z": -110,
+      "r": 55,
+      "h": 6
+     },
+     {
+      "type": "flat",
+      "x": 185,
+      "z": -110,
+      "r": 55,
+      "h": 6
+     }
+    ],
+    "places": [
+     {
+      "kind": "model",
+      "model": "ash_crater02_fire",
+      "x": -34,
+      "z": -8,
+      "rot": 0,
+      "r": 3,
+      "block": false
+     },
+     {
+      "kind": "model",
+      "model": "ash_chimney_01_fire",
+      "x": 30,
+      "z": 16,
+      "rot": 1,
+      "r": 3,
+      "block": false
+     },
+     {
+      "kind": "model",
+      "model": "ash_crater04_fire",
+      "x": 6,
+      "z": -36,
+      "rot": 2,
+      "r": 3,
+      "block": false
+     },
+     {
+      "kind": "model",
+      "model": "ash_chimney_03_fire",
+      "x": -14,
+      "z": 34,
+      "rot": 3,
+      "r": 3,
+      "block": false
+     },
+     {
+      "kind": "model",
+      "model": "ash_rocktooth01",
+      "x": -90,
+      "z": 60,
+      "rot": 0,
+      "r": 4
+     },
+     {
+      "kind": "model",
+      "model": "ash_rocktooth02",
+      "x": 80,
+      "z": 70,
+      "rot": 1,
+      "r": 4
+     },
+     {
+      "kind": "model",
+      "model": "ash_rocktooth03",
+      "x": 0,
+      "z": -110,
+      "rot": 2,
+      "r": 4
+     },
+     {
+      "kind": "model",
+      "model": "ash_rocktooth04",
+      "x": -120,
+      "z": -20,
+      "rot": 3,
+      "r": 4
+     },
+     {
+      "kind": "model",
+      "model": "ash_rocktooth01",
+      "x": 120,
+      "z": -10,
+      "rot": 4,
+      "r": 4
+     },
+     {
+      "kind": "model",
+      "model": "ash_lava_glow_01",
+      "x": 0,
+      "z": 0,
+      "rot": 0,
+      "r": 0,
+      "block": false
+     }
+    ],
+    "forests": [
+     {
+      "x": -200,
+      "z": 120,
+      "r": 50,
+      "n": 28
+     },
+     {
+      "x": 200,
+      "z": 120,
+      "r": 50,
+      "n": 28
+     },
+     {
+      "x": 0,
+      "z": -230,
+      "r": 50,
+      "n": 28
+     }
+    ],
+    "rocks": [
+     {
+      "x": -100,
+      "z": 180,
+      "r": 40,
+      "n": 12
+     },
+     {
+      "x": 100,
+      "z": 180,
+      "r": 40,
+      "n": 12
+     }
+    ],
+    "resources": [
+     {
+      "x": 0,
+      "z": 240,
+      "stone": 8,
+      "food": 8,
+      "wood": 16
+     },
+     {
+      "x": -220,
+      "z": -140,
+      "stone": 6,
+      "food": 6,
+      "wood": 16
+     },
+     {
+      "x": 220,
+      "z": -140,
+      "stone": 6,
+      "food": 6,
+      "wood": 16
+     }
+    ],
+    "shrubs": 220
+   },
+   "start": {
+    "buildings": [
+     [
+      "ninigi_fireplace",
+      0,
+      210,
+      0
+     ]
+    ],
+    "units": [
+     [
+      "ninigi_worker",
+      -8,
+      194,
+      6
+     ],
+     [
+      [
+       "Miyagi_s0",
+       "hermit_s0"
+      ],
+      10,
+      192,
+      1,
+      2
+     ],
+     [
+      [
+       "ninigi_warrior"
+      ],
+      16,
+      202,
+      4,
+      2
+     ],
+     [
+      [
+       "ninigi_archer"
+      ],
+      20,
+      196,
+      3,
+      2
+     ]
+    ]
+   },
+   "models": [
+    "Bela_s0",
+    "hu_colossi",
+    "hu_mammoth",
+    "hu_rhino",
+    "Tarna_s0",
+    "Cole_s0",
+    "aje_tyrannosaurus",
+    "aje_brachiosaurus",
+    "aje_stegosaurus",
+    "aje_triceratops_archer",
+    "Miyagi_s0",
+    "hermit_s0",
+    "ninigi_kong",
+    "ninigi_seismosaurus",
+    "ninigi_triceratops",
+    "ninigi_sumo",
+    "lovelace_s0",
+    "seas_rex",
+    "seas_mobile_suit",
+    "seas_triceratops",
+    "hu_zombie_warrior",
+    "hu_undead_warrior",
+    "hu_zombie_archer",
+    "hu_zombie_killer",
+    "schliemann_zombie"
+   ]
+  },
+  "SEAS": {
+   "foeTribe": "Aje",
+   "foe2Tribe": "Ninigi",
+   "foe": {
+    "tribe": "Aje",
+    "name": "Dustriders",
+    "behaviour": "Schnecke",
+    "res": {
+     "food": 1500,
+     "wood": 1500,
+     "stone": 1200
+    }
+   },
+   "foe2": {
+    "tribe": "Ninigi",
+    "name": "Dragon Clan",
+    "behaviour": "Schnecke",
+    "res": {
+     "food": 1500,
+     "wood": 1500,
+     "stone": 1200
+    }
+   },
+   "res": {
+    "food": 800,
+    "wood": 700,
+    "stone": 600
+   },
+   "epoch": 2,
+   "powers": [],
+   "map": {
+    "seed": 3303,
+    "setting": "Ashvalley",
+    "size": 540,
+    "base": 6,
+    "noise": [
+     [
+      0.005,
+      6
+     ],
+     [
+      0.025,
+      1.3
+     ]
+    ],
+    "ground": [
+     0,
+     7,
+     2,
+     3,
+     4,
+     5
+    ],
+    "clear": [
+     [
+      0,
+      0,
+      30
+     ],
+     [
+      0,
+      210,
+      30
+     ],
+     [
+      -185,
+      -110,
+      30
+     ],
+     [
+      185,
+      -110,
+      30
+     ]
+    ],
+    "features": [
+     {
+      "type": "hill",
+      "x": 0,
+      "z": 0,
+      "r": 150,
+      "h": 26
+     },
+     {
+      "type": "flat",
+      "x": 0,
+      "z": 0,
+      "r": 26,
+      "h": 31,
+      "edge": 16
+     },
+     {
+      "type": "flat",
+      "x": 0,
+      "z": 210,
+      "r": 55,
+      "h": 6
+     },
+     {
+      "type": "flat",
+      "x": -185,
+      "z": -110,
+      "r": 55,
+      "h": 6
+     },
+     {
+      "type": "flat",
+      "x": 185,
+      "z": -110,
+      "r": 55,
+      "h": 6
+     }
+    ],
+    "places": [
+     {
+      "kind": "model",
+      "model": "ash_crater02_fire",
+      "x": -34,
+      "z": -8,
+      "rot": 0,
+      "r": 3,
+      "block": false
+     },
+     {
+      "kind": "model",
+      "model": "ash_chimney_01_fire",
+      "x": 30,
+      "z": 16,
+      "rot": 1,
+      "r": 3,
+      "block": false
+     },
+     {
+      "kind": "model",
+      "model": "ash_crater04_fire",
+      "x": 6,
+      "z": -36,
+      "rot": 2,
+      "r": 3,
+      "block": false
+     },
+     {
+      "kind": "model",
+      "model": "ash_chimney_03_fire",
+      "x": -14,
+      "z": 34,
+      "rot": 3,
+      "r": 3,
+      "block": false
+     },
+     {
+      "kind": "model",
+      "model": "ash_rocktooth01",
+      "x": -90,
+      "z": 60,
+      "rot": 0,
+      "r": 4
+     },
+     {
+      "kind": "model",
+      "model": "ash_rocktooth02",
+      "x": 80,
+      "z": 70,
+      "rot": 1,
+      "r": 4
+     },
+     {
+      "kind": "model",
+      "model": "ash_rocktooth03",
+      "x": 0,
+      "z": -110,
+      "rot": 2,
+      "r": 4
+     },
+     {
+      "kind": "model",
+      "model": "ash_rocktooth04",
+      "x": -120,
+      "z": -20,
+      "rot": 3,
+      "r": 4
+     },
+     {
+      "kind": "model",
+      "model": "ash_rocktooth01",
+      "x": 120,
+      "z": -10,
+      "rot": 4,
+      "r": 4
+     },
+     {
+      "kind": "model",
+      "model": "ash_lava_glow_01",
+      "x": 0,
+      "z": 0,
+      "rot": 0,
+      "r": 0,
+      "block": false
+     }
+    ],
+    "forests": [
+     {
+      "x": -200,
+      "z": 120,
+      "r": 50,
+      "n": 28
+     },
+     {
+      "x": 200,
+      "z": 120,
+      "r": 50,
+      "n": 28
+     },
+     {
+      "x": 0,
+      "z": -230,
+      "r": 50,
+      "n": 28
+     }
+    ],
+    "rocks": [
+     {
+      "x": -100,
+      "z": 180,
+      "r": 40,
+      "n": 12
+     },
+     {
+      "x": 100,
+      "z": 180,
+      "r": 40,
+      "n": 12
+     }
+    ],
+    "resources": [
+     {
+      "x": 0,
+      "z": 240,
+      "stone": 8,
+      "food": 8,
+      "wood": 16
+     },
+     {
+      "x": -220,
+      "z": -140,
+      "stone": 6,
+      "food": 6,
+      "wood": 16
+     },
+     {
+      "x": 220,
+      "z": -140,
+      "stone": 6,
+      "food": 6,
+      "wood": 16
+     }
+    ],
+    "shrubs": 220
+   },
+   "start": {
+    "buildings": [
+     [
+      "seas_headquarters",
+      0,
+      210,
+      0
+     ]
+    ],
+    "units": [
+     [
+      "seas_worker",
+      -8,
+      194,
+      6
+     ],
+     [
+      [
+       "lovelace_s0"
+      ],
+      10,
+      192,
+      1,
+      2
+     ],
+     [
+      [
+       "seas_warrior"
+      ],
+      16,
+      202,
+      4,
+      2
+     ],
+     [
+      [
+       "seas_gunner"
+      ],
+      20,
+      196,
+      3,
+      2
+     ]
+    ]
+   },
+   "models": [
+    "Bela_s0",
+    "hu_colossi",
+    "hu_mammoth",
+    "hu_rhino",
+    "Tarna_s0",
+    "Cole_s0",
+    "aje_tyrannosaurus",
+    "aje_brachiosaurus",
+    "aje_stegosaurus",
+    "aje_triceratops_archer",
+    "Miyagi_s0",
+    "hermit_s0",
+    "ninigi_kong",
+    "ninigi_seismosaurus",
+    "ninigi_triceratops",
+    "ninigi_sumo",
+    "lovelace_s0",
+    "seas_rex",
+    "seas_mobile_suit",
+    "seas_triceratops",
+    "hu_zombie_warrior",
+    "hu_undead_warrior",
+    "hu_zombie_archer",
+    "hu_zombie_killer",
+    "schliemann_zombie"
+   ]
+  }
+ }
+}

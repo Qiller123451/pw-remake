@@ -1,0 +1,21 @@
+{
+  "cfg": "mirage",
+  "mission": 15,
+  "tribe": "Aje",
+  "title": "Mission 15: New World Order ",
+  "steps": 5,
+  "passed": 5,
+  "failedStep": null,
+  "over": true,
+  "won": true,
+  "finished": true,
+  "gameMinutes": 11.8,
+  "wallSeconds": 62,
+  "teleports": 37,
+  "cheatKills": 335,
+  "topUps": 21,
+  "triggerErrors": 0,
+  "fails": 0,
+  "exception": null,
+  "date": "2026-11-02"
+}

@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- MoonSharp 2.0 (BSD-3-Clause, https://github.com/moonsharp-devs/moonsharp), vendored as source:
+       a Lua 5.2 interpreter written in C#. Changed for determinism (docs/MULTIPLAYER.md "Determinism"): the math
+       library and the ^ operator use src/Sim/Core/FdLibm.cs (linked below) instead of System.Math, and numbers
+       turn into strings with the invariant culture (DynValue.CastToString). -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>MoonSharp.Interpreter</AssemblyName>
+    <RootNamespace>MoonSharp.Interpreter</RootNamespace>
+    <DefineConstants>$(DefineConstants);DOTNET_CORE;NETSTANDARD</DefineConstants>
+    <Nullable>disable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CS0168;CS0219;CS0162;CS0618;CS0649;CS0414;CS1591;CS8632;SYSLIB0050;SYSLIB0051;CS0108;CS0114;CS1570;CS1572;CS1573;CS1574;CS1584;CS1658;CS0659;CS0661;CS0660</NoWarn>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <EnableDefaultCompileItems>true</EnableDefaultCompileItems>
+    <!-- the Lua interpreter of the mission scripts: optimized also in Debug (the game's Play builds Debug) -->
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../Sim/Core/FdLibm.cs" Link="Determinism/FdLibm.cs" />
+  </ItemGroup>
+</Project>

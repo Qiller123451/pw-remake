@@ -1,0 +1,21 @@
+{
+  "cfg": "base",
+  "mission": 2,
+  "tribe": "Ninigi",
+  "title": "Mission 2: Druid Island",
+  "steps": 13,
+  "passed": 13,
+  "failedStep": null,
+  "over": true,
+  "won": true,
+  "finished": true,
+  "gameMinutes": 6.9,
+  "wallSeconds": 6,
+  "teleports": 0,
+  "cheatKills": 108,
+  "topUps": 0,
+  "triggerErrors": 0,
+  "fails": 0,
+  "exception": null,
+  "date": "2026-11-02"
+}

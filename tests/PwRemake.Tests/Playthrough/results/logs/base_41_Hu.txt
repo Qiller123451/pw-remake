@@ -1,0 +1,85 @@
+ok  1. the opening film sb4101: quests "Breakthrough Part I" and "Part II" (5 s, at 5 s)
+ok  2. the party reaches the place of first contact: dialogue db_4102 (Dustriders and Norsemen fight) (6 s, at 11 s)
+ok  3. the fight is over, dialogue db_4111: quest "The Bridgehead" (epoch 4) (53 s, at 64 s)
+   [64 s] epoch 1, units 7/0, flamethrowers 3 (squad 0), saved 0, fighters 4, workers 3, buildings 0: ; res food 300,wood 300,stone 300,skulls 0,power 0; next epoch: ok (missing )
+   teleport (squad: hu_flamethrower) to 1180,330 at 184 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 184 s
+   [244 s] epoch 2, units 16/29, flamethrowers 5 (squad 3 at (1187, 331) (1187, 331) (619, 869)), saved 0, fighters 6, workers 10, buildings 5: hu_fireplacex1 hu_stone_cottagex3 hu_weapons_smithx1; res food 900,wood 900,stone 900,skulls 225,power 0; next epoch: ok (missing )
+   teleport (squad: hu_flamethrower) to 1180,330 at 245 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 245 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 305 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 305 s
+   teleport (defence: hu_flamethrower) to 276,664 at 356 s
+   teleport (defence: hu_flamethrower) to 276,664 at 356 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 365 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 365 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 396 s
+   [424 s] epoch 3, units 29/37, flamethrowers 15 (squad 15 at (1186, 331) (1188, 330) (1187, 331)), saved 0, fighters 16, workers 13, buildings 6: hu_fireplacex1 hu_stone_cottagex4 hu_weapons_smithx1; res food 1200,wood 1200,stone 1200,skulls 494,power 0; next epoch: ok (missing )
+   teleport (squad: hu_flamethrower) to 1180,330 at 425 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 425 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 457 s
+ok  4. the base reaches epoch 4: quest "The Bridgehead" (413 s, at 477 s)
+   teleport (squad: hu_flamethrower) to 1180,330 at 485 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 485 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 517 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 546 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 546 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 578 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 596 s
+   [605 s] epoch 4, units 29/37, flamethrowers 15 (squad 15 at (1186, 331) (1188, 331) (1187, 331)), saved 0, fighters 16, workers 13, buildings 6: hu_fireplacex1 hu_stone_cottagex4 hu_weapons_smithx1; res food 1200,wood 1200,stone 1200,skulls 578,power 0
+   teleport (squad: hu_flamethrower) to 1180,330 at 607 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 607 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 639 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 658 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 668 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 668 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 700 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 719 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 726 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 727 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 727 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 727 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 728 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 729 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 729 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 729 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 729 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 730 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 730 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 731 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 761 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 780 s
+   [786 s] epoch 4, units 29/37, flamethrowers 15 (squad 15 at (1186, 332) (1188, 330) (1187, 331)), saved 0, fighters 16, workers 13, buildings 6: hu_fireplacex1 hu_stone_cottagex4 hu_weapons_smithx1; res food 1200,wood 1100,stone 1140,skulls 853,power 0
+   teleport (squad: hu_flamethrower) to 1180,330 at 787 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 788 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 788 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 788 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 789 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 790 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 790 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 790 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 790 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 791 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 791 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 792 s
+   [967 s] epoch 4, units 24/37, flamethrowers 10 (squad 5 at (791, 797) (785, 805) (784, 805)), saved 15, fighters 11, workers 13, buildings 6: hu_fireplacex1 hu_stone_cottagex4 hu_weapons_smithx1; res food 400,wood 300,stone 1140,skulls 1018,power 0
+   teleport (squad: hu_flamethrower) to 1180,330 at 1101 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 1101 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 1101 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 1101 s
+ok  5. 20 flamethrowers reach the rendezvous point: quest "Breakthrough Part I" (625 s, at 1102 s)
+   [1148 s] epoch 4, units 19/37, flamethrowers 5 (squad 5 at (1186, 331) (1187, 331) (1188, 331)), saved 20, fighters 6, workers 13, buildings 6: hu_fireplacex1 hu_stone_cottagex4 hu_weapons_smithx1; res food 400,wood 300,stone 1140,skulls 1280,power 0
+ok  6. Leighton reaches the rendezvous point, boards the carrier: film sb4108 (quest "Breakthrough Part II") (210 s, at 1312 s)
+ok  7. the film sb4108 ends the mission (QUIT) (12 s, at 1324 s)
+ok no exception
+ok QUIT: the mission is won
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Hu; game time 22 min; teleports 59; cheat kills 208; top-ups 35
+   triggers fired 102 of 162, 129 firings, 349 actions, warnings 0
+   quests: LB41MQ01=done LB41MQ02=done LB41MQ03=done LB41SQ01=done LB41SQ02=open LB41SQ03=done
+   sequences: 
+   player: hu_flamethrower x5; buildings ; res {"food":260,"wood":0,"stone":1140,"skulls":1496,"power":0}
+   won: {"won":true,"text":""}
+   epoch 4, flamethrowers 5 (hu_flamethrower), population 5/0
+   variables: Flamer_Fugees=20 MQ01=1 MQ02=1 MQ03=1 Bases_seen=1 Ho_Destroyed=1 Need_For_Speed_Failed=0

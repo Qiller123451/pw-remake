@@ -1,0 +1,58 @@
+ok  1. the opening film sc_7010: quest "The Core of the Problem" (1 s, at 1 s)
+   teleport (army: special_eusmilus) to 380,722 at 91 s
+ok  2. the army reaches the first pumping station: film ms_7026, quest "Countdown of Death" (97 s, at 98 s)
+   teleport (army: aje_spearman) to 464,698 at 99 s
+   teleport (guard1: aje_warrior) to 456,689 at 222 s
+   teleport (guard3: aje_archer) to 624,553 at 243 s
+   teleport (guard2: aje_archer) to 792,688 at 287 s
+   teleport (guard2: aje_archer) to 792,688 at 287 s
+   teleport (army: Bela_s0) to 408,477 at 351 s
+   teleport (army: Cole_s0) to 408,477 at 351 s
+   teleport (army: aje_spearman) to 408,477 at 351 s
+   teleport (army: aje_spearman) to 408,477 at 351 s
+   teleport (army: aje_spearman) to 408,477 at 351 s
+   teleport (army: aje_spearman) to 408,477 at 351 s
+   teleport (army: aje_spearman) to 408,477 at 351 s
+   teleport (army: aje_spearman) to 408,477 at 351 s
+   teleport (army: aje_spearman) to 408,477 at 351 s
+   teleport (army: aje_spearman) to 408,477 at 351 s
+   teleport (army: aje_spearman) to 408,477 at 351 s
+   teleport (army: aje_archer) to 408,477 at 351 s
+   teleport (army: aje_spearman) to 408,477 at 351 s
+   teleport (army: aje_spearman) to 409,475 at 352 s
+   teleport (army: aje_archer) to 409,475 at 352 s
+   teleport (army: aje_spearman) to 403,468 at 363 s
+   teleport (army: aje_archer) to 840,478 at 372 s
+   teleport (army: aje_spearman) to 845,480 at 545 s
+   teleport (army: aje_spearman) to 845,480 at 545 s
+   teleport (army: aje_spearman) to 845,480 at 545 s
+   teleport (army: aje_spearman) to 845,480 at 545 s
+   teleport (army: aje_spearman) to 845,482 at 546 s
+   teleport (army: aje_spearman) to 845,482 at 546 s
+   teleport (army: aje_spearman) to 845,482 at 546 s
+   teleport (army: aje_spearman) to 846,479 at 548 s
+   teleport (army: aje_archer) to 840,466 at 554 s
+   teleport (army: aje_spearman) to 855,468 at 561 s
+ok  3. the five pumping stations are taken and held: the countdown stops, sequence sc_7040 (quest "Countdown of Death") (464 s, at 562 s)
+   teleport (guard5: aje_spearman) to 847,467 at 649 s
+   teleport (heroes: tesla_s0) to 623,138 at 651 s
+   teleport (guard3: aje_warrior) to 624,553 at 668 s
+   teleport (guard1: aje_warrior) to 456,689 at 696 s
+ok  4. Béla, Cole, Stina and Taslow walk into the crater: quest "The Core of the Problem" (142 s, at 704 s)
+ok  5. the film sc_7041 ends the mission (3 s, at 707 s)
+ok no exception
+ok QUIT: the mission is won
+   hero Bela_s0: alive True parked False inside False at (624, 139) task idle
+   hero Cole_s0: alive True parked False inside False at (621, 142) task move
+   hero special_eusmilus: alive True parked False inside False at (623, 139) task idle
+   hero tesla_s0: alive True parked False inside False at (621, 140) task idle
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Aje (mission: Hu); game time 12 min; teleports 37; cheat kills 335; top-ups 21
+   triggers fired 110 of 163, 136 firings, 593 actions, warnings 0
+   quests: L15MQ01=done L15MQ02=done L15SQ01=done L15SQ02=failed L15SQ03=failed
+   sequences: sc_7010@0 ms_7026@91 sc_7030_a@103 sc_7038@282 sc_7040@561 sc_7041@707
+   player: aje_resource_collector x1, tesla_s0 x1, lovelace_s0 x1, aje_warrior x2, aje_worker x11, Bela_s0 x1, Cole_s0 x1, special_eusmilus x1, aje_spearman x21, aje_archer x5; buildings aje_tent aje_rodeo aje_tent aje_tent aje_tent aje_tent aje_tent aje_tent; res {"food":2200,"wood":1800,"stone":800,"skulls":2475,"power":0}
+   won: {"won":true,"text":""}
+   population 45/51, epoch 5
+   variables: ctrlpts=5 ctrlpt01=1 ctrlpt02=1 ctrlpt03=1 ctrlpt04=1 ctrlpt05=1 cntdwn_aborted=1 blocker=0

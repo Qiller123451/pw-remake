@@ -1,0 +1,20 @@
+ok  1. quest "Back on Earth" from the start (1 s, at 1 s)
+   teleport (army: hu_archer) to 1071,486 at 79 s
+ok  2. the army breaks into the Barbarian main base: quest "Back on Earth" accomplished, the last line of defence appears (79 s, at 80 s)
+   teleport (army: hu_spearman) to 1077,251 at 80 s
+   teleport (army: hu_archer) to 1077,252 at 81 s
+   teleport (army: hu_spearman) to 1077,252 at 81 s
+   teleport (army: hu_spearman) to 1077,252 at 81 s
+   teleport (army: special_eusmilus) to 1077,252 at 81 s
+ok  3. the last line of defence is beaten (or the harbour reached): quest "Barbarian Main Base" accomplished (5 s, at 85 s)
+ok  4. the film ms_2045 ends the mission (0 s, at 85 s)
+ok no exception
+ok QUIT: the mission is won, "Back on Earth" accomplished
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Hu (mission: Aje); game time 1 min; teleports 6; cheat kills 21; top-ups 0
+   triggers fired 34 of 148, 34 firings, 52 actions, warnings 0
+   quests: L04MQ01=done L04MQ02=done L04SQ01=open L04SQ02=hidden L04SQ03=hidden L04SQ04=hidden L04SQ05=hidden
+   sequences: ms_2020@0 ms_2045@84
+   player: hu_archer x3, hu_kentrosaurus x1, hu_spearman x3, hu_worker x7, hu_berserker x1, Cole_s0 x1, special_eusmilus x1, Bela_s0 x1; buildings hu_stone_cottage hu_stone_cottage hu_stone_cottage hu_stone_cottage hu_stone_cottage hu_stone_cottage hu_fireplace hu_fireplace; res {"food":200,"wood":150,"stone":2000,"skulls":159,"power":0}
+   won: {"won":true,"text":""}

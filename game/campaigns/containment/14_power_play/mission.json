@@ -1,0 +1,275 @@
+{
+ "id": 14,
+ "title": "Power Play",
+ "place": "Lake Mead, Nevada",
+ "date": "June 24, 1966",
+ "briefing": [
+  "The rifts are opening again - three of them, around Lake Mead, all in the same week. They are not natural. Kiko has photographed the machines beside them: crude copies of Taslov's Gate, with Crane's cables running to a generating station on the shore.",
+  "Smash the engines and their rifts collapse. But Crane's engineers will raise a smashed engine again while the station feeds them - hold its site, or cut the power at the source."
+ ],
+ "crane": {
+  "behaviour": "Turtle"
+ },
+ "creatures": [
+  "Velociraptor",
+  "Deinonychus",
+  "Allosaurus",
+  "Carnotaurus",
+  "Baryonyx",
+  "Spinosaurus",
+  "Smilodon"
+ ],
+ "powers": [
+  "supply",
+  "recon",
+  "airdrop",
+  "artillery"
+ ],
+ "res": {
+  "food": 1200,
+  "wood": 1200,
+  "stone": 1100
+ },
+ "map": {
+  "seed": 6224,
+  "clear": [
+   [
+    -170,
+    -120,
+    26
+   ],
+   [
+    10,
+    20,
+    26
+   ],
+   [
+    200,
+    60,
+    26
+   ],
+   [
+    175,
+    -175,
+    40
+   ]
+  ],
+  "setting": "Savanna",
+  "size": 540,
+  "base": 5,
+  "water": 0,
+  "noise": [
+   [
+    0.004,
+    7
+   ],
+   [
+    0.02,
+    1.4
+   ]
+  ],
+  "ground": [
+   4,
+   0,
+   2,
+   3,
+   6,
+   7
+  ],
+  "features": [
+   {
+    "type": "basin",
+    "x": 260,
+    "z": -270,
+    "r": 120,
+    "depth": 14
+   },
+   {
+    "type": "flat",
+    "x": 165,
+    "z": -160,
+    "r": 80,
+    "h": 5
+   },
+   {
+    "type": "flat",
+    "x": -185,
+    "z": 185,
+    "r": 70,
+    "h": 5
+   },
+   {
+    "type": "mesa",
+    "x": -40,
+    "z": -170,
+    "r": 50,
+    "h": 20
+   },
+   {
+    "type": "mesa",
+    "x": 90,
+    "z": 170,
+    "r": 45,
+    "h": 18
+   },
+   {
+    "type": "mesa",
+    "x": -170,
+    "z": 30,
+    "r": 40,
+    "h": 16
+   }
+  ],
+  "roads": [
+   {
+    "path": [
+     [
+      -260,
+      200
+     ],
+     [
+      -140,
+      140
+     ],
+     [
+      0,
+      60
+     ],
+     [
+      120,
+      -60
+     ],
+     [
+      180,
+      -150
+     ]
+    ],
+    "width": 9,
+    "kind": "highway"
+   }
+  ],
+  "places": [
+   {
+    "kind": "camp",
+    "x": 120,
+    "z": -200,
+    "rot": 0,
+    "tents": 3
+   }
+  ],
+  "rocks": [
+   {
+    "x": 40,
+    "z": -90,
+    "r": 70,
+    "n": 30
+   },
+   {
+    "x": -60,
+    "z": 100,
+    "r": 60,
+    "n": 20
+   }
+  ],
+  "forests": [
+   {
+    "x": -220,
+    "z": 100,
+    "r": 40,
+    "n": 24
+   }
+  ],
+  "resources": [
+   {
+    "x": -180,
+    "z": 130,
+    "stone": 8,
+    "food": 8,
+    "wood": 26
+   },
+   {
+    "x": -90,
+    "z": 200,
+    "stone": 4,
+    "food": 4,
+    "wood": 10
+   }
+  ],
+  "shrubs": 300
+ },
+ "start": {
+  "buildings": [
+   [
+    "seas_headquarters",
+    -190,
+    190,
+    0
+   ],
+   [
+    "seas_barracks",
+    -158,
+    194,
+    0
+   ],
+   [
+    "seas_garage",
+    -192,
+    228,
+    0
+   ]
+  ],
+  "units": [
+   [
+    "sq_halloran",
+    -202,
+    168,
+    1
+   ],
+   [
+    "seas_worker",
+    -194,
+    172,
+    6
+   ],
+   [
+    "sq_trooper",
+    -180,
+    170,
+    4,
+    2
+   ],
+   [
+    "seas_marksman",
+    -174,
+    164,
+    2,
+    2
+   ],
+   [
+    "sq_taslov",
+    -170,
+    165,
+    1
+   ],
+   [
+    "sq_booker",
+    -160,
+    168,
+    1
+   ],
+   [
+    "sq_aa_halftrack",
+    -150,
+    175,
+    2
+   ],
+   [
+    "sq_shock_trooper",
+    -150,
+    160,
+    4,
+    2
+   ]
+  ]
+ }
+}

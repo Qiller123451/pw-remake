@@ -1,0 +1,21 @@
+{
+  "cfg": "mirage",
+  "mission": 6,
+  "tribe": "Hu",
+  "title": "Mission 6: Pirates and Hostages",
+  "steps": 4,
+  "passed": 4,
+  "failedStep": null,
+  "over": true,
+  "won": true,
+  "finished": true,
+  "gameMinutes": 14.1,
+  "wallSeconds": 36,
+  "teleports": 6,
+  "cheatKills": 88,
+  "topUps": 21,
+  "triggerErrors": 0,
+  "fails": 0,
+  "exception": null,
+  "date": "2026-11-02"
+}

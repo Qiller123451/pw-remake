@@ -1,0 +1,17 @@
+ok  1. quest "Freeing the Hostages" from the start (1 s, at 1 s)
+   teleport (army: special_eusmilus) to 331,554 at 81 s
+   teleport (army: Cole_s0) to 331,554 at 87 s
+   teleport (army: Bela_s0) to 331,554 at 87 s
+ok  2. the army reaches the pirates' prison and breaks its buildings: the hostages are free (sc_8080) (199 s, at 200 s)
+ok  3. the fleet breaks the water gate and sinks the big pirate ship in the bay (sc_8013) (630 s, at 830 s)
+ok  4. the film ms_8090 ends the mission (0 s, at 830 s)
+ok no exception
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Aje; game time 14 min; teleports 3; cheat kills 91; top-ups 20
+   triggers fired 56 of 114, 56 firings, 119 actions, warnings 0
+   quests: L06MQ01=done L06MQ02=done L06SQ01=failed L06SQ02=hidden L06SQ03=hidden
+   sequences: sc_8005@0 sc_8080@199 sc_8011@536 8043@794 sc_8013@830 ms_8090@830
+   player: Cole_s0 x1, special_eusmilus x1, aje_worker x7, aje_resource_collector x1, Bela_s0 x1, aje_cronosaurus x11, aje_catamaran x4; buildings aje_tent aje_tent aje_floating_harbour aje_tent aje_tent aje_tent; res {"food":720,"wood":500,"stone":340,"skulls":792,"power":0}
+   won: {"won":true,"text":""}
+   warships aje_cronosaurus aje_cronosaurus aje_cronosaurus aje_cronosaurus aje_cronosaurus aje_cronosaurus aje_cronosaurus aje_cronosaurus aje_cronosaurus aje_cronosaurus aje_cronosaurus aje_catamaran aje_catamaran aje_catamaran aje_catamaran; epoch 4

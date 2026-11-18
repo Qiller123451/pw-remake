@@ -1,0 +1,32 @@
+ok  1. the opening film sc_4025: quest "The Telescope Tower" (1 s, at 1 s)
+ok  2. the army reaches the tower ruin: it becomes the player's (15 s, at 16 s)
+ok  3. the workers repair the telescope tower while the army guards it: quest "The Telescope Tower", film sc_4030 (118 s, at 134 s)
+   teleport (army: seas_marksman) to 724,264 at 134 s
+   teleport (army: special_eusmilus) to 724,264 at 134 s
+   teleport (army: Bela_s0) to 724,264 at 134 s
+ok  4. quest "The SEAS Storm" (6 s, at 140 s)
+   teleport (army: seas_marksman) to 687,353 at 273 s
+   teleport (army: seas_marksman) to 687,353 at 273 s
+   teleport (army: Cole_s0) to 687,353 at 273 s
+   teleport (army: Bela_s0) to 687,353 at 273 s
+   teleport (army: seas_marksman) to 752,149 at 424 s
+   teleport (army: special_eusmilus) to 752,149 at 424 s
+   teleport (army: seas_marksman) to 639,218 at 510 s
+   teleport (army: seas_marksman) to 639,218 at 512 s
+   teleport (army: special_eusmilus) to 639,218 at 512 s
+   teleport (army: seas_marksman) to 687,353 at 1050 s
+   teleport (army: seas_marksman) to 687,353 at 1050 s
+   teleport (army: special_eusmilus) to 687,353 at 1050 s
+   teleport (army: Bela_s0) to 687,353 at 1050 s
+ok  5. the fleet stops the carrier ships for 40 minutes: film sc_4038, the mission is won (2404 s, at 2544 s)
+ok no exception
+ok QUIT: the mission is won
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe SEAS (mission: Ninigi); game time 42 min; teleports 16; cheat kills 56; top-ups 0
+   triggers fired 115 of 195, 412 firings, 759 actions, warnings 0
+   quests: L12MQ01=done L12MQ02=hidden L12MQ03=done L12SQ01=open L12SQ02=open
+   sequences: sc_4025@1 sc_4030@139 sc_4027@302 sc_4038@2544
+   player: seas_hovercraft x1, seas_marksman x4, seas_worker x10, Cole_s0 x1, special_eusmilus x1, Bela_s0 x1, seas_submarine x7; buildings seas_barracks seas_headquarters ninigi_telescope_tower_ruins seas_steelwork seas_steelwork seas_barracks seas_barracks seas_carrier; res {"food":15,"wood":2500,"stone":300,"skulls":1330,"power":0}
+   won: {"won":true,"text":""}
+   variables: Carrier=0 Turmstörer=2 Tower_Island=0; warships seas_submarine seas_submarine seas_submarine seas_submarine seas_submarine seas_submarine seas_submarine

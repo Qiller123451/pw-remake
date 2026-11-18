@@ -1,0 +1,26 @@
+ok the mission ran without an exception
+ok the intro film ms_4010 is requested at the start (["ms_4010",1])
+ok quest 1 "In the Dinosaur Den" appears after the film (2 s)
+ok the level timer 0 runs hidden (the next wave comes when it runs out)
+ok the seven animal waves come out of the gates in order (pola@4 gall@54 bary@114 smil@164 styg@234 tric@281 allo@326)
+ok wave 2 comes 50 s after wave 1 (TIMR; 50 s)
+ok the random patrol trigger gives the animals routes (8 firings)
+ok quest 1 accomplished (336 s), quest 2 "The Mayor's Life Guard" appears (336 s)
+ok dialogue scenes are requested (ds_4014@337 ds_4012@345 ds_4016@661 ds_4013@1033)
+ok squads of all three guard players appear
+ok the guard squads come in order (354, 414, 494, 574, 649, 709 s)
+ok the squads' classes were created (models of three foreign tribes): aje_warrior aje_spearman aje_archer aje_thrower ninigi_ninja ninigi_archer ninigi_sumo ninigi_marksman hu_warrior hu_pikeman hu_chariot hu_marksman hu_killer hu_archer aje_dilophosaurus aje_assassin hu_wild_boar hu_berserker ninigi_warrior ninigi_parasaurolophus_gatling aje_eusmilus aje_velociraptor_handler hu_mammoth
+ok patrol routes for players 2 and 3
+ok quest 2 accomplished (1033 s), quest 3 "The Final Challenge" appears (1033 s)
+ok the boss sequence sc_4009 is requested
+ok the level-4 Atroxosaurus enters (1042 s, level 4)
+ok OBJP: the boss below 20 % hit points (5 %)
+ok the final film ms_4015 is requested
+ok quest 3 accomplished
+ok the boss is deleted after the film (DELO)
+ok QUIT: the mission is won (G.endMission(true)) after 18 game minutes
+ok bonus: 3 quests x 2000 (6000)
+ok no action errors (0)
+ok no unknown condition / action type
+   triggers fired 64 of 119, 76 firings, 185 actions, most enemies at once 9, warnings 0
+   sequences ms_4010@1 sc_4009@1041 ms_4015@1064 quests L11MQ01:shown@1 L11MQ01:done@335 L11MQ02:shown@335 L11MQ02:done@1032 L11MQ03:shown@1032 L11MQ03:done@1064

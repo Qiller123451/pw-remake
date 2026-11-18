@@ -1,0 +1,626 @@
+{
+ "source": "remake/src/engine/audio.js decodeWav (pw-exporter 98c7703)",
+ "synthetic": {
+  "audio_stereo_ima.wav": {
+   "channels": 2,
+   "rate": 22050,
+   "frames": 2525,
+   "sha256": "f184f5a0b56c5f21cf395c92ab0947eca167ac1b48230b30d9850483f6b4743a",
+   "head": [
+    11153,
+    -8883,
+    11195,
+    -16434,
+    11156,
+    -25259,
+    11191,
+    -21700,
+    11141,
+    -14149,
+    11066,
+    -5324
+   ]
+  },
+  "audio_mono_ima.wav": {
+   "channels": 1,
+   "rate": 22050,
+   "frames": 3535,
+   "sha256": "ffdf3b2b0fe3b0eea198f3a9a0de76049d169d58cee02e6f3bee4e0dc39e4680",
+   "head": [
+    -7770,
+    -7856,
+    -7882,
+    -7859,
+    -7708,
+    -7414,
+    -8045,
+    -8678,
+    -8432,
+    -8955,
+    -9839,
+    -10681
+   ]
+  }
+ },
+ "files": {
+  "02_battle/hit_explosion_medium1.wav": {
+   "channels": 1,
+   "rate": 44100,
+   "frames": 83681,
+   "sha256": "54cb382d8abb5929d7c05e3ac6dbb969bf49cc7361bcc17bedcdfe86da067b2d",
+   "head": [
+    626,
+    637,
+    661,
+    713,
+    825,
+    1068,
+    1591,
+    919,
+    105,
+    -1099,
+    -2220,
+    -2948
+   ]
+  },
+  "02_battle/hit_explosion_medium2.wav": {
+   "channels": 1,
+   "rate": 44100,
+   "frames": 97968,
+   "sha256": "13eee4dee9c35ba13f374d1790c8d2fee1bee3c276b151b9ab7f7c9f060a5797",
+   "head": [
+    305,
+    316,
+    340,
+    392,
+    504,
+    747,
+    1270,
+    2391,
+    4474,
+    3622,
+    2331,
+    1627
+   ]
+  },
+  "02_battle/hit_explosion_medium3.wav": {
+   "channels": 1,
+   "rate": 44100,
+   "frames": 75517,
+   "sha256": "efa1d402f7e1506068cc2e76d74a804c0967bd9adb702ce776b1c1c981a0570d",
+   "head": [
+    11588,
+    11599,
+    11623,
+    11675,
+    11787,
+    12030,
+    12204,
+    11730,
+    10710,
+    9982,
+    9850,
+    8045
+   ]
+  },
+  "02_battle/hit_explosion_small2.wav": {
+   "channels": 1,
+   "rate": 44100,
+   "frames": 116337,
+   "sha256": "fc31738a25af71300b5f020d06ff2d51c7c8fc4b81086c82683d15e4e2273da5",
+   "head": [
+    1,
+    -1,
+    -3,
+    -5,
+    -3,
+    -3,
+    -5,
+    -3,
+    -5,
+    -3,
+    -5,
+    -3
+   ]
+  },
+  "02_battle/hit_explosion_small3.wav": {
+   "channels": 1,
+   "rate": 44100,
+   "frames": 100009,
+   "sha256": "f68e2aaa272cd4d397aeb3c8d03a6cb1bdd710e69b881e2032dca68dde6871c4",
+   "head": [
+    23,
+    25,
+    23,
+    14,
+    2,
+    -6,
+    -16,
+    -15,
+    -7,
+    -2,
+    -9,
+    -18
+   ]
+  },
+  "02_battle/hit_object_explosion_large1.wav": {
+   "channels": 1,
+   "rate": 44100,
+   "frames": 59189,
+   "sha256": "341d4c0aefb85406b3716f6b08b6e172d822dc440f29cbc52a767aa667793a40",
+   "head": [
+    3,
+    -6,
+    -2,
+    1,
+    4,
+    -1,
+    5,
+    1,
+    -3,
+    1,
+    1,
+    1
+   ]
+  },
+  "02_battle/proj_metal_small_hit_soil1.wav": {
+   "channels": 1,
+   "rate": 44100,
+   "frames": 26533,
+   "sha256": "a67a750e26167e4ef3d4666c4f102177b3c686b49c6ccf1e47767bbe0176ad62",
+   "head": [
+    346,
+    335,
+    311,
+    259,
+    147,
+    -96,
+    -619,
+    -1142,
+    -802,
+    -1234,
+    -842,
+    -791
+   ]
+  },
+  "02_battle/proj_metal_small_hit_soil2.wav": {
+   "channels": 1,
+   "rate": 44100,
+   "frames": 28574,
+   "sha256": "e3bbaa31f09fdb7e9cedfb11dcf3e680c4af0f795bee509afe387c0d800cb652",
+   "head": [
+    32,
+    21,
+    -3,
+    -55,
+    -77,
+    -180,
+    -401,
+    -875,
+    -399,
+    33,
+    -135,
+    -492
+   ]
+  },
+  "02_battle/proj_metal_small_hit_soil3.wav": {
+   "channels": 1,
+   "rate": 44100,
+   "frames": 22451,
+   "sha256": "bb0405744434972a64d9783723cd29705b4b5316bb56c48733aba0e32a99cce1",
+   "head": [
+    -73,
+    -84,
+    -60,
+    -112,
+    -224,
+    -467,
+    -84,
+    171,
+    -246,
+    -975,
+    -1273,
+    -821
+   ]
+  },
+  "02_battle/proj_metal_small_hit_unit1.wav": {
+   "channels": 1,
+   "rate": 44100,
+   "frames": 46943,
+   "sha256": "65a0c676cf1905f20081e22219c4cfec8d67b3a6040a46ce1d748c18a438ffb8",
+   "head": [
+    -39,
+    -50,
+    -74,
+    -126,
+    -238,
+    -481,
+    -1004,
+    -1676,
+    -1586,
+    -1668,
+    -1444,
+    -1240
+   ]
+  },
+  "02_battle/proj_metal_small_hit_unit2.wav": {
+   "channels": 1,
+   "rate": 44100,
+   "frames": 44902,
+   "sha256": "8cc6452c73dc653a9fd5a2343b140d7c93ac1267561bde0dbe50864c209b2e5d",
+   "head": [
+    186,
+    197,
+    221,
+    273,
+    385,
+    628,
+    1151,
+    2122,
+    1725,
+    1605,
+    2152,
+    2450
+   ]
+  },
+  "02_battle/proj_metal_small_hit_unit3.wav": {
+   "channels": 1,
+   "rate": 44100,
+   "frames": 32656,
+   "sha256": "4c517530ba89a6e4ba7fd61f5cf13e45ef33dd475f54320815aead89fbdb6bc0",
+   "head": [
+    -620,
+    -609,
+    -585,
+    -533,
+    -421,
+    -178,
+    345,
+    1466,
+    3228,
+    177,
+    3088,
+    2710
+   ]
+  },
+  "02_battle/proj_metal_small_hit_unit4.wav": {
+   "channels": 1,
+   "rate": 44100,
+   "frames": 26533,
+   "sha256": "5b6be95d062836aa6f3d60018d5e5c3910d89ad3d5248be043b00f96cb761439",
+   "head": [
+    66,
+    55,
+    79,
+    131,
+    243,
+    0,
+    174,
+    205,
+    119,
+    197,
+    553,
+    706
+   ]
+  },
+  "02_battle/proj_metal_small_hit_unit5.wav": {
+   "channels": 1,
+   "rate": 44100,
+   "frames": 20410,
+   "sha256": "79711ab2fd1604f556bb56ff87269bc3999a6cdfe7b437fd37c001531cd181cd",
+   "head": [
+    22,
+    22,
+    26,
+    32,
+    30,
+    19,
+    2,
+    9,
+    23,
+    21,
+    2,
+    -5
+   ]
+  },
+  "04_step/step_huge_dino_carn1.wav": null,
+  "04_step/step_huge_dino_carn2.wav": null,
+  "04_step/step_huge_dino_carn3.wav": null,
+  "05_ui/ui_building_place.wav": null,
+  "05_ui/ui_click_error.wav": null,
+  "05_ui/ui_click_success.wav": null,
+  "05_ui/ui_invent_era.wav": null,
+  "05_ui/ui_new_technology.wav": null,
+  "05_ui/ui_no_wood.wav": null,
+  "05_ui/ui_task_attack.wav": null,
+  "05_ui/ui_task_go_to.wav": null,
+  "05_ui/ui_unit_transformed.wav": null,
+  "05_ui/ui_warn_under_attack.wav": null,
+  "06_atmo/atmo_3d_frog1.wav": {
+   "channels": 1,
+   "rate": 44100,
+   "frames": 59189,
+   "sha256": "c1b07f3395f11c1349c3c22a4b7962b508396cc3c40d9591d7a55fa39f4ddde5",
+   "head": [
+    0,
+    0,
+    -2,
+    -4,
+    -6,
+    -8,
+    -8,
+    -6,
+    -6,
+    -4,
+    0,
+    2
+   ]
+  },
+  "06_atmo/atmo_3d_frog3.wav": {
+   "channels": 1,
+   "rate": 44100,
+   "frames": 91845,
+   "sha256": "50ba55d96df42e5d771d5a3c60f8d281376914dc2955d5b3ca26d7f76dd878bd",
+   "head": [
+    -1,
+    -3,
+    -1,
+    -3,
+    -5,
+    -1,
+    -1,
+    -1,
+    -3,
+    -1,
+    -3,
+    -3
+   ]
+  },
+  "06_atmo/atmo_3d_insect1.wav": {
+   "channels": 1,
+   "rate": 44100,
+   "frames": 57148,
+   "sha256": "de3b4549b8be00b77431da5b069d173e7daa78a3522ed3e0a1e1f255daac2c5d",
+   "head": [
+    -1,
+    1,
+    1,
+    3,
+    1,
+    3,
+    1,
+    -3,
+    1,
+    -3,
+    -1,
+    1
+   ]
+  },
+  "06_atmo/atmo_3d_insect2.wav": {
+   "channels": 1,
+   "rate": 44100,
+   "frames": 57148,
+   "sha256": "c0bfaff50dc8277655603e19f7ea99dfad0b90fe5bca7f5889fb28b18d58dc59",
+   "head": [
+    20,
+    22,
+    24,
+    22,
+    9,
+    -13,
+    -11,
+    17,
+    36,
+    33,
+    12,
+    -2
+   ]
+  },
+  "06_atmo/atmo_gen_ocean.wav": null,
+  "06_atmo/atmo_gen_wail_high1.wav": null,
+  "06_atmo/atmo_gen_wail_med1.wav": null,
+  "06_atmo/atmo_jungle_forest.wav": null,
+  "06_atmo/atmo_jungle_plain.wav": null,
+  "06_atmo/atmo_jungle_wind.wav": null,
+  "07_speech_acks/Aje/Rider2/Aje_Allo_gag_1.wav": {
+   "channels": 1,
+   "rate": 22050,
+   "frames": 61105,
+   "sha256": "bd9b8c970567bb50c20d0f2c9184530e04b5a8bc0fbc4aa3a3106f3dd9516c2e",
+   "head": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  "07_speech_acks/Aje/Rider2/Aje_Allo_gag_2.wav": {
+   "channels": 1,
+   "rate": 22050,
+   "frames": 40905,
+   "sha256": "6b11c5835c4ea22cecd81ea197aa8b645670f0b064001f79b273c6b2150665a0",
+   "head": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  "07_speech_acks/Aje/Rider2/Aje_Allo_gag_3.wav": {
+   "channels": 1,
+   "rate": 22050,
+   "frames": 75245,
+   "sha256": "4f803d4d9424be61280939a2de61ebfd5fc63f38be86ab53e305df5da9a912ba",
+   "head": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  "07_speech_acks/Aje/Rider2/Aje_Allo_gag_4.wav": {
+   "channels": 1,
+   "rate": 22050,
+   "frames": 22220,
+   "sha256": "1a4388016228c129ea83c80742c385de0fbe0c47d5c16eda94b19aaa3781da9a",
+   "head": [
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1
+   ]
+  },
+  "07_speech_acks/Aje/Rider2/Aje_Allo_move_1.wav": {
+   "channels": 1,
+   "rate": 22050,
+   "frames": 21210,
+   "sha256": "f0c185138c032e8957534e54956ce21f27589088e46b231422056f1a2a316d7d",
+   "head": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  },
+  "07_speech_acks/Aje/Rider2/Aje_Allo_move_2.wav": {
+   "channels": 1,
+   "rate": 22050,
+   "frames": 22220,
+   "sha256": "8a63a54b6f096fb30e5a31c28cc78e82a290c2092eddf792cc214bce04e51aaf",
+   "head": [
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1
+   ]
+  },
+  "07_speech_acks/Aje/Rider2/Aje_Allo_move_3.wav": {
+   "channels": 1,
+   "rate": 22050,
+   "frames": 27270,
+   "sha256": "8922d54aa47fefb8b38659c2cf725836d962d4c71854243f4833d508ca1b14f5",
+   "head": [
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1
+   ]
+  },
+  "07_speech_acks/Aje/Rider2/Aje_Allo_sel_2.wav": {
+   "channels": 1,
+   "rate": 22050,
+   "frames": 28280,
+   "sha256": "8fcdc05b857d43c6d9fb790f2e7a9e09deb3713b2c4e84a6f8b18c55bc540769",
+   "head": [
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1
+   ]
+  },
+  "07_speech_acks/Aje/Rider2/Aje_Allo_sel_3.wav": {
+   "channels": 1,
+   "rate": 22050,
+   "frames": 45450,
+   "sha256": "c3556c73f8d8dde4be96f4274fdf5d5d732f4c4d557defef9beaf8b92185386a",
+   "head": [
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1,
+    -1
+   ]
+  },
+  "07_speech_acks/Aje/Rider2/Aje_Allo_sel_4.wav": {
+   "channels": 1,
+   "rate": 22050,
+   "frames": 34845,
+   "sha256": "6c5150f037c62294b4b05e02be9c51fc87e9ab91957f4caa594cb0ffdf6bac94",
+   "head": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ]
+  }
+ }
+}

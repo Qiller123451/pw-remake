@@ -1,0 +1,19 @@
+ok  1. the opening film sb4301, dialogue db_4301: quest "Tabula Rasa" (7 s, at 7 s)
+ok  2. the Dustriders' camp at the bay is broken (their counter-attack and buildings): quest "Tabula Rasa" (95 s, at 102 s)
+ok  3. the film sb4305: quest "The Agony of Choice" (4 s, at 106 s)
+   teleport (army: hu_chariot) to 455,152 at 210 s
+   teleport (army: hu_chariot) to 455,152 at 210 s
+ok  4. a unit reaches the Norsemen's horn: quest "The Agony of Choice" (105 s, at 211 s)
+ok  5. the film sb4302a ends the mission (quit) (3 s, at 214 s)
+ok no exception
+ok the mission is won
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Hu (mission: Ninigi); game time 4 min; teleports 2; cheat kills 30; top-ups 0
+   triggers fired 65 of 122, 65 firings, 170 actions, warnings 0
+   quests: LB43MQ01=done LB43MQ02=done LB43SQ01=open LB43SQ02=hidden LB43SQ03=hidden
+   sequences: 
+   player: hu_warrior x5, hu_archer x6, schliemann_s0 x1, hu_spearman x4, hu_chariot x2, hu_pikeman x4, hu_worker x8; buildings ; res {"food":600,"wood":600,"stone":150,"skulls":748,"power":0}
+   won: {"won":true,"text":""}
+   variables: mq01_done=1 mq02_set=1 mq02_done=1 victory_condition=1
+   Dustrider buildings left in the bay: aje_tent@(383, 649) hp 133 built True untargetable False invuln 0 aje_tent@(433, 603) hp 133 built True untargetable False invuln 0

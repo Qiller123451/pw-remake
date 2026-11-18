@@ -1,0 +1,339 @@
+{
+ "id": 16,
+ "title": "Open Door",
+ "place": "Copper Basin, Nevada",
+ "date": "August 6, 1966",
+ "briefing": [
+  "Today the Door opens for the first time in front of the whole world: Tala's people come through with their herds to trade, the newspapers are on the hill, and the President is listening on the radio.",
+  "Crane is here too. He has wired relay masts into the Door's circuit on three mesas around the basin, and something very large is walking in from the south.",
+  "Keep the Door standing, bring the caravans to the Dustriders' camp, bring down the masts, and end Augustus Crane's career."
+ ],
+ "tribes": [
+  "Aje"
+ ],
+ "aje": {
+  "behaviour": "Mikrobe"
+ },
+ "crane": {
+  "ai": false
+ },
+ "ajeFriendly": true,
+ "creatures": [
+  "Velociraptor",
+  "Deinonychus",
+  "Allosaurus",
+  "Carnotaurus",
+  "Atroxosaurus",
+  "Smilodon",
+  "Spinosaurus"
+ ],
+ "powers": [
+  "supply",
+  "recon",
+  "airdrop",
+  "artillery"
+ ],
+ "res": {
+  "food": 1500,
+  "wood": 1500,
+  "stone": 1400,
+  "power": 100
+ },
+ "map": {
+  "seed": 8066,
+  "clear": [
+   [
+    0,
+    0,
+    30
+   ],
+   [
+    190,
+    -170,
+    20
+   ],
+   [
+    -200,
+    -180,
+    20
+   ],
+   [
+    200,
+    120,
+    20
+   ],
+   [
+    -60,
+    150,
+    30
+   ]
+  ],
+  "setting": "Savanna",
+  "size": 520,
+  "base": 6,
+  "noise": [
+   [
+    0.004,
+    9
+   ],
+   [
+    0.02,
+    1.5
+   ]
+  ],
+  "ground": [
+   0,
+   3,
+   4,
+   7,
+   6,
+   1
+  ],
+  "features": [
+   {
+    "type": "mesa",
+    "x": 190,
+    "z": -170,
+    "r": 55,
+    "h": 18
+   },
+   {
+    "type": "mesa",
+    "x": -200,
+    "z": -180,
+    "r": 50,
+    "h": 16
+   },
+   {
+    "type": "mesa",
+    "x": 200,
+    "z": 120,
+    "r": 45,
+    "h": 16
+   },
+   {
+    "type": "flat",
+    "x": -20,
+    "z": 20,
+    "r": 140,
+    "h": 6
+   }
+  ],
+  "roads": [
+   {
+    "path": [
+     [
+      -40,
+      260
+     ],
+     [
+      -40,
+      120
+     ],
+     [
+      -20,
+      40
+     ],
+     [
+      0,
+      -40
+     ],
+     [
+      10,
+      -260
+     ]
+    ],
+    "width": 9,
+    "kind": "highway"
+   },
+   {
+    "path": [
+     [
+      0,
+      -40
+     ],
+     [
+      190,
+      -150
+     ]
+    ],
+    "width": 6,
+    "kind": "dirt"
+   }
+  ],
+  "places": [
+   {
+    "kind": "town",
+    "x": -10,
+    "z": -90,
+    "rot": 0,
+    "blocks": 1,
+    "len": 140,
+    "empty": 0.4
+   },
+   {
+    "kind": "camp",
+    "x": -60,
+    "z": 160,
+    "rot": 0,
+    "tents": 4
+   },
+   {
+    "kind": "model",
+    "model": "sq_bus",
+    "x": 60,
+    "z": 70,
+    "rot": 0.6,
+    "r": 4
+   },
+   {
+    "kind": "model",
+    "model": "sq_army_truck",
+    "x": 70,
+    "z": 60,
+    "rot": 0.2,
+    "r": 3
+   }
+  ],
+  "rocks": [
+   {
+    "x": 120,
+    "z": 40,
+    "r": 60,
+    "n": 20
+   }
+  ],
+  "resources": [
+   {
+    "x": -150,
+    "z": 150,
+    "stone": 8,
+    "food": 8,
+    "wood": 26
+   }
+  ],
+  "forests": [
+   {
+    "x": -180,
+    "z": 60,
+    "r": 50,
+    "n": 30
+   }
+  ],
+  "shrubs": 300
+ },
+ "start": {
+  "buildings": [
+   [
+    "seas_headquarters",
+    -130,
+    140,
+    0
+   ],
+   [
+    "seas_barracks",
+    -98,
+    144,
+    0
+   ],
+   [
+    "seas_garage",
+    -132,
+    178,
+    0
+   ],
+   [
+    "sq_searchlight",
+    30,
+    30,
+    0
+   ],
+   [
+    "sq_flak",
+    -30,
+    -30,
+    0
+   ],
+   [
+    "sq_flak",
+    40,
+    -20,
+    0
+   ]
+  ],
+  "units": [
+   [
+    "sq_halloran",
+    -142,
+    118,
+    1
+   ],
+   [
+    "seas_worker",
+    -134,
+    122,
+    6
+   ],
+   [
+    "sq_trooper",
+    -2,
+    4,
+    4,
+    2
+   ],
+   [
+    "seas_marksman",
+    4,
+    -2,
+    2,
+    2
+   ],
+   [
+    "sq_taslov",
+    -10,
+    20,
+    1
+   ],
+   [
+    "sq_booker",
+    -30,
+    40,
+    1
+   ],
+   [
+    "sq_tala",
+    20,
+    30,
+    1
+   ],
+   [
+    "seas_triceratops",
+    -40,
+    60,
+    2
+   ],
+   [
+    "sq_aa_halftrack",
+    0,
+    60,
+    2
+   ],
+   [
+    "sq_arc_halftrack",
+    10,
+    50,
+    1
+   ]
+  ]
+ },
+ "zones": [
+  {
+   "name": "camp",
+   "x": -60,
+   "z": 160,
+   "r": 24,
+   "kind": "evac"
+  }
+ ],
+ "civName": "A Dustrider"
+}

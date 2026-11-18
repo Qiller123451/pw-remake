@@ -1,0 +1,14 @@
+ok  1. the opening film sc_3080: quest "Stalking" (3 s, at 3 s)
+ok  2. the army makes its way north until the temple comes into sight: sequence sc_3070, quest "Stalking" (48 s, at 51 s)
+ok  3. Béla, Cole and Stina fight through the SEAS base to the temple entrance: quest "No Trespassing" (148 s, at 199 s)
+ok  4. the film sc_3090 ends the mission (2 s, at 201 s)
+ok no exception
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Hu (mission: Ninigi); game time 3 min; teleports 0; cheat kills 70; top-ups 0
+   triggers fired 38 of 128, 38 firings, 77 actions, warnings 0
+   quests: L10MQ01=done L10MQ02=done L10SQ01=failed L10SQ02=hidden
+   sequences: sc_3080a@0 sc_3080@0 sc_3070@50 sc_3090@200
+   player: darwin_s0 x1, hu_chariot x4, hu_worker x1, Bela_s0 x1, Cole_s0 x1, special_eusmilus x1; buildings ; res {"food":250,"wood":250,"stone":250,"skulls":445,"power":0}
+   won: {"won":true,"text":""}
+   variables: alarm_set=1 mq02_done=1 player01_dead=0 player02_dead=0

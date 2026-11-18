@@ -1,0 +1,22 @@
+ok  1. quest "To the Temple" from the start (1 s, at 1 s)
+ok  2. the heroes cross the city to the temple: sequence sc_2055, quest "Pirates in the Holy City", the pirates take the support points (82 s, at 83 s)
+ok  3. support point 1 (the rodeo): the pirates in it are beaten (41 s, at 124 s)
+ok  4. the pirates' second wave against support point 1 is beaten (28 s, at 152 s)
+ok  5. support point 3 (the animal farm): the pirates in it are beaten (51 s, at 203 s)
+ok  6. the pirates' second wave against support point 3 is beaten (27 s, at 230 s)
+ok  7. two support points freed: quest accomplished, the last fortification (weapon smith) opens (0 s, at 230 s)
+ok  8. support point 2 (the weapon smith): the pirates in it are beaten (10 s, at 240 s)
+ok  9. the pirates' second wave against support point 2 is beaten (5 s, at 245 s)
+ok 10. the last fortification is freed: sequence sc_2049, quest "To the Harbour" (0 s, at 245 s)
+ok 11. the way to the harbour is fought free: the pirates' last defence falls (86 s, at 331 s)
+ok 12. the film ms_2090 ends the mission (SQNZ quit) (4 s, at 335 s)
+ok no exception
+ok the mission is won, the four main quests accomplished
+   variables: sum_of_spots=3 available_spots=2 spot01_cleared=1 spot02_cleared=1 spot03_cleared=1 Ninja_dead=0
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Ninigi (mission: Aje); game time 6 min; teleports 0; cheat kills 103; top-ups 0
+   triggers fired 124 of 161, 147 firings, 283 actions, warnings 0
+   quests: L05MQ01=done L05MQ02=done L05MQ04=done L05MQ03=done L05SQ01=hidden
+   sequences: ms_2046@0 sc_2051@13 sc_2057@68 sc_2055@82 sc_2049@244 sc_2053@305 ms_2090@334
+   player: Cole_s0 x1, Bela_s0 x1, special_eusmilus x1, aje_velociraptor_handler x2, ninigi_saltasaurus_archer x1, ninigi_seismosaurus x1; buildings aje_tent aje_tent aje_tent; res {"food":200,"wood":150,"stone":100,"skulls":335,"power":0}

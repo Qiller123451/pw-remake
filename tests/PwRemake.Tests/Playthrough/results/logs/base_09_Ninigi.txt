@@ -1,0 +1,48 @@
+ok  1. the opening film ms_3010: quests "A dangerous Path" and "Survival of the Fittest" (1 s, at 1 s)
+ok  2. the heroes follow the path to the bridge: sequence sc_3025 (the bridge breaks) (64 s, at 65 s)
+ok  3. the heroes reach the Dragon Clan village: dialogue ds_3020, quest "Rescue Mission" (29 s, at 94 s)
+ok  4. the Barbarians attacking the village are beaten: quest "Rescue Mission", sequence sc_3030, the village joins (40 s, at 134 s)
+ok  5. quest "Hunting the Looters" (0 s, at 134 s)
+   teleport (army: ninigi_warrior) to 177,818 at 205 s
+   teleport (army: ninigi_warrior) to 177,818 at 205 s
+   teleport (army: ninigi_warrior) to 246,403 at 206 s
+   teleport (army: ninigi_warrior) to 716,610 at 207 s
+   teleport (army: ninigi_warrior) to 716,610 at 207 s
+   teleport (army: special_eusmilus) to 716,610 at 207 s
+ok  6. the three parts of the wreck are fetched from the Barbarian altars (74 s, at 208 s)
+ok  7. the airplane is cleared and a tower stands next to it: quest "The Bird of Steel", sequence sc_3033 (116 s, at 324 s)
+   teleport (all: ninigi_worker) to 748,314 at 324 s
+   teleport (all: ninigi_worker) to 748,314 at 324 s
+ok  8. the film sc_3033: quest "A dangerous Path" accomplished, the launch ramp is the player's (2 s, at 326 s)
+   teleport (army: Bela_s0) to 748,314 at 463 s
+   teleport (army: special_eusmilus) to 748,314 at 463 s
+   teleport (army: ninigi_warrior) to 748,314 at 464 s
+   teleport (army: ninigi_warrior) to 748,314 at 464 s
+   teleport (army: Cole_s0) to 748,314 at 466 s
+   teleport (army: Bela_s0) to 748,314 at 523 s
+   teleport (army: special_eusmilus) to 748,314 at 523 s
+   teleport (army: ninigi_warrior) to 748,314 at 525 s
+   teleport (army: ninigi_warrior) to 748,314 at 525 s
+   teleport (army: Cole_s0) to 748,314 at 527 s
+   teleport (army: special_eusmilus) to 748,314 at 665 s
+   teleport (army: ninigi_warrior) to 748,314 at 667 s
+   teleport (army: ninigi_warrior) to 748,314 at 667 s
+   teleport (army: Bela_s0) to 748,314 at 667 s
+   teleport (army: Cole_s0) to 748,314 at 667 s
+   teleport (army: Bela_s0) to 748,314 at 1322 s
+   teleport (army: ninigi_warrior) to 748,314 at 1324 s
+   teleport (army: Cole_s0) to 748,314 at 1325 s
+   teleport (army: special_eusmilus) to 748,314 at 1325 s
+   teleport (army: ninigi_warrior) to 748,314 at 1326 s
+ok  9. the workers build the launch ramp while the army guards it: quest "Prepare for Start" (1164 s, at 1490 s)
+ok 10. the film ms_3040 ends the mission (2 s, at 1492 s)
+ok no exception
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Ninigi; game time 25 min; teleports 28; cheat kills 160; top-ups 3
+   triggers fired 99 of 118, 161 firings, 482 actions, warnings 0
+   quests: L09MQ01=done L09MQ03=done L09MQ02=done L09MQ04=done L09MQ05=done L09MQ06=done L09SQ01=failed L09SQ02=hidden
+   sequences: ms_3010@0 sc_3025@64 sc_3030@130 sc_3033@326 ms_3040@1492
+   player: ninigi_worker x8, ninigi_warrior x5, ninigi_archer x2, ninigi_harvester x1, Bela_s0 x1, Cole_s0 x1, special_eusmilus x1, ninigi_monk x1; buildings ninigi_small_tower carrier_launch_pad ninigi_dojo ninigi_lumbermill ninigi_hunting_lodge ninigi_stone_quarry ninigi_temple ninigi_paddy ninigi_fireplace ninigi_warehouse ninigi_paddy ninigi_animal_farm ninigi_small_tower; res {"food":620,"wood":1100,"stone":590,"skulls":1767,"power":0}
+   won: {"won":true,"text":""}
+   variables: parts_collected=4 mq03_done=1 mq05_done=1 mq06_done=1 reinforcements=1

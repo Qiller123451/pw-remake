@@ -1,0 +1,325 @@
+{
+ "id": 13,
+ "title": "The Long Haul",
+ "place": "Raton Pass, New Mexico",
+ "date": "May 16, 1966",
+ "unlocks": [],
+ "briefing": [
+  "Taslov has spent a year building a Door: a Gate machine that opens one passage, slowly and on purpose, to Tala's world. Its last parts leave Los Alamos tonight in five Army trucks.",
+  "Crane wants them. The road over Raton Pass is the only way north. Escort the convoy to the depot on the far side: the trucks drive themselves, but they stop dead whenever anything comes near them."
+ ],
+ "night": true,
+ "crane": {
+  "ai": false
+ },
+ "creatures": [
+  "Velociraptor",
+  "Deinonychus",
+  "Allosaurus",
+  "Carnotaurus"
+ ],
+ "powers": [
+  "recon",
+  "airdrop",
+  "artillery"
+ ],
+ "res": {
+  "food": 0,
+  "wood": 0,
+  "stone": 0
+ },
+ "camera": [
+  -250,
+  210
+ ],
+ "map": {
+  "seed": 5166,
+  "clear": [
+   [
+    -255,
+    210,
+    20
+   ],
+   [
+    240,
+    -205,
+    22
+   ],
+   [
+    5,
+    70,
+    26
+   ]
+  ],
+  "setting": "Northland",
+  "size": 600,
+  "base": 7,
+  "noise": [
+   [
+    0.005,
+    6
+   ],
+   [
+    0.025,
+    1.2
+   ]
+  ],
+  "ground": [
+   0,
+   2,
+   4,
+   3,
+   6,
+   1
+  ],
+  "features": [
+   {
+    "type": "ridge",
+    "path": [
+     [
+      -330,
+      135
+     ],
+     [
+      150,
+      135
+     ]
+    ],
+    "w": 52,
+    "h": 26
+   },
+   {
+    "type": "ridge",
+    "path": [
+     [
+      -160,
+      5
+     ],
+     [
+      330,
+      5
+     ]
+    ],
+    "w": 52,
+    "h": 26
+   },
+   {
+    "type": "ridge",
+    "path": [
+     [
+      -330,
+      -125
+     ],
+     [
+      170,
+      -125
+     ]
+    ],
+    "w": 46,
+    "h": 22
+   },
+   {
+    "type": "hill",
+    "x": 0,
+    "z": 270,
+    "r": 60,
+    "h": 14
+   }
+  ],
+  "roads": [
+   {
+    "path": [
+     [
+      -300,
+      205
+     ],
+     [
+      -250,
+      200
+     ],
+     [
+      -150,
+      205
+     ],
+     [
+      -40,
+      195
+     ],
+     [
+      80,
+      205
+     ],
+     [
+      200,
+      195
+     ],
+     [
+      235,
+      140
+     ],
+     [
+      200,
+      70
+     ],
+     [
+      80,
+      65
+     ],
+     [
+      -40,
+      75
+     ],
+     [
+      -160,
+      65
+     ],
+     [
+      -235,
+      10
+     ],
+     [
+      -200,
+      -60
+     ],
+     [
+      -80,
+      -55
+     ],
+     [
+      40,
+      -65
+     ],
+     [
+      160,
+      -55
+     ],
+     [
+      230,
+      -110
+     ],
+     [
+      240,
+      -200
+     ]
+    ],
+    "width": 9,
+    "kind": "highway"
+   }
+  ],
+  "places": [
+   {
+    "kind": "camp",
+    "x": 250,
+    "z": -240,
+    "rot": 3.141592653589793,
+    "tents": 2
+   }
+  ],
+  "forests": [
+   {
+    "x": 60,
+    "z": 105,
+    "r": 22,
+    "n": 16
+   },
+   {
+    "x": -120,
+    "z": 100,
+    "r": 20,
+    "n": 12
+   },
+   {
+    "x": -60,
+    "z": -90,
+    "r": 22,
+    "n": 14
+   },
+   {
+    "x": 120,
+    "z": -95,
+    "r": 20,
+    "n": 12
+   },
+   {
+    "x": -200,
+    "z": 255,
+    "r": 30,
+    "n": 20
+   }
+  ],
+  "rocks": [
+   {
+    "x": 120,
+    "z": 250,
+    "r": 40,
+    "n": 14
+   },
+   {
+    "x": -250,
+    "z": -200,
+    "r": 40,
+    "n": 14
+   }
+  ],
+  "shrubs": 220
+ },
+ "start": {
+  "buildings": [],
+  "units": [
+   [
+    "sq_halloran",
+    -262,
+    215,
+    1,
+    3
+   ],
+   [
+    "sq_booker",
+    -255,
+    222,
+    1,
+    3
+   ],
+   [
+    "sq_trooper",
+    -268,
+    222,
+    6,
+    2
+   ],
+   [
+    "seas_medic",
+    -272,
+    214,
+    1,
+    2
+   ],
+   [
+    "sq_jeep",
+    -230,
+    212,
+    2
+   ],
+   [
+    "sq_aa_halftrack",
+    -262,
+    232,
+    2
+   ],
+   [
+    "sq_arc_halftrack",
+    -278,
+    230,
+    1
+   ]
+  ]
+ },
+ "zones": [
+  {
+   "name": "depot",
+   "x": 240,
+   "z": -205,
+   "r": 20
+  }
+ ]
+}

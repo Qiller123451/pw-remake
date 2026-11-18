@@ -1,0 +1,1 @@
+Local change: EventMemberDescriptor.cs - ReferenceEqualityComparer fully qualified (ambiguous with System.Collections.Generic on .NET 5+).

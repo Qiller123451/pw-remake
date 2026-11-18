@@ -1,0 +1,21 @@
+{
+  "cfg": "base",
+  "mission": 10,
+  "tribe": "Hu",
+  "title": "Mission 10: The Prophet",
+  "steps": 4,
+  "passed": 4,
+  "failedStep": null,
+  "over": true,
+  "won": true,
+  "finished": true,
+  "gameMinutes": 3.4,
+  "wallSeconds": 11,
+  "teleports": 0,
+  "cheatKills": 70,
+  "topUps": 0,
+  "triggerErrors": 0,
+  "fails": 0,
+  "exception": null,
+  "date": "2026-11-02"
+}

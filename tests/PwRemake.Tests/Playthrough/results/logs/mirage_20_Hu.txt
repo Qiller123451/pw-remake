@@ -1,0 +1,31 @@
+ok  1. the opening film sb4101: quests "Breakthrough Part I" and "Part II" (5 s, at 5 s)
+ok  2. the party reaches the place of first contact: dialogue db_4102 (Dustriders and Norsemen fight) (6 s, at 11 s)
+ok  3. the fight is over, dialogue db_4111: quest "The Bridgehead" (epoch 4) (37 s, at 48 s)
+   [48 s] epoch 1, units 9/0, flamethrowers 3 (squad 0), saved 0, fighters 6, workers 3, buildings 0: ; res food 300,wood 300,stone 300,skulls 0,power 0; next epoch: ok (missing )
+   [228 s] epoch 2, units 23/31, flamethrowers 11 (squad 0), saved 0, fighters 14, workers 9, buildings 4: hu_fireplacex1 hu_stone_cottagex2 hu_weapons_smithx1; res food 900,wood 900,stone 900,skulls 225,power 0; next epoch: ok (missing )
+   teleport (squad: hu_flamethrower) to 1180,330 at 232 s
+   teleport (squad: hu_flamethrower) to 1180,330 at 232 s
+   teleport (defence: hu_archer) to 278,665 at 249 s
+   [408 s] epoch 3, units 29/31, flamethrowers 13 (squad 9 at (880, 758) (879, 760) (880, 756)), saved 2, fighters 16, workers 13, buildings 4: hu_fireplacex1 hu_stone_cottagex2 hu_weapons_smithx1; res food 1200,wood 1200,stone 1200,skulls 1001,power 0; next epoch: ok (missing )
+ok  4. the base reaches epoch 4: quest "The Bridgehead" (426 s, at 474 s)
+   teleport (defence: hu_archer) to 275,667 at 535 s
+   [589 s] epoch 4, units 29/31, flamethrowers 13 (squad 13 at (745, 836) (745, 835) (1157, 484)), saved 2, fighters 16, workers 13, buildings 4: hu_fireplacex1 hu_stone_cottagex2 hu_weapons_smithx1; res food 1200,wood 1200,stone 1200,skulls 1389,power 0
+   teleport (defence: hu_archer) to 294,729 at 678 s
+   teleport (defence: hu_archer) to 294,729 at 678 s
+ok  5. 20 flamethrowers reach the rendezvous point: quest "Breakthrough Part I" (232 s, at 706 s)
+   [770 s] epoch 4, units 21/31, flamethrowers 5 (squad 4 at (1078, 605) (1087, 594)), saved 25, fighters 8, workers 13, buildings 4: hu_fireplacex1 hu_stone_cottagex2 hu_weapons_smithx1; res food 960,wood 900,stone 1200,skulls 1995,power 0
+   [951 s] epoch 4, units 21/31, flamethrowers 5 (squad 4 at (1187, 332) (1187, 331)), saved 25, fighters 8, workers 13, buildings 4: hu_fireplacex1 hu_stone_cottagex2 hu_weapons_smithx1; res food 960,wood 900,stone 1200,skulls 2516,power 0
+ok  6. Leighton reaches the rendezvous point, boards the carrier: film sb4108 (quest "Breakthrough Part II") (248 s, at 954 s)
+ok  7. the film sb4108 ends the mission (QUIT) (12 s, at 966 s)
+ok no exception
+ok QUIT: the mission is won
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Hu (mission: SEAS); game time 16 min; teleports 6; cheat kills 206; top-ups 33
+   triggers fired 94 of 171, 2965 firings, 27078 actions, warnings 0
+   quests: LB41MQ01=done LB41MQ02=done LB41MQ03=done LB41SQ01=open LB41SQ02=hidden LB41SQ03=done
+   sequences: 
+   player: hu_worker x13, hu_archer x2, hu_flamethrower x5; buildings hu_fireplace hu_stone_cottage hu_weapons_smith hu_stone_cottage; res {"food":960,"wood":900,"stone":1200,"skulls":2516,"power":0}
+   won: {"won":true,"text":""}
+   epoch 4, flamethrowers 5 (hu_flamethrower), population 20/31
+   variables: Flamer_Fugees=25 MQ01=1 MQ02=1 MQ03=1 Bases_seen=1 Ho_Destroyed=0 Need_For_Speed_Failed=0

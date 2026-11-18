@@ -1,0 +1,19 @@
+ok  1. quest "Freeing the Hostages" from the start (1 s, at 1 s)
+   teleport (army: special_eusmilus) to 331,554 at 80 s
+   teleport (army: Cole_s0) to 331,554 at 89 s
+   teleport (army: Bela_s0) to 331,554 at 89 s
+ok  2. the army reaches the pirates' prison and breaks its buildings: the hostages are free (sc_8080) (213 s, at 214 s)
+   teleport (fleet: seas_cannon_turtle) to 553,639 at 760 s
+   teleport (fleet: seas_cannon_turtle) to 553,639 at 760 s
+ok  3. the fleet breaks the water gate and sinks the big pirate ship in the bay (sc_8013) (708 s, at 922 s)
+ok  4. the film ms_8090 ends the mission (0 s, at 922 s)
+ok no exception
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe SEAS (mission: Aje); game time 15 min; teleports 5; cheat kills 89; top-ups 21
+   triggers fired 71 of 129, 71 firings, 193 actions, warnings 0
+   quests: L06MQ01=done L06MQ02=done L06SQ01=failed L06SQ02=hidden L06SQ03=hidden
+   sequences: sc_8005@0 sc_8080@213 sc_8011@398 8043@760 sc_8013@921 ms_8090@921
+   player: Cole_s0 x1, special_eusmilus x1, Bela_s0 x1, seas_worker x15, seas_wehrspinne x1, seas_triceratops x1, seas_warrior x3, seas_spearman x1, seas_marksman x4, seas_cannon_turtle x7; buildings seas_headquarters seas_barracks seas_barracks seas_barracks seas_barracks seas_barracks seas_carrier; res {"food":1200,"wood":1200,"stone":800,"skulls":1974,"power":0}
+   won: {"won":true,"text":""}
+   warships seas_cannon_turtle seas_cannon_turtle seas_cannon_turtle seas_cannon_turtle seas_cannon_turtle seas_cannon_turtle seas_cannon_turtle; epoch 4

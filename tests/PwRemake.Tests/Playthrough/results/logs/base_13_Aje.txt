@@ -1,0 +1,101 @@
+ok  1. the opening film sc_4070: quest "Hold the Fort" (1 s, at 1 s)
+   teleport (squad0: Bela_s0) to 636,322 at 86 s
+   teleport (squad0: aje_warrior) to 636,322 at 86 s
+   teleport (squad0: aje_spearman) to 636,322 at 88 s
+   teleport (squad0: aje_triceratops_archer) to 636,322 at 95 s
+   teleport (squad0: aje_triceratops_archer) to 636,322 at 96 s
+   teleport (squad0: aje_warrior) to 636,322 at 182 s
+   teleport (squad0: aje_warrior) to 636,322 at 260 s
+   teleport (squad1: aje_warrior) to 555,460 at 280 s
+   teleport (squad1: aje_warrior) to 555,460 at 280 s
+   teleport (squad2: aje_triceratops_archer) to 962,454 at 655 s
+   teleport (squad2: aje_spearman) to 962,454 at 655 s
+   teleport (squad2: aje_warrior) to 962,454 at 655 s
+   teleport (squad0: aje_spearman) to 636,322 at 676 s
+   teleport (squad0: aje_triceratops_archer) to 636,322 at 677 s
+   teleport (squad0: aje_warrior) to 636,322 at 677 s
+   teleport (squad0: aje_triceratops_archer) to 636,322 at 678 s
+   teleport (squad1: aje_spearman) to 982,579 at 938 s
+   teleport (squad1: aje_warrior) to 982,579 at 938 s
+   teleport (squad1: aje_warrior) to 982,579 at 938 s
+   teleport (squad0: aje_spearman) to 636,322 at 1002 s
+   teleport (squad0: aje_warrior) to 636,322 at 1002 s
+   teleport (squad0: aje_warrior) to 636,322 at 1002 s
+   teleport (squad0: aje_triceratops_archer) to 636,322 at 1003 s
+   teleport (squad0: aje_triceratops_archer) to 636,322 at 1003 s
+   teleport (squad1: aje_spearman) to 983,579 at 1238 s
+   teleport (squad1: aje_warrior) to 983,579 at 1238 s
+   teleport (squad1: aje_warrior) to 983,579 at 1238 s
+   teleport (squad2: aje_spearman) to 962,451 at 1256 s
+   teleport (squad2: aje_warrior) to 962,451 at 1256 s
+   teleport (squad0: aje_triceratops_archer) to 636,322 at 1378 s
+   teleport (squad0: aje_spearman) to 636,322 at 1378 s
+   teleport (squad0: aje_warrior) to 636,322 at 1378 s
+   teleport (squad0: aje_warrior) to 636,322 at 1378 s
+   teleport (squad0: aje_warrior) to 636,322 at 1378 s
+   teleport (squad0: aje_triceratops_archer) to 636,322 at 1379 s
+   teleport (squad1: aje_spearman) to 982,474 at 1551 s
+   teleport (squad1: aje_warrior) to 982,474 at 1551 s
+   teleport (squad1: aje_warrior) to 982,474 at 1551 s
+   teleport (squad1: aje_triceratops_archer) to 982,579 at 1838 s
+   teleport (squad1: aje_spearman) to 982,579 at 1838 s
+   teleport (squad1: aje_warrior) to 982,579 at 1838 s
+   teleport (squad1: aje_warrior) to 982,579 at 1838 s
+   teleport (squad0: aje_spearman) to 636,322 at 2012 s
+   teleport (squad0: aje_warrior) to 636,322 at 2012 s
+   teleport (squad0: aje_warrior) to 636,322 at 2012 s
+   teleport (squad0: aje_triceratops_archer) to 636,322 at 2013 s
+   teleport (squad0: aje_triceratops_archer) to 636,322 at 2013 s
+   teleport (squad0: aje_warrior) to 636,322 at 2013 s
+   teleport (squad1: aje_triceratops_archer) to 982,579 at 2138 s
+   teleport (squad1: aje_spearman) to 982,579 at 2138 s
+   teleport (squad1: aje_warrior) to 982,579 at 2138 s
+   teleport (squad1: aje_warrior) to 982,579 at 2138 s
+   teleport (squad1: aje_warrior) to 982,579 at 2138 s
+   teleport (squad2: aje_spearman) to 960,451 at 2156 s
+   teleport (squad0: aje_spearman) to 636,322 at 2220 s
+   teleport (squad0: aje_warrior) to 636,322 at 2221 s
+   teleport (squad0: aje_warrior) to 636,322 at 2221 s
+   teleport (squad0: aje_triceratops_archer) to 636,322 at 2222 s
+   teleport (squad0: aje_triceratops_archer) to 636,322 at 2222 s
+   teleport (squad0: Bela_s0) to 636,322 at 2224 s
+   teleport (squad0: aje_spearman) to 636,322 at 2523 s
+   teleport (squad0: aje_warrior) to 636,322 at 2523 s
+   teleport (squad0: aje_warrior) to 636,322 at 2523 s
+   teleport (squad0: aje_warrior) to 636,322 at 2523 s
+   teleport (squad0: aje_triceratops_archer) to 636,322 at 2524 s
+   teleport (squad0: aje_triceratops_archer) to 636,322 at 2524 s
+   teleport (squad0: Bela_s0) to 636,322 at 2525 s
+   teleport (squad1: aje_warrior) to 688,466 at 2726 s
+   teleport (squad2: aje_triceratops_archer) to 959,454 at 2762 s
+   teleport (squad2: aje_spearman) to 959,454 at 2762 s
+   teleport (squad2: aje_warrior) to 959,454 at 2762 s
+ok  2. the army waits in front of the gate until the big SEAS attack is beaten: quest "Hold the Fort" (2860 s, at 2861 s)
+ok  3. quest "Counter Attack" (25 s, at 2886 s)
+   teleport (army: aje_triceratops_archer) to 605,971 at 2886 s
+   teleport (army: aje_triceratops_archer) to 605,971 at 2886 s
+   teleport (army: aje_triceratops_archer) to 605,971 at 2886 s
+   teleport (army: Bela_s0) to 605,971 at 2886 s
+   teleport (army: aje_spearman) to 605,971 at 2886 s
+   teleport (army: aje_warrior) to 605,971 at 2886 s
+   teleport (army: aje_archer) to 605,971 at 2886 s
+   teleport (army: aje_warrior) to 605,971 at 2886 s
+   teleport (army: aje_warrior) to 605,971 at 2886 s
+ok  4. the army breaks the SEAS headquarters on the plateau: quest "Counter Attack" (5 s, at 2891 s)
+ok  5. the film ms_6020 ends the mission (5 s, at 2896 s)
+ok no exception
+ok QUIT: the mission is won
+   group team_mainbase: 0 alive 
+   group team_outpost01: 0 alive 
+   group team_outpost02: 2 alive seas_wehrspinne@986,482:attack seas_wehrspinne@981,483:attack
+   group team_outpost03: 0 alive 
+   city wall pieces left: 19 of 20 (lost: hcl13_city_wall_87)
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Aje (mission: Ninigi); game time 48 min; teleports 80; cheat kills 190; top-ups 0
+   triggers fired 98 of 167, 98 firings, 193 actions, warnings 0
+   quests: L13MQ01=done L13MQ02=done L13SQ01=failed L13SQ02=failed L13SQ03=hidden L13SQ04=hidden L13SQ05=hidden L13SQ06=hidden L13SQ07=hidden
+   sequences: sc_4070@0 sc_4080@2872 ms_6020@2895
+   player: aje_resource_collector x2, darwin_s0 x1, aje_triceratops_archer x4, aje_worker x14, Cole_s0 x1, special_eusmilus x1, Bela_s0 x1, aje_spearman x3, aje_warrior x8, aje_archer x1; buildings ninigi_snare_trap ninigi_snare_trap aje_clay_wall aje_slaughterhouse aje_clay_wall_gate aje_clay_wall ninigi_snare_trap ninigi_snare_trap ninigi_snare_trap ninigi_snare_trap aje_clay_wall aje_small_tower aje_small_tower aje_clay_wall aje_clay_wall_gate aje_clay_wall ninigi_stone_quarry ninigi_lumbermill aje_slaughterhouse aje_slaughterhouse ninigi_hunting_lodge aje_clay_wall aje_cook_house aje_small_farm aje_rodeo ninigi_engineer aje_small_tower aje_small_tower aje_clay_wall ninigi_snare_trap aje_medium_tower aje_clay_wall ninigi_snare_trap aje_tent aje_tent aje_tent aje_tent aje_tent aje_tent; res {"food":640,"wood":1330,"stone":1500,"skulls":2515,"power":0}
+   won: {"won":true,"text":""}
+   variables: init_main_attack=1 main_attack_done=1 team_mainbase_def=1 team_outpost01_def=1 team_outpost02_def=1 team_outpost03_def=1

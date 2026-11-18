@@ -1,0 +1,275 @@
+{
+ "id": 1,
+ "title": "The Copper Basin Rift",
+ "place": "Copper Basin, Nevada",
+ "date": "June 14, 1964",
+ "unlocks": [
+  "sq_trooper",
+  "sq_flak",
+  [
+   "sq_stabilizer",
+   "later"
+  ]
+ ],
+ "briefing": [
+  "At 04:10 this morning the Copper Basin seismograph station recorded a tremor with no epicentre. At 04:40 the sheriff radioed that \"lizards the size of a truck\" were in the streets.",
+  "SEAS has seen this once before - sixty years ago, in the papers of a man named Taslov. A tear between our world and another. Get the townsfolk out, hold the line, and wait for the scientist."
+ ],
+ "creatures": [
+  "Velociraptor",
+  "Deinonychus",
+  "Allosaurus"
+ ],
+ "powers": [
+  "supply",
+  "recon"
+ ],
+ "res": {
+  "food": 500,
+  "wood": 450,
+  "stone": 350
+ },
+ "map": {
+  "seed": 1964,
+  "clear": [
+   [
+    170,
+    -60,
+    22
+   ],
+   [
+    -110,
+    200,
+    14
+   ]
+  ],
+  "setting": "Savanna",
+  "size": 480,
+  "base": 6,
+  "noise": [
+   [
+    0.004,
+    9
+   ],
+   [
+    0.02,
+    1.5
+   ]
+  ],
+  "ground": [
+   0,
+   3,
+   4,
+   7,
+   6,
+   1
+  ],
+  "features": [
+   {
+    "type": "mesa",
+    "x": 170,
+    "z": -150,
+    "r": 60,
+    "h": 18
+   },
+   {
+    "type": "mesa",
+    "x": -190,
+    "z": -170,
+    "r": 50,
+    "h": 14
+   },
+   {
+    "type": "flat",
+    "x": -20,
+    "z": -40,
+    "r": 120,
+    "h": 6
+   },
+   {
+    "type": "flat",
+    "x": -40,
+    "z": 150,
+    "r": 60,
+    "h": 6
+   }
+  ],
+  "roads": [
+   {
+    "path": [
+     [
+      -40,
+      240
+     ],
+     [
+      -40,
+      120
+     ],
+     [
+      -20,
+      40
+     ],
+     [
+      0,
+      -40
+     ],
+     [
+      10,
+      -240
+     ]
+    ],
+    "width": 9,
+    "kind": "highway"
+   },
+   {
+    "path": [
+     [
+      0,
+      -40
+     ],
+     [
+      160,
+      -40
+     ],
+     [
+      190,
+      -90
+     ]
+    ],
+    "width": 6,
+    "kind": "dirt"
+   }
+  ],
+  "places": [
+   {
+    "kind": "town",
+    "x": -20,
+    "z": -40,
+    "rot": 0,
+    "blocks": 1,
+    "len": 150
+   },
+   {
+    "kind": "farm",
+    "x": -170,
+    "z": 60,
+    "rot": 0.6
+   },
+   {
+    "kind": "strip",
+    "x": -40,
+    "z": 70,
+    "rot": 3.141592653589793
+   },
+   {
+    "kind": "model",
+    "model": "sq_bus",
+    "x": -96,
+    "z": 196,
+    "rot": 1.2,
+    "r": 4
+   },
+   {
+    "kind": "model",
+    "model": "sq_bus",
+    "x": -84,
+    "z": 206,
+    "rot": 1,
+    "r": 4
+   },
+   {
+    "kind": "model",
+    "model": "sq_army_truck",
+    "x": -100,
+    "z": 214,
+    "rot": 0.6,
+    "r": 3
+   }
+  ],
+  "forests": [
+   {
+    "x": -150,
+    "z": 170,
+    "r": 50,
+    "n": 30
+   },
+   {
+    "x": 140,
+    "z": 160,
+    "r": 40,
+    "n": 20
+   }
+  ],
+  "rocks": [
+   {
+    "x": 160,
+    "z": -60,
+    "r": 50,
+    "n": 22
+   }
+  ],
+  "resources": [
+   {
+    "x": -40,
+    "z": 170,
+    "stone": 5,
+    "food": 6,
+    "wood": 26
+   }
+  ],
+  "shrubs": 320
+ },
+ "start": {
+  "buildings": [
+   [
+    "seas_headquarters",
+    -8,
+    186,
+    0
+   ],
+   [
+    "seas_barracks",
+    24,
+    190,
+    0
+   ]
+  ],
+  "units": [
+   [
+    "sq_halloran",
+    -20,
+    164,
+    1
+   ],
+   [
+    "seas_worker",
+    -12,
+    168,
+    6
+   ],
+   [
+    "sq_trooper",
+    2,
+    166,
+    4,
+    2
+   ],
+   [
+    "seas_marksman",
+    8,
+    160,
+    2,
+    2
+   ]
+  ]
+ },
+ "zones": [
+  {
+   "name": "buses",
+   "x": -90,
+   "z": 200,
+   "r": 16,
+   "kind": "evac"
+  }
+ ]
+}

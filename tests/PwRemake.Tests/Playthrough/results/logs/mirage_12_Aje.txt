@@ -1,0 +1,17 @@
+ok  1. the opening film sc_4025: quest "The Telescope Tower" (1 s, at 1 s)
+ok  2. the army reaches the tower ruin: it becomes the player's (15 s, at 16 s)
+ok  3. the workers repair the telescope tower while the army guards it: quest "The Telescope Tower", film sc_4030 (118 s, at 134 s)
+   teleport (army: Bela_s0) to 724,268 at 134 s
+ok  4. quest "The SEAS Storm" (6 s, at 140 s)
+ok  5. the fleet stops the carrier ships for 40 minutes: film sc_4038, the mission is won (2404 s, at 2544 s)
+ok no exception
+ok QUIT: the mission is won
+ok no action errors (0)
+ok no unknown condition / action type
+   tribe Aje (mission: Ninigi); game time 42 min; teleports 1; cheat kills 65; top-ups 0
+   triggers fired 130 of 195, 507 firings, 932 actions, warnings 0
+   quests: L12MQ01=done L12MQ02=hidden L12MQ03=done L12SQ01=open L12SQ02=open
+   sequences: sc_4025@1 sc_4030@138 sc_4027@176 sc_4038@2543
+   player: aje_resource_collector x1, aje_transport_turtle x1, aje_archer x4, aje_worker x12, Cole_s0 x1, special_eusmilus x1, Bela_s0 x1, aje_cronosaurus x12; buildings aje_rodeo ninigi_telescope_tower_ruins ninigi_hunting_lodge ninigi_stone_quarry aje_tent aje_tent aje_tent aje_tent aje_tent; res {"food":125,"wood":425,"stone":1000,"skulls":640,"power":0}
+   won: {"won":true,"text":""}
+   variables: Carrier=1 Turmstörer=2 Tower_Island=0; warships aje_cronosaurus aje_cronosaurus aje_cronosaurus aje_cronosaurus aje_cronosaurus aje_cronosaurus aje_cronosaurus aje_cronosaurus aje_cronosaurus aje_cronosaurus aje_cronosaurus aje_cronosaurus

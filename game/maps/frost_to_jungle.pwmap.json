@@ -1,0 +1,9 @@
+{
+  "format": "pw-remake-map",
+  "version": 1,
+  "base": "Base/Maps/Multiplayer/multi_4_ice_601.ula",
+  "name": "Frost and Jungle",
+  "description": "The remake's first map with two biomes: the frozen west of an Icewaste map melts into a rainforest in the east.",
+  "author": "ParaWorld Remake",
+  "biomes": "frost_to_jungle.biomes.json"
+}
