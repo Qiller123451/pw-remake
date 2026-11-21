@@ -507,6 +507,7 @@ public sealed partial class TribeAI
             Tactic = Tactic, Harbour = M.Harbour && W.WaterNav != null, Watermap = M.Watermap && W.WaterNav != null, Warpgate = M.Warpgate,
             OwnWarpgate = s.Blds.Any(b => PwRemake.Sim.World.World.IsWarpGateScript(b.Def!.Script)), Has = c => s.CountOf(c) > 0,
             DefenderGame = GameType == "Defender", Defender = IsDefender, Custommap = Custommap,
+            EpochSix = OptEpochSix, FinalStage = FinalStage,
         };
     }
 
@@ -517,7 +518,7 @@ public sealed partial class TribeAI
         // gifts: every control think, not on the arena map (multi_arena_001)
         if (!Regex.IsMatch(LevelName ?? "", "multi_arena_001", RegexOptions.IgnoreCase))
         {
-            var g = Data.Gift(Difficulty, Multimap, (S ?? Census()).Age, P.Id);
+            var g = Data.Gift(Difficulty, Multimap, AiAge(S ?? Census()), P.Id);        // (MIRAGE: GetCurrentAge(brain, m_bEpochSix))
             // SpawnResources is engine code; taken to fill the stores like any income (AddResource), not to overflow them
             foreach (var (r, v) in g)
             {
@@ -556,6 +557,33 @@ public sealed partial class TribeAI
     }
     int FreeAge;
     double Cap(string r) => P.Caps.TryGetValue(r, out var c) ? c : 0;
+
+    // ------------------------------------------------------------------ MIRAGE: the game options (CMirageAIMgr)
+    // MIRAGE's AI reads the game options through CMirageAIMgr (Ai/misc/MirageAIMgr.usl: ClientSettings, else the pool
+    // mixer). Those the remake has (Rules/GameplayOptions.cs) and where the scripts use them:
+    //   EpochSix      AiGoalBuildVillage.UpdateBuildList:406-408 (bEpochSix: the request "final_stage" at epoch 5;
+    //                 GetCurrentAge(brain, true) = 6 once final_stage is invented -> m_bFinalStage rows: mud pits, mines,
+    //                 the launch pads ...) and AiModuleControlDefault Think:524 (the gifts' epoch factor 4 at age 6)
+    //   FlyingEnabled AiGoalGeneralAttack.UpdateSolutionWithSpecUnits:647 (flyers join the attack squads, Attack.cs
+    //                 SpecUnits) and - meant - AiGoalMinistryOfDefense.SpecialAllowed:1072 ("flyers_enabled" mix rows;
+    //                 MIRAGE checks RemoveTitans there, a bug: docs/MODDER_NOTES.md §15)
+    //   RemoveTitans  AiGoalMinistryOfDefense.SpecialAllowed:1076 ("titans_enabled" mix rows)
+    // BldgMaxCapacity is no AI read: the engine refuses a building over the limit (CanAddBuilding); the remake's planner
+    // asks World.LimitRoom (Economy.cs Missing). Portals: the AI never builds a portal terminus (only the Ninigi's
+    // Explode list names it, BV:2682). The base game has none of this (no CMirageAIMgr).
+    bool MirageAi => D.Extra.Mod == "MIRAGE";
+    GameplayOptions Options => P.Gameplay ?? GameplayOptions.Default;
+    /// <summary>CMirageAIMgr.EpochSix (the option MaxEpoch 6)</summary>
+    public bool OptEpochSix => MirageAi && Options.EpochSix;
+    /// <summary>CMirageAIMgr.FlyingEnabled</summary>
+    public bool OptFlying => MirageAi && Options.FlyingEnabled;
+    /// <summary>CMirageAIMgr.RemoveTitans</summary>
+    public bool OptRemoveTitans => MirageAi && Options.RemoveTitans;
+    /// <summary>m_bFinalStage (BV:409): GetCurrentAge(brain, bEpochSix) == 6 - the sixth stage is invented and the
+    /// option is on</summary>
+    public bool FinalStage => OptEpochSix && (P.Tt != null ? P.Tt.Invented("final_stage") : P.Techs.Has("final_stage"));
+    /// <summary>GetCurrentAge(brain, m_bEpochSix) (AiUtilityMgr.usl:327): 6 at the sixth stage, else the epoch</summary>
+    public int AiAge(Census S) => FinalStage ? 6 : S.Age;
 
     // ------------------------------------------------------------------ main loop
     public void Update(double dt)

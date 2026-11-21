@@ -248,7 +248,7 @@ public sealed class CoopMapPlan
     }
     static string? Str(JsonNode? t, string k) => t?[k] is JsonValue v && v.TryGetValue<string>(out var s) ? s : null;
     /// <summary>a list in the definition: a Lua sequence is a JSON array, an empty table an empty object</summary>
-    static IEnumerable<JsonNode> Items(JsonNode? n) => n is JsonArray a ? a.Where(x => x != null)! : n is JsonObject o ? o.Select(x => x.Value).Where(x => x != null)! : Enumerable.Empty<JsonNode>();
+    static IEnumerable<JsonNode> Items(JsonNode? n) => n is JsonArray a ? a.OfType<JsonNode>() : n is JsonObject o ? o.Select(x => x.Value).OfType<JsonNode>() : Enumerable.Empty<JsonNode>();
 
     /// <summary>`extend` (or a seat's `extend`); null when absent</summary>
     public static CoopExtend? ExtendOf(JsonNode? v)

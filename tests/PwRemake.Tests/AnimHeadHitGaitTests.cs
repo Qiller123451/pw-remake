@@ -132,7 +132,7 @@ public static class AnimHeadHitGaitTests
         t.True(heads.Count > 150 && missing.Count == 0, $"{heads.Count} head classes, without a model: {string.Join(", ", missing)}");
         t.Equal(0, w.Models.Clips("hu_worker_head").Count, "a head is a static mesh");
         foreach (var s in new[] { "fa", "la", "ra", "ba" })
-            t.True(probe.Anim.Has("hit_reaction_" + s), $"{probe.Gfx}: hit_reaction_{s}");
+            t.True(probe.Anim!.Has("hit_reaction_" + s), $"{probe.Gfx}: hit_reaction_{s}");
     }
 
     /// <summary>walkanimconfig.txt Animals2 .. 4: the transitions from gait to gait (the digits: a gait first)</summary>

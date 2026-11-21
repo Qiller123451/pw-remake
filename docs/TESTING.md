@@ -16,11 +16,13 @@ skipped without them:
 | `PW_DATA` | a converted data folder of the toolkit (gamedata.json, techtree.json, assets/manifest.json ...) |
 | `PW_DATA_MIRAGE` | the same for MIRAGE |
 | `PW_CAMPAIGN` | a folder of exported missions (pw-campaign/1 JSON) |
-| `PW_CONTENT` | a content folder with configs/ |
+| `PW_CONTENT` | a content folder with configs/ - **converted to the map format** (configs/<id>/maps, missions with map.lua: docs/MAP_FORMAT.md). Test content made before the map format is converted with `dotnet run --project tools/mapconvert -c Release -- prepare --config <content>/configs/<id> --missions-from <content>/configs/<id>/missions` (in place: the old JSON files stay beside, so older code still reads it) |
+| `PW_CONTENT_OLD` | mission folders of the old layout (mission.json, world.json), the converter's input in `MapFormatTests` (default /home/claude/testcontent) |
 | `PW_MODELS_EXTRA` | more folders of converted models (.glb), `;`-separated, for the model checks below |
 
 Golden tests compare the C# rules, maps and trigger engine with the browser remake's JavaScript run in node on the
-same data (`tests/golden/`): the port must give the same numbers.
+same data (`tests/golden/`): the port must give the same numbers. (The map goldens keep reading the original `.ula`;
+`MapFormatTests` check that the converted maps give exactly the same: docs/MAP_FORMAT.md "Tests".)
 
 Skirmish and army budget (docs/SKIRMISH.md): `PointBuyGolden*` (tests/golden/pointbuy_dump.mjs: pointbuy.js and
 skirmish.js in node, 0 differences), `SkirmishArmyBudget`, `SkirmishSetupJson`, `SkirmishMapList`,
@@ -84,6 +86,17 @@ tribe).
 Bridges (docs/SIMULATION.md "Bridges"): `dotnet run --project tests/PwRemake.Tests -- BridgeTests` - the ground just
 under a deck blocked without cutting a way, units crossing beside a bridge never under it, mission 6 / 7 bridges
 blocking their boxes, MIRAGE / base mission 13's allies walking back from the cleared SEAS outpost (about 2 minutes).
+
+Goals out of reach (docs/SIMULATION.md "Goals out of reach"): `UnreachableGoalTests` - mission 9's Dragon Clan village
+reachable from the heroes' start for every unit size, its altars' and airplane's islands other regions; a goal more
+than 160 m off on another island: every way ends at the region's cell nearest it (brute force), not found; small and big
+units sent there (mission 9, and mission 6's army from its island to the pirates' prison) stand at that point (~20 s).
+
+Crossings (docs/AI.md "transports"): `FerryTests` - mission 2's scripted turtles, mission 15's SEAS hovercraft, mission
+12's Hu and Aje crossings. `Mission12ShipCrossing` waits (up to 2 more minutes) for each crossing player's first
+fighter before it orders the attack: the Aje start with workers only and train their first raptor handler at 30 - 50 s
+by the seed, so at 30 s seeds 2, 6 and 7 had none and never crossed ("p5: a crossing" failed - the test's set-up, not
+the AI). `PW_FERRY_SEED=n` runs it on another seed (seeds 1 - 8 pass).
 
 ## The game, headless and with screenshots
 
@@ -160,8 +173,12 @@ of a mission the way a player would, with `MissionSession` (triggers, computer p
 bot gives its orders as the world's commands (applied at once between steps, as the computer player's
 `CommandHands`); its cheats are those of the JS bot and counted in the report: the player's units are healed, enemies
 near its fighters lose a fifth of their hit points a second, a unit that makes no progress towards its goal for 60 s
-is teleported (progress: nearer the goal, or 8 m from where it stood unless it has no way there - a goal that moves,
-an enemy being hunted, does not restart the count; the count runs only while `go()` keeps sending the unit: one it left alone for more than 10 s -
+is teleported (progress: 2 m nearer the goal, or 8 m from where it stood; for a unit that has no way there
+(`Unit.NoWay`: across water - it walks to the shore nearest the goal and stops) only 8 m nearer: jostling in the crowd
+at the shore restarted the count of one or another, and a group was carried across one by one over minutes; and one
+of them carried across takes the others of the group with no way there along, as a transport would - one by one,
+mission 9's army was spread over three islands and the heroes fell alone at the airplane; a goal that moves, an enemy
+being hunted, does not restart the count; the count runs only while `go()` keeps sending the unit: one it left alone for more than 10 s -
 there, or fighting / standing guard on the playthrough's other orders - starts anew where it stands; "there" is within
 6 m plus sqrt(n) m for a group of n plus a big unit's radius, measured from the ring of free ground round a goal on
 blocked ground - a building, rocks: where the units' own walk ends), resources topped up where a step says so (and for an upgrade dearer than the stores hold). A

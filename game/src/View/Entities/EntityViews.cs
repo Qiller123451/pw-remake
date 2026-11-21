@@ -47,7 +47,12 @@ public partial class EntityViews : Node3D
     /// its hull in sc_4070), advanced by LiveDt</summary>
     public Func<Prop, AnimCtl?>? PropAnimOf;
     /// <summary>a cutscene hides this world object (an Entity or a Prop) while it plays (SessionSequenceStage.Hides)</summary>
-    public Func<object, bool>? Hide;
+    public new Func<object, bool>? Hide;
+    /// <summary>no fog of war while this says so (a cutscene plays: SessionSequenceStage.NoFog) - everything is drawn as
+    /// if seen (the original shows its scenes whole: docs/TERRAIN.md "Fog of war")</summary>
+    public Func<bool>? NoFog;
+    bool FogVisible(double x, double z) => NoFog?.Invoke() == true || Fog.Visible(x, z);
+    bool FogExplored(double x, double z) => NoFog?.Invoke() == true || Fog.Explored(x, z);
     /// <summary>models drawn this frame</summary>
     public int Drawn { get; private set; }
     /// <summary>the shadow's length per metre of height (main.js SHADOW_REACH)</summary>
@@ -170,6 +175,8 @@ public partial class EntityViews : Node3D
         P?.Mark("entities:resources");
         SyncWrecks(gdt);
         P?.Mark("entities:wrecks");
+        PrepareInfected(cam);
+        P?.Mark("entities:infected");
     }
     Plane[] _planes = System.Array.Empty<Plane>();
     readonly HashSet<int> _failed = new();
@@ -211,7 +218,7 @@ public partial class EntityViews : Node3D
         return e.Gfx;
     }
 
-    bool Visible(EntityView v, Player? me)
+    new bool Visible(EntityView v, Player? me)
     {
         var e = v.E;
         if (e.Parked || Hide?.Invoke(e) == true) return false;
@@ -219,11 +226,15 @@ public partial class EntityViews : Node3D
         {
             if (u.Inside) return false;
             if (_sees(u.Owner)) return true;
-            if (!u.Alive) return v.Shown && Fog.Visible(u.Pos.X, u.Pos.Z) || u.DeadT > 0 && Fog.Explored(u.Pos.X, u.Pos.Z);
-            return Fog.Visible(u.Pos.X, u.Pos.Z) && !W.HiddenFrom(u, me);
+            // the original's VisInFOW: a wild animal is seen in the fog (Animal.usl OnInit: owner -1 ->
+            // Server/GameplayOptions/ResourcesVisibleInFOW, default true; an owned one not)
+            if (u.Alive && u.Owner == null && u.Cls == "ANML") return !W.HiddenFrom(u, me);
+            if (!u.Alive) return v.Shown && FogVisible(u.Pos.X, u.Pos.Z) || u.DeadT > 0 && FogExplored(u.Pos.X, u.Pos.Z);
+            return FogVisible(u.Pos.X, u.Pos.Z) && !W.HiddenFrom(u, me);
         }
         if (_sees(e.Owner)) return true;
-        return Fog.Explored(e.Pos.X, e.Pos.Z) && !(e.Alive && W.HiddenFrom(e, me));
+        if (e is ResNode) return !(e.Alive && W.HiddenFrom(e, me));     // (resources: VisInFOW, ResourcesVisibleInFOW)
+        return FogExplored(e.Pos.X, e.Pos.Z) && !(e.Alive && W.HiddenFrom(e, me));
     }
 
     static bool InFrustum(Plane[]? f, Vector3 c, float r) => Frustum.Has(f, c, r);
@@ -255,6 +266,35 @@ public partial class EntityViews : Node3D
             if (Math.Min(y0, y1) <= b.Y1 + r && Math.Max(y0, y1) >= b.Y0) return true;
         }
         return false;
+    }
+
+    // the parts, flags and states of an entity's model (when its look changed)
+    void SyncLook(EntityView v, ModelInstance m, Color? party)
+    {
+        var e = v.E;
+        v.Look = e.LookVersion;
+        if (v.PartsChanged()) v.BuildParts();
+        if (e is Unit u)
+        {
+            v.SyncHands(u);
+            v.SyncHead(u);
+            if (u.HideMask >= 0) m.SetHideMask((uint)u.HideMask);
+            m.SetAnimalTint(u.PartyTinted ? party : null);
+            foreach (var (bit, on) in u.VisFlags) m.SetVisFlag(bit, on);
+            // a nest's young is small and grows up (animals.js growthUpdate: obj.scale = 1 - babyness * (1 - growupScale))
+            m.Scale = Vector3.One * (u.Babyness > 0 ? 1f - (float)u.Babyness * (1f - m.Template.GrowupScale) : 1f) * (float)u.DrawScale;
+        }
+        else if (e is Building b)
+        {
+            var st = new BuildingState(b.VisLevel, b.VisDmg, b.VisAge, b.Night);
+            if (_walls.Contains(v.Gfx!.ToLowerInvariant()))
+            {
+                st.ArmMask = b.ArmMask;
+                if (b.WallParts != null) st.WallParts = WallSet(b.WallParts);
+            }
+            if (b.Def?.WallKind == "gate") st.GateEnds = b.GateEnds;
+            m.SetBuildingState(st);
+        }
     }
 
     bool SyncOne(EntityView v, double gdt, double alpha, Plane[]? frustum, Player? me)
@@ -323,7 +363,14 @@ public partial class EntityViews : Node3D
         bool draw = v.Shown && near;
         if (e is Unit wu && wu.Wreck != null) draw = false;      // (a ship's wreck stands in for it: EntityViews.Wrecks)
         m.Visible = draw;
-        if (!draw) { v.Culled = true; return false; }
+        if (!draw)
+        {
+            v.Culled = true;
+            // (an infected object out of sight gets its look now, a few per frame - not all at once when a village
+            // comes into view: EntityViews.Infection.cs)
+            if (m.Infection != e.Infection && (e.Alive || e is Unit)) QueueInfected(v);
+            return false;
+        }
         // (set only when it changed: every set sends the change down the model's whole tree of nodes - a building's
         // dozens of parts - and to the renderer, also for the buildings and the units standing still)
         if (m.Position != pos) m.Position = pos;
@@ -341,6 +388,7 @@ public partial class EntityViews : Node3D
         // a building, wall or built object: the original's setting textures of the biome where it stands (SettingMaterials;
         // units keep theirs - the original has none for them). Cheap when nothing changed (SetSetting).
         if (e is Building) m.SetSetting(v.Setting ??= View.SettingAt(pos.X, pos.Z));
+        P?.SubMark("ent:colours");
         // a unit behind a building shows through it in its ring colour, a building covers (UnitsBehind; the original's
         // flatshades): ships and the dead do not show (SetBehind returns at once when nothing changed)
         BehindRole behind = BehindRole.None;
@@ -352,35 +400,18 @@ public partial class EntityViews : Node3D
         else if (e is Unit bu && bu.Alive && bu.Cls != "SHIP")
             behind = v.OnScreen && MayBeCovered(c, Math.Max(rad, h * 0.5f)) ? BehindRole.UnitCovered : BehindRole.Unit;
         m.SetBehind(behind, behind >= BehindRole.Unit ? GroundRings.RingColor(e) : default);
+        P?.SubMark("ent:behind");
         // ---- the look (parts, flags, states) when it changed
-        if (e.LookVersion != v.Look || v.PartsChanged())
-        {
-            v.Look = e.LookVersion;
-            if (v.PartsChanged()) v.BuildParts();
-            if (e is Unit u)
-            {
-                v.SyncHands(u);
-                v.SyncHead(u);
-                if (u.HideMask >= 0) m.SetHideMask((uint)u.HideMask);
-                m.SetAnimalTint(u.PartyTinted ? party : null);
-                foreach (var (bit, on) in u.VisFlags) m.SetVisFlag(bit, on);
-                // a nest's young is small and grows up (animals.js growthUpdate: obj.scale = 1 - babyness * (1 - growupScale))
-                m.Scale = Vector3.One * (u.Babyness > 0 ? 1f - (float)u.Babyness * (1f - m.Template.GrowupScale) : 1f) * (float)u.DrawScale;
-            }
-            else if (e is Building b)
-            {
-                var st = new BuildingState(b.VisLevel, b.VisDmg, b.VisAge, b.Night);
-                if (_walls.Contains(v.Gfx!.ToLowerInvariant()))
-                {
-                    st.ArmMask = b.ArmMask;
-                    if (b.WallParts != null) st.WallParts = WallSet(b.WallParts);
-                }
-                if (b.Def?.WallKind == "gate") st.GateEnds = b.GateEnds;
-                m.SetBuildingState(st);
-            }
-        }
+        if (e.LookVersion != v.Look || v.PartsChanged()) SyncLook(v, m, party);
         else if (e is Building b2 && m.State.Night != b2.Night) m.SetNight(b2.Night);
+        // a building being built: its next level's parts rise out of the ground, the last level's scaffolding sinks
+        // (the engine's build-up: Parts.cs BuildUp, ModelInstance.BuildUp.cs)
+        if (e is Building bup && m.Template.HasBuildUp) m.StepBuildUp(bup.Built ? 1 : bup.Progress, W.Time);
+        // the infected stage a mission set (Entity.Infection: the Outbreak mission, docs/INFECTED_LOOK.md); a ruin stays as
+        // it is drawn
         P?.SubMark("ent:look");
+        if (m.Infection != e.Infection && (e.Alive || e is Unit)) m.SetInfected(e.Infection);
+        P?.SubMark("ent:infect");
         // ---- the clips (advanced only while drawn; a model coming back is put on the simulation's time)
         // a ruin plays its clip "destroy" once from the building's destruction (BuildingCorpse.PlayAnim) - its emitters
         // are the explosion, the debris and the smoke
@@ -558,7 +589,8 @@ public partial class EntityViews : Node3D
             if (mi == null) continue;
             var pos = new Vector3((float)p.Pos.X, (float)p.Pos.Y, (float)p.Pos.Z);
             if (!mi.Template.IsDynamic) mi.SetSetting(mi.Setting ?? View.SettingAt(pos.X, pos.Z));   // (a well: its setting's textures)
-            bool show = p.Alive && p.Visible && Fog.Explored(p.Pos.X, p.Pos.Z) && InFrustum(frustum, pos + Vector3.Up * 2, 14) && Hide?.Invoke(p) != true;
+            // (decoration is seen in the fog: the original's CDecoObj / CDecoColObj ... SetVisInFOW(true), MiscObj.usl)
+            bool show = p.Alive && p.Visible && InFrustum(frustum, pos + Vector3.Up * 2, 14) && Hide?.Invoke(p) != true;
             mi.Visible = show;
             if (!show) continue;
             mi.Position = pos;
@@ -593,7 +625,7 @@ public partial class EntityViews : Node3D
                 AddChild(n);
             }
             var pos = new Vector3((float)p.Pos.X, (float)p.Pos.Y, (float)p.Pos.Z);
-            n.Visible = p.Delay <= 0 && Fog.Visible(p.Pos.X, p.Pos.Z) && InFrustum(frustum, pos, 2);
+            n.Visible = p.Delay <= 0 && FogVisible(p.Pos.X, p.Pos.Z) && InFrustum(frustum, pos, 2);
             if (!n.Visible) continue;
             n.Position = pos;
             var dir = new Vector3((float)(p.Pos.X - p.Prev.X), (float)(p.Pos.Y - p.Prev.Y), (float)(p.Pos.Z - p.Prev.Z));
@@ -647,6 +679,37 @@ public partial class EntityViews : Node3D
             else if (n.Type == "bush" && bushes.TryGetValue(k, out var q)) _bushOf[n] = q;
         }
         L.Info($"resources: {_treeOf.Count} trees, {_stoneOf.Count} stones, {_bushOf.Count} bushes of {W.Resources.Count} nodes matched to the map's props");
+        // trees that lie felled from the start (map attribute fallen = 1: the Outbreak's giant trees): their log at rest
+        foreach (var n in W.Resources) if (n.Fallen && n.Alive) LogAtRest(n);
+    }
+
+    /// <summary>a felled tree's log lying still (its fall clip at its end), without the fall</summary>
+    void LogAtRest(ResNode n)
+    {
+        if (_logs.ContainsKey(n)) return;
+        if (n.TimberKind == null || !HasFile(Lib, n.TimberKind))
+        {
+            // (the data lacks the log model - <tree>_timber, which the game's model list has: an export without it - the
+            // tree itself laid down along the log's direction: flat on the ground - the crown pressed down to under half
+            // its height and tipped a little into the ground, the foot sunk so no root floats)
+            if (n.Gfx == null || !HasFile(Lib, n.Gfx) || Lib.Instantiate(n.Gfx.ToLowerInvariant()) is not ModelInstance t) return;
+            float sc = (float)(n.Scale <= 0 ? 1 : n.Scale);
+            t.Transform = new Transform3D(
+                new Basis(Vector3.Up, (float)(n.LogRot ?? n.Rot)) * Basis.FromScale(new Vector3(1, 0.5f, 1)) * new Basis(Vector3.Right, -Mathf.Pi / 2 - 0.02f) * Basis.FromScale(Vector3.One * sc),
+                new Vector3((float)n.Pos.X, (float)W.Height(n.Pos.X, n.Pos.Z) - 0.12f * sc, (float)n.Pos.Z));
+            AddChild(t);
+            _logs[n] = (t, 99, null);
+            return;
+        }
+        var m = Lib.Instantiate(n.TimberKind.ToLowerInvariant());
+        if (m == null) return;
+        m.Position = new Vector3((float)n.Pos.X, (float)W.Height(n.Pos.X, n.Pos.Z), (float)n.Pos.Z);
+        m.Rotation = new Vector3(0, (float)(n.LogRot ?? n.Rot), 0);
+        m.Scale = Vector3.One * (float)(n.Scale <= 0 ? 1 : n.Scale);
+        AddChild(m);
+        string? clip = m.Anim == null ? null : m.Anim.Has(n.FallClip) ? n.FallClip : m.Anim.Pick("chop_down_01", "chop_down");
+        if (clip != null) { m.Play(clip, false, 1, null, 0); m.Anim!.Player.Advance(30); }
+        _logs[n] = (m, 99, clip);
     }
 
     /// <summary>the felled tree's crown hits the ground (frame 40 of its clip: ui/logs.js LEAF_FRAME) - the effects'

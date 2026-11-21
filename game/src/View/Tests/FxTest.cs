@@ -5,7 +5,8 @@
 // vehicle explosion, a building at 50 % / 25 %, poison, ice, heal and item glows, the MIRAGE moves' fx / fxAt / fxFly,
 // blasts), the drawn effects (explosions, dust, blood, muzzle smoke, glows, scorch marks; the damage smoke of a
 // damaged building), the healing areas (their rays standing up), a mission's effect (EFCT), question marks, a
-// cutscene's effect item, the "Particles" setting (off / low / on / high), and the cost of many emitters. Screenshots
+// cutscene's effect item, the "Particles" setting (off / low / on / high), the cost of many emitters, the SEAS
+// buildings' steam mixed by its sheet's alpha (SeasSteam), the mixed particles lit by the night (NightSmoke). Screenshots
 // of each group with --shots; --only=<group,...> runs only those groups (e.g. --only=HealAreas).
 //
 // Run (rendering on llvmpipe in the container):
@@ -88,7 +89,7 @@ public partial class FxTest : Node3D
                 ("EmitterData", EmitterData), ("ModelEmitters", ModelEmitters), ("StaticEmitters", StaticEmitters),
                 ("EffectModels", EffectModels), ("GameEvents", GameEvents), ("OriginalEffects", OriginalEffects),
                 ("HealAreas", HealAreas), ("Drawn", Drawn), ("MissionAndMarks", MissionAndMarks), ("Settings", Settings),
-                ("OutOfView", OutOfView), ("Performance", Performance), ("VisualFixes", VisualFixes),
+                ("OutOfView", OutOfView), ("Performance", Performance), ("VisualFixes", VisualFixes), ("SeasSteam", SeasSteam), ("NightSmoke", NightSmoke),
             })
                 if (only == null || only.Contains(name)) await run();
         }
@@ -410,6 +411,94 @@ public partial class FxTest : Node3D
         _props.Remove(h1); _props.Remove(h2);
         await Run(6.0);
         Check(Sprites == 0, $"removed landscape objects: their spray ends ({Sprites})");
+    }
+
+    // ------------------------------------------------------------------------------------------- SEAS steam
+    // The SEAS buildings' steam (seas_greenhouse, seas_steelwork, seas_barracks: particle_01.tga cells 16-21, GSF
+    // material 0x106, white, alpha 50): the original draws it mixed by the sheet's alpha (EmitterDef.ResolveBlend:
+    // PWClient.exe 0x6c767f takes the alpha bits 0x3, not 0x4). Until 2026-11-21 it was added with the alpha unused -
+    // the cells' grey border made bright squares over the chimneys (Kacper, MIRAGE Outbreak on Icewaste). Checked: the
+    // steam's emitters are mixed and their sprites are drawn in a mixed batch, none in an additive one.
+    async Task SeasSteam()
+    {
+        var at = new Vector3(0, 0, -150);
+        var made = new List<ModelInstance>();
+        foreach (var (gfx, dx) in new[] { ("seas_greenhouse", -14f), ("seas_steelwork", 6f), ("seas_barracks", 26f) })
+            if (Place(gfx, at + new Vector3(dx, 0, 0), 0.3f) is { } m) made.Add(m);
+        if (made.Count == 0) { GD.Print("skip SeasSteam: no SEAS buildings in the data"); return; }
+        var steam = _lib.Template("seas_greenhouse")?.Emitters.Where(e => e.Path.ToString().Contains("steam")).ToList();
+        Check(steam == null || (steam.Count > 0 && steam.All(e => e.Emitter!.Additive == false && e.Emitter.GsfFlags == 0x106)),
+            $"seas_greenhouse's steam: mixed by its material 0x106 ({string.Join(", ", steam?.Select(e => $"{(e.Emitter!.Additive ? "add" : "mix")} 0x{e.Emitter.GsfFlags:x}") ?? new string[0])})");
+        Look(at + new Vector3(6, 10, 0), 48, 0.5f, 0.32f);
+        await Run(4.0);
+        int mixed = 0, added = 0;
+        foreach (var b in _p.Batches)
+        {
+            if (!b.Tex.ResourceName.StartsWith("particle_01", StringComparison.OrdinalIgnoreCase) || b.GridW != 8) continue;
+            var d = b.Data;
+            for (int i = 0; i < b.LastN; i++)
+            {
+                int o = i * ParticleBatch.FLOATS, tile = (int)d[o + 18] % 256;
+                if (tile < 16 || tile > 21 || new Vector2(d[o + 3] - at.X, d[o + 11] - at.Z).Length() > 50) continue;
+                if (b.Additive) added++; else mixed++;
+            }
+        }
+        Check(mixed > 0 && added == 0, $"the steam's sprites drawn mixed ({mixed} mixed, {added} additive)");
+        await Shot("fx_seas_steam.png");
+        foreach (var m in made) m.QueueFree();
+        await Run(3.0);
+    }
+
+    // ------------------------------------------------------------------------------------------- night smoke
+    // The mixed particles' light (WorldRenderer.ParticleLight -> Particles.MixLight; PWClient 0x704f31: a "_pm"
+    // sprite's colour x the sun's colour, at least 0x0f0f0f; the additive ones unlit): the SEAS buildings' steam and a
+    // campfire at the remake's night (the day-night cycle's / the sequel's: sun 0.22, 0x8aa8ff). Shots: unlit (white,
+    // as until 2026-11-21: bright steam over dark buildings) and lit; the fire's additive sprites unchanged.
+    async Task NightSmoke()
+    {
+        var at = new Vector3(0, 0, 150);
+        var made = new List<ModelInstance>();
+        foreach (var (gfx, dx) in new[] { ("seas_greenhouse", -14f), ("seas_steelwork", 6f), ("campfire", 22f) })
+            if (Place(gfx, at + new Vector3(dx, 0, 6), 0.3f) is { } m) made.Add(m);
+        if (made.Count == 0) { GD.Print("skip NightSmoke: no models"); return; }
+        Check(_r.ParticleLight.IsEqualApprox(Godot.Colors.White), $"by day the particle light is the sun's tint (white without a sky table: {_r.ParticleLight})");
+        _r.SetNight((0.22f, Color.FromHtml("8aa8ff"), 0.36f, Color.FromHtml("101828")));
+        var L = _r.ParticleLight;
+        Check(L.R < 0.2f && L.G < 0.2f && L.B < 0.35f && L.B > L.R && L.R >= WorldRenderer.PARTICLE_LIGHT_MIN - 1e-4f,
+            $"at night the mixed particles' light is the night's sun: dark blue, at least 15/255 ({L.R:0.000} {L.G:0.000} {L.B:0.000})");
+        Look(at + new Vector3(4, 10, 0), 48, 0.5f, 0.32f);
+        // (mean colour of the mixed sprites of particle_01's 8 x 8 sheet near the place, and the additive sprites' brightest)
+        (float Mix, float Add) Sample()
+        {
+            float sum = 0, add = 0; int n = 0;
+            foreach (var b in _p.Batches)
+            {
+                var d = b.Data;
+                for (int i = 0; i < b.LastN; i++)
+                {
+                    int o = i * ParticleBatch.FLOATS;
+                    if (new Vector2(d[o + 3] - at.X, d[o + 11] - at.Z).Length() > 50) continue;
+                    float c = Math.Max(d[o + 12], Math.Max(d[o + 13], d[o + 14]));
+                    if (b.Additive) add = Math.Max(add, c); else { sum += c; n++; }
+                }
+            }
+            return (n > 0 ? sum / n : 0, add);
+        }
+        _p.MixLight = Godot.Colors.White;
+        await Run(4.0);
+        var (mix0, add0) = Sample();
+        await Shot("fx_night_smoke_unlit.png");
+        _p.MixLight = L;
+        await Run(1.0);
+        var (mix1, add1) = Sample();
+        await Shot("fx_night_smoke.png");
+        Check(mix0 > 0.5f && mix1 < mix0 * 0.4f, $"the mixed sprites darken with the night ({mix0:0.00} -> {mix1:0.00})");
+        Check(add0 <= 0 || add1 > add0 * 0.8f, $"the additive sprites keep their light ({add0:0.00} -> {add1:0.00})");
+        _r.SetNight(null);
+        _p.MixLight = _r.ParticleLight;
+        Check(_r.ParticleLight.IsEqualApprox(Godot.Colors.White), "the day again: the particle light back");
+        foreach (var m in made) m.QueueFree();
+        await Run(3.0);
     }
 
     // ------------------------------------------------------------------------------------------- effect models

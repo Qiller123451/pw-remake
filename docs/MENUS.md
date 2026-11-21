@@ -21,6 +21,8 @@ game/src/UI/MultiplayerMenu.cs  Multiplayer: name, Host Direct IP (port, game ty
 game/src/UI/CoopLobby.cs        the co-op lobby: Shared / Co-op campaign, online and offline (the campaign menu's "Co-op …";
                                 the PvP lobby is SkirmishMenu's network mode) - docs/COOP.md
 game/src/UI/IntroScreen.cs      the start films (the logos and the intro) before the title screen
+game/src/UI/CampaignMenu.cs     the campaign menu: tabs Campaign (the original campaign) and Custom campaigns; tribe, difficulty, options
+game/src/UI/CustomCampaignsTab.cs  the Custom campaigns tab, its New / Edit campaign dialog (MenuDialog), CustomPlay
 game/src/UI/OptionsPanel.cs     the Options window (tabs and settings); OptionsScreen = it on the title screen
 game/src/UI/PwTabs.cs           the original's tab control (CTabCtrl; art controls/tabctrl_*)
 game/src/UI/Game/PauseMenu.cs   the game's menu (Esc): Options opens the same OptionsPanel
@@ -36,8 +38,10 @@ src/Sim/Content/GameTexts.cs    the installation's string tables (Data/locale/<l
 
 The configuration (ParaWorld or MIRAGE, docs/CONTENT.md), then the main menu's buttons with the original's captions
 and tooltips (`_UI_MainMenu_Button_*`, `_UI_MainMenu_Tooltip_*`): Campaign, Continue Campaign, Skirmish, Load Game,
-Options, Help (the help book), Controls (the keys and the mouse, `Help/ControlsList.cs`), Game data … (the setup
-screen), Quit.
+Map Editor (the map editor in the game: docs/MAP_EDITOR.md), Options, Help (the help book), Controls (the keys and the
+mouse, `Help/ControlsList.cs`), Game data … (the setup screen), Quit - and the remake's Scenarios. The remake's
+campaign **Containment** has no button here: it is in the campaign menu's Custom campaigns tab ("The remake's
+campaigns", Start opens its menu; its Back returns there).
 
 **Continue Campaign** (MainMenu.usl `Init` / `OnContinueCampaign`): the original looks through the profile's saves for
 the newest one (by the file's time) whose level is not a multiplayer map and loads it at once. Here: the newest save of
@@ -74,6 +78,7 @@ Compared with the browser remake's title (menu.js `title()`):
 |---|---|
 | Campaign, Skirmish, Load game, Options, Help, Controls, Exit game | the same |
 | Containment (1964), Scenarios | the same (game/src/UI/Sequel: docs/SEQUEL.md "Playing") |
+| (the toolkit's map tools) | **Map Editor**: the remake's map editor inside the game (game/src/Editor, docs/MAP_EDITOR.md) |
 | the version line (click: copied) | the version under the title and in the Options window and pause menu (not copied on a click) |
 | the game data configuration in the campaign menu (and the toolkit's build of a mod's data) | the configuration on the title screen; data are prepared by the prepare tool (docs/CONTENT.md) |
 
@@ -163,19 +168,43 @@ corners' transparent parts), the title strip `outerframe_toptile` whose first ~1
 longer than the tab widens its plain middle. The test data of the development container had only part of the converted menu art; the
 slider, tab, drop list and text box pieces were staged from the user's export (`E:\Paraworld\export\remake\375f3d3a`).
 
+## Campaign menu
+
+![Campaign → Custom campaigns](images/campaign_custom.jpg)
+
+Two tabs (PwTabs, as the Options window); below them for both: **Your tribe**, **Your colour** (the skirmish's palette
+and RGB picker with "As in the mission" first; the shown mission's other players' colours greyed out, "used by <name>";
+remembered per campaign - docs/CAMPAIGN.md "Your colour"), **Difficulty**, MIRAGE's **Game options**,
+the debug options line, **Back**, **Co-op …** (the Campaign tab only), **Start mission**. The tab and the entry chosen
+last are shown again (settings.json `campaignTab`, `campaignMission`, `customSelection`).
+
+* **Campaign**: the original campaign of the configuration - the tutorial and missions 1 - 16 - with the chosen
+  mission's title, description, the tribe you play, the army budget and its status (missions not adapted yet greyed).
+* **Custom campaigns**: every other mission, grouped (a header per group, its missions under it): **Booster Pack**
+  (4-1 .. 4-3), **MIRAGE** (MIRAGE's own missions, only in MIRAGE), **The remake's campaigns** (Containment and the
+  Scenarios: Start opens their menus), **My maps** (your maps with triggers, edited copies of campaign missions as
+  "<title> (edited)"; was the "Custom maps …" menu) and **your campaigns** (each a header and its missions in order; a
+  mission opens when the one before was won - greyed until then). The right side shows the chosen entry's texts; Start
+  plays it with the tribe, difficulty and options below (on a campaign's header: its next mission). Under the list:
+  **New campaign …** / **Edit …** (name, author, description, pick and order the missions and maps; Save, Delete …),
+  **Export …** / **Import …** (a `.pwcampaign` file). docs/CAMPAIGN.md "Custom campaigns" has the rules and the file
+  format, docs/MAP_EDITOR.md "Edited missions and custom campaigns" the user's side. `--screen custom` opens this tab.
+
 ## The campaign's army window
 
 menu.js `campaignArmy` (the army screen of a campaign mission with an army budget) is ported: the campaign menu's
 Start and the end screen's Continue open `ArmyScreen` with `CampaignArmy.Of` (docs/SKIRMISH.md, docs/CAMPAIGN.md),
 `--army-mission <n>` shows it. One difference: its Back after the end screen's Continue goes to the campaign menu (the
-JS went back to the end screen, which the session has left by then).
+JS went back to the end screen, which the session has left by then). The online co-op lobby opens it per seat ("My
+army ...", `CampaignArmy.ForCoopSeat`: the host's budget, seats 2 / 3 without the story heroes, no debug "Free"; Done
+and Back return to the lobby) - docs/COOP.md "Armies".
 
 ## The remake's own campaigns (sequel_ui.js, ported)
 
 `remake/src/ui/sequel_ui.js` and the menus `sequel()` / `scenarios()` of menu.js are ported with those campaigns
-(docs/SEQUEL.md): the title screen's **Containment (1964)** (`SequelMenu`: the 1964 and 1966 missions with place,
+(docs/SEQUEL.md): the campaign menu's Custom campaigns tab's **Containment (1964)** (no longer a title screen button) (`SequelMenu`: the 1964 and 1966 missions with place,
 date, briefing and what each brings in; a mission opens when the one before it was won; the difficulty; it is played
-with the MIRAGE configuration - the menu says so and offers the switch) and **Scenarios** (`ScenarioMenu`: all open,
+with the MIRAGE configuration - the menu says so and offers the switch) and **Scenarios** (the title screen's and the Custom campaigns tab's; `ScenarioMenu`: all open,
 the tribe to play, the tribes that won each marked). Missions that do not play yet are greyed out (`SequelStatus`, as
 `CampaignStatus`). In the game: the briefing window before the mission (the game waits; Begin is a command), and
 `SequelHud` beside the HUD (objectives, radio box with the speakers' portrait cards, clock, electricity, command
@@ -191,7 +220,10 @@ powers); the end screen's Continue starts the next mission. `--screen sequel`, `
   newest by date, damaged files skipped); `python -m unittest tests.test_films` in tools/prepare: the start films'
   lookup (MIRAGE's own first, any case of the name), stubs and placeholders left out.
 * `godot --path game -- --intro --quit-after 2 --screenshot <png>` (a start film), `--continue` (the newest save);
+* `dotnet run --project tests/PwRemake.Tests -- CustomCampaign`: the campaign menu's groups, user campaigns
+  (docs/CAMPAIGN.md "Custom campaigns").
 * `godot --path game -- --screen options --options-tab 0..4 --quit-after 5 --screenshot <png>`; `--screen controls`;
+  `--screen campaign`, `--screen custom` (the Custom campaigns tab);
   in a game `--menu-at 1 --menu-page options --options-tab 3` (docs/DEBUG.md).
 
 ![Options: Graphics](images/menus_options_graphics.jpg)

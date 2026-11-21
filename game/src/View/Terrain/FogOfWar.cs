@@ -1,4 +1,5 @@
-// Fog of war: what the local player sees (bright), has seen (dimmed to 55 %) and has never seen (black).
+// Fog of war (the JS's darkening - the fallback without a cloud texture; the game draws the original's clouds:
+// FogClouds.cs): what the local player sees (bright), has seen (dimmed to 55 %) and has never seen (black).
 //
 // The grid (FogGrid: seen now, seen once) is the simulation's - src/Sim/World/FogOfWar.cs: the world keeps the human
 // player's fog and updates it in its steps, the systems ask it (docs/SAVES.md); the view draws it (FogOverlay.SetFog /
@@ -11,6 +12,10 @@
 //     f = smoothstep(0, 0.45, v) * mix(0.55, 1, smoothstep(0.45, 0.9, v))      v: 255 seen, 115 explored, 0 never
 // and adds back the share of the scene fog that the JS applied after darkening (fog colour * fog amount * (1 - f)),
 // so the result equals the JS's darken-then-fog. The sky (no depth) is left alone, as in the JS.
+//
+// The game uses this pass only without any fog of war cloud texture in the data (WorldView: FogClouds.Create null);
+// the original's default renderer does not darken the ground (docs/TERRAIN.md "Fog of war: how the original draws it").
+// In-engine cutscenes draw no fog of war at all (Suspended).
 //
 // Ported from remake/src/engine/terrain.js (FogOfWar, fowUniforms, applyFow) (pw-exporter 98c7703).
 using System;
@@ -128,5 +133,9 @@ void fragment() {
     public bool RevealAll { get => _reveal; set { _reveal = value; Apply(); } }
     /// <summary>fowOn: the overlay drawn at all</summary>
     public bool On { get => _on; set { _on = value; Apply(); } }
-    void Apply() { _mul.Visible = _add.Visible = _on && !_reveal; }
+    /// <summary>a cutscene plays: no fog of war over anything (GameSession: SessionSequenceStage.NoFog) - the original
+    /// shows its scenes whole; the fog comes back as it was when the scene ends</summary>
+    public bool Suspended { get => _suspended; set { if (_suspended != value) { _suspended = value; Apply(); } } }
+    bool _suspended;
+    void Apply() { _mul.Visible = _add.Visible = _on && !_reveal && !_suspended; }
 }

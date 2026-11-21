@@ -21,7 +21,7 @@ it is read twice; the models from `ModelLibrary` (docs/VIEW.md).
 | engine/weather.js | Fx/WeatherFx.cs | snow and rain |
 | main.js buildWorld (terrain, skirt, water, trees, decoration, stones, bushes, fish, grass, W.adaptTerrain, W.clearVegetation) | World/WorldView.cs | the scene of a map: the API the game uses |
 | (the rules' answers maps/source.js needs) | World/RulesMapAdapter.cs | `IMapRules` over `Sim/Rules` |
-| - | World/MapLoader.cs | find a `.ula` of the installation, read it into a `MapSource` |
+| - | World/MapLoader.cs | find a converted map of the configuration (docs/MAP_FORMAT.md) by name, id or path, read it into a `MapSource` |
 | - | World/MapViewer.cs + scenes/MapViewer.tscn | the map viewer tool |
 
 The effects (engine/fx.js, particles.js, modelfx.js: the models' particle emitters, the game's effect models, the
@@ -66,7 +66,8 @@ view.SetGrass("off" | "on" | "dense");  r.Settings.Shadows = "high"; r.ApplySett
 ## Data flow
 
 ```
-.ula ──Ula.ParseUla──> MapData ──MapSource.OriginalSource(rules, forest.json, manifest)──> MapSource S
+map folder ──PwMapReader──> PwMap ──ToMapData──> MapData ──MapSource.OriginalSource(rules, forest.json, manifest)──> MapSource S
+  (.ula ──Prepare: tools/mapconvert, PwMapConvert──> map folder; docs/MAP_FORMAT.md)
 S.Height ──HeightField(S.Size, S.MeshCell)──> Ground (float samples every 2 m on every map)
 Ground + S.Splat(hf) (8 weights / vertex: 4 m material grid, bilinear, noise-warped borders)
        + painted brush cells ──GroundLayers (biomes: x the biome weights, per biome by role - docs/BIOMES.md)──>
@@ -192,13 +193,72 @@ starts on the first start location looking along the map's DefaultCamera (yaw = 
 ## Fog of war
 
 `FogGrid` is the JS FogOfWar: cells of 4 m, `Update(viewers)` stamps sight discs, `Vis` / `ExploredCells`, texture
-values 255 visible / 115 explored / 0 never seen; it implements the simulation's `IFogOfWar`. `FogOverlay` draws it
+values 255 visible / 115 explored / 0 never seen; it implements the simulation's `IFogOfWar`. **The game draws it as
+the original: `FogClouds`, below** ("Fog of war: how the original draws it"). The JS's darkening pass is kept as the
+fallback without any cloud texture in the data: `FogOverlay` draws it
 for everything at once: a full-screen pass in the transparent queue (last) reads the depth buffer, rebuilds each
 pixel's world position, samples the fog texture (linear) and multiplies the pixel by
 `smoothstep(0, 0.45, v) * mix(0.55, 1, smoothstep(0.45, 0.9, v))` - applyFow's factor - then adds back the scene fog's
 share (`fog colour x fog amount x (1 - f)`), which makes it equal to the JS's darken-before-fog on every material.
 The sky is left alone. The JS patched each material instead (terrain, props, units, water, grass, sprites); one pass
 needs no change to the models' materials.
+
+### Fog of war: how the original draws it
+
+Read from PWClient.exe and the scripts for the remake (2026-11-21, Kacper: "look into the original game how exactly fog
+of war was being drawn and copy it"); the two screenshots of the original he sent (a savanna town, a jungle river) were
+used only to check the result. Implemented in `game/src/View/Terrain/FogClouds.cs` (the drawing) and
+`game/src/View/Entities/EntityViews.cs` (what is shown in the fog).
+
+* **Which renderer**: `Rendering/FOW/Visible` (default 1) and `Rendering/FOW/Type` (default 0) (0x450469 ff.). Type 0
+  is `Pest::CFOWRenderer2` (FOWRND2, the clouds, the only one the game uses by default); Type 1 is the older
+  `CFOWRenderer` with a darkening screen filter (`CFXRenderFilterFogOverlay`: `Rendering/FOW/ColorR/G/B` default 160,
+  `SoftnessLayers` 3, `SoftnessWidth`, `ScapeOffset`, `Complete`; 0x450ff2 ff.). So by default **the ground is not
+  darkened at all** - not never seen, not explored: the fog of war is only the clouds.
+* **The fog map**: cells of 16 m, 2 bits each: 0 never seen, 1 explored, 3 seen now (0x6fa630 stamps a circle - the
+  cells whose centre lies within the sight radius + 8 m; 0x6fa7a0 turns 3 into 1 before each update). From it a byte
+  per cell "seen now", eased every 0.04 s by +6 while the cell is seen and -2 while not (0x44ec08 -> 0x6fa7f0): from
+  nothing to fully seen in 1.7 s, back in 5.1 s.
+* **Where the clouds are**: over everything not seen *now* - explored or never seen alike (the original makes no
+  difference on the screen). A cloud sprite every 4 m (4 x 4 per cell; 0x71b9xx), its alpha (1 - bilinear over the
+  cell of the corners' s = max(0, (byte - 128) / 128)) x fade x the sprite's own weight; fade = clamp((0.75 - (d - 10)
+  / R) x 6, 0, 1) with d the distance from the camera and R the terrain renderer's range (copied every frame,
+  0x71be6e; its value was not read - **R = 800 m here, estimated**: beyond the remake's camera view); sprites under
+  0.05 are left out (0x71bb03 ff.).
+* **A sprite**: camera-facing, 6 m to each side along the camera's right and 8 m up along the camera's up from its
+  point (0x71a3b8 x 6 / x 8, quad 0x71a850 ff.): 12 x 8 m, the lower edge on the ground - the clouds lie on the land
+  and the water, tall trees stand out of them. Its point: the ground's height there (the original computes a height
+  per sprite from the terrain around it, 0x71b0xx, not fully read - **here the ground's height, the water level over
+  the sea**). A random byte per sprite (a table, 0xa40a68): bits 0-1 the atlas column, 2-3 the row, 0-5 one of 64
+  drift paths. Blending: alpha over (the material `Scape.FogOfWar`'s blend mode was not read), no depth write.
+* **The drift** (0x71a431 ff.): t = time x 0.02; path i moves by (2 sin(((i x 1.141) + 105) x 0.05 t) + sin(7.234 t),
+  2 sin(((i x 0.131) + 70 - i + 154) x 0.05 t) + sin(7.723 t)) m - +-3 m on periods of 35 .. 60 s.
+* **The colour**: the sky manager's (0x727e00): **row 8** of the setting's sky gradient (`skygradient_day.tga`, else
+  `skygradient.tga`, Texture/Scape/<Setting>/) at the time of day; row 0 when the table has fewer than 9 rows; 0x607090
+  without a table. Row 8 of the original tables: Northland and Jungle white, Savanna ffffc9 (warm white), Icewaste
+  d5e0f0 .. e5eef5, Ashvalley / Cave2 / Cave3 e5c6b5 .. fcd6c2, Cave1 ffd28a. Times its brightness (205 + 50 x (0.5 +
+  0.25 x (sin u + sin v))) / 255, u and v sines of the sprite's place and the time (constants 0x88c710 .. 0x88c750).
+  Alpha: the colour's alpha x the sprite's x 150 / 255 (0x71a79e). The clouds are not lit otherwise.
+* **The texture**: the setting's `Texture/Scape/<Setting>/fog.tga` (on disk `fog_(0256).dds`, DXT5; the path "Scape/"
+  + setting 0x48cf67, the name 0x6fc432), else `Texture/Effects/fogofwar.tga` (0x71ab49 .. 0x71ab89). Each is a 4 x 4
+  atlas of white wisps, the wisp in the alpha; every setting of Base and MIRAGE's Cave3 has the same picture.
+  `tools/prepare/fog_textures.py` makes them `assets/terrain/<Setting>/fog.png` and `assets/terrain/fogofwar.png`
+  (Prepare); without them the game takes the original's `particle_06` cloud atlas (2 x 2, not the fog's own - a log
+  line says so), without that the old darkening pass (`FogOverlay`).
+* **What is seen in the fog** (0x44e850, each object after a fog update; the server's `SetVisInFOW`):
+  characters, animals, vehicles and ships (CHTR, ANML, VHCL, SHIP) only where the byte is above 127; an object marked
+  VisInFOW always - decoration (`CDecoObj`, `CDecoColObj`, `CDecoColAnimObj`, `CSeasHQLavaObj`: MiscObj.usl), wild
+  animals (Animal.usl OnInit: owner -1 -> `Server/GameplayOptions/ResourcesVisibleInFOW`, default true), the gates
+  `CGateFOWVIsible`, the flying trader; buildings are not hidden by the client's pass (whether the server sends an
+  enemy building never seen was not read: here as before, shown once explored). Every object not seen gets a flag
+  (0x2e5 bit 0x40) whose use was not found. Here: units as before (seen now), wild animals, resources and props
+  always, buildings once explored.
+* Not taken over / open: the minimap's fog (`EventSink_CMiniMap_FOWUpdate`) was not read - the remake's minimap as
+  before; units appear when the 4 m grid sees them (the original: when the eased byte passes 127, up to 0.85 s later).
+
+**In a cutscene no fog of war is drawn at all** (`FogClouds.Suspended`, `FogOverlay.Suspended`, docs/GAME_SESSION.md
+"No fog of war in a cutscene"): mission 16's opening sc_7050 looks over the crater rim beyond the 250 m its trigger reveals - the black
+covered the left 60 % of the screen.
 
 Note: with MSAA the depth texture this pass reads stays empty (Godot 4.7, seen on Vulkan / llvmpipe), so the world
 renderer uses FXAA and turns MSAA off.
@@ -230,8 +290,9 @@ xvfb-run -a -s "-screen 0 1600x900x24" godot --path game res://scenes/MapViewer.
 from above (orthographic, no depth fog, the co-op seats' starts marked).
 
 Keys: the camera controls, F1 info line, F2 fog of war test, G grass mode, F12 screenshot (user folder), B the biome
-brush (docs/BIOMES.md "Authoring"; `--biomes=<file>`, `--brush=<biome>`, `--biomes-out=<file>`). `--map` also takes a
-remake map (`Remake/frost_to_jungle.pwmap.json`).
+brush (docs/BIOMES.md "Authoring"; `--biomes=<file>`, `--brush=<biome>`, `--biomes-out=<file>`). `--map` takes a map's name
+(`single_11`), its id (`Base/Maps/Multiplayer/multi_2_jun_001.ula`, `Remake/frost_to_jungle.pwmap.json`) or the path of
+a map folder / `.pwmap` (a `.ula` path: converted in memory) - the configuration's converted maps (docs/MAP_FORMAT.md).
 `--check` runs the API on the loaded map and prints `CHECK` lines: chunk count, vertex weights = MapSource.Splat,
 water, trees and props drawn, AdaptTerrain levels samples and paints materials (and returns false without a brush),
 ClearVegetation takes the trees within its radius, FogGrid discs and explored cells. Results on multi_2_jun_001 and

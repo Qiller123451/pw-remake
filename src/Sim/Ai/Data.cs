@@ -109,6 +109,9 @@ public sealed class AiCtx
     /// Scripts/Game/misc/CustomMapSettings.txt - the campaign's levels - with a campaign AI for the player); null: unknown,
     /// as data.js (neither m_bCustommap nor !m_bCustommap holds)</summary>
     public bool? Custommap;
+    /// <summary>MIRAGE's bEpochSix (CMirageAIMgr.EpochSix: the game option MaxEpoch 6; BV:406) and m_bFinalStage (the
+    /// sixth stage invented: GetCurrentAge(brain, bEpochSix) == 6, BV:409) - TribeAI.OptEpochSix / FinalStage</summary>
+    public bool EpochSix, FinalStage;
     public Func<string, bool>? Has;
     public AiCtx With(string letter) { var c = (AiCtx)MemberwiseClone(); c.Letter = letter; return c; }
 }
@@ -422,6 +425,11 @@ public sealed class AiData
         (new Regex(@"^!has:(\w+)$"), (c, m) => !(c.Has != null && c.Has(m.Groups[1].Value))),
         // MIRAGE (AiGoalGeneralAttack.usl:87, 266: the skirmish rows of the attack plans are "m_bMultimap&&!m_bCustommap")
         (new Regex(@"^m_bCustommap$"), (c, m) => c.Custommap == true), (new Regex(@"^!m_bCustommap$"), (c, m) => c.Custommap == false),
+        // MIRAGE's game options in the build list (AiGoalBuildVillage.UpdateBuildList: "final_stage" when bEpochSix, the
+        // sixth stage's buildings when m_bFinalStage). bFreeSpec / bSupply stay unknown (= false): the remake has neither
+        // option, and both are off by default
+        (new Regex(@"^bEpochSix$"), (c, m) => c.EpochSix), (new Regex(@"^!bEpochSix$"), (c, m) => !c.EpochSix),
+        (new Regex(@"^m_bFinalStage$"), (c, m) => c.FinalStage), (new Regex(@"^!m_bFinalStage$"), (c, m) => !c.FinalStage),
     };
     static bool Cmp(double a, string op, double b) => op == ">=" ? a >= b : op == ">" ? a > b : op == "<=" ? a <= b : op == "<" ? a < b : a == b;
     /// <summary>raw script conditions the extractor could not turn into fields; unknown ones do not hold</summary>

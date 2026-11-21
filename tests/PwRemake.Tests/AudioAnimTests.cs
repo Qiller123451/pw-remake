@@ -219,7 +219,7 @@ public static class AudioAnimTests
         for (int i = 0; i < 20 * 600; i++)
         {
             w.Step();
-            if (b.Task.Type == "roam" && b.Task.Phase is "idle" or "wait" && b.Anim.CurName != null) seen.Add(b.Anim.CurName);
+            if (b.Task.Type == "roam" && b.Task.Phase is "idle" or "wait" && b.Anim!.CurName != null) seen.Add(b.Anim.CurName);
         }
         t.Log("clips while standing: " + string.Join(", ", seen));
         t.True(seen.Contains("standanim"), "its standing clip");
@@ -247,7 +247,7 @@ public static class AudioAnimTests
         for (int i = 0; i < 20 * 300; i++)
         {
             w.Step();
-            string? before = r.IdleCur; var cur = r.Anim.CurName;
+            string? before = r.IdleCur; var cur = r.Anim!.CurName;
             t.True(w.TrexIdle(r), "it has the clips");
             if (r.Anim.CurName != cur || r.IdleCur != before) { seen.Add(r.IdleCur!); if (r.IdleCur == "idle_0") loops0 = Math.Max(loops0, (int)Math.Round(r.IdleLeft / r.Anim.LoopLength("idle_0"))); }
             t.True(r.Anim.CurName!.StartsWith("idle_"), "always an idle_ clip: " + r.Anim.CurName);
@@ -267,7 +267,7 @@ public static class AudioAnimTests
         if (v.Anim == null || !v.Anim.Has("hit_back")) t.Skip("no clips of the warrior");
         var a = w.SpawnUnit("aje_warrior", e, 3, 0)!;
         v.BusyAnim = true;
-        v.Anim.Play("hit_back", new AnimOpts { Loop = false, Restart = true });
+        v.Anim!.Play("hit_back", new AnimOpts { Loop = false, Restart = true });
         for (int i = 0; i < 4; i++) w.Step();
         double len = v.Anim.Duration("hit_back");
         t.True(v.Anim.Cur!.Time < len - 0.1, "thrown: early in hit_back");

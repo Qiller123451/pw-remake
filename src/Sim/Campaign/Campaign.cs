@@ -52,6 +52,9 @@ public sealed class CampaignConfig
     /// <summary>MIRAGE's game options (sixth epoch, no titans) for every player of the mission (GameStart.Gameplay;
     /// null = the defaults)</summary>
     public PwRemake.Sim.Rules.GameplayOptions? Gameplay;
+    /// <summary>the colour the human player chose (GameStart.Color; co-op: seat 1's CoopSeat.Color), null: the mission's.
+    /// Given only when no other player of the mission has it (MissionColors).</summary>
+    public string? Color;
 }
 
 /// <summary>What the setup decided for one object of the data (setup.js plans[]).</summary>
@@ -216,17 +219,35 @@ public sealed partial class Campaign : ICampaignStep
         return g.Length > 0 && Manifest.Has(g) ? g : Manifest.Has(lc) ? lc : cg != null && Manifest.Has(cg) ? cg.ToLowerInvariant() : null;
     }
     /// <summary>the mount whose captain (rider) class is `cls`, for a rider class that cannot stand on its own (its tech
-    /// tree object has a placeholder 1 hit point), else null</summary>
-    public string? MountOf(string cls)
+    /// tree object has a placeholder 1 hit point at every level), else null. A class that is a rider and a soldier of its
+    /// own is itself: hu_archer (the chariot's captain) has 1 hit point only at level 1, below its lowest level (2) - its
+    /// start army slot is an archer, not the chariot (the original creates the class it is given)</summary>
+    public string? MountOf(string cls) => MountOf(D, cls, ref _mounts);
+    /// <summary>MountOf without a campaign (tests, the army screen)</summary>
+    public static string? MountOf(PwRemake.Sim.Rules.Rules D, string cls)
     {
-        var s = D.Stats(cls, 1, null);
+        Dictionary<string, string>? m = null;
+        return MountOf(D, cls, ref m);
+    }
+    static string? MountOf(PwRemake.Sim.Rules.Rules D, string cls, ref Dictionary<string, string>? mounts)
+    {
+        // (MinLevel: the lowest level with real hit points, else the first one the tech tree lists)
+        var s = D.Stats(cls, D.MinLevel(cls, null), null);
         if (s == null || !(s.Hp <= 1)) return null;
-        if (_mounts == null)
+        if (mounts == null)
         {
-            _mounts = new Dictionary<string, string>(StringComparer.Ordinal);
-            foreach (var k in D.IndexOrder) { var st = D.Stats(k, 1, null); if (st?.Captain != null) _mounts.TryAdd(st.Captain.ToLowerInvariant(), k); }
+            mounts = new Dictionary<string, string>(StringComparer.Ordinal);
+            foreach (var k in D.IndexOrder)
+            {
+                var st = D.Stats(k, 1, null);
+                if (st?.Captain == null) continue;
+                // (several mounts may share a captain - aje_velociraptor_handler_char rides the raptor and the
+                // atroxosaurus: the mount the rider is named after wins, else the first in the tech tree's order)
+                var cap = st.Captain.ToLowerInvariant();
+                if (!mounts.TryAdd(cap, k) && cap.StartsWith(k.ToLowerInvariant() + "_", StringComparison.Ordinal)) mounts[cap] = k;
+            }
         }
-        return _mounts.TryGetValue(cls.ToLowerInvariant(), out var m) ? m : null;
+        return mounts.TryGetValue(cls.ToLowerInvariant(), out var m) ? m : null;
     }
     /// <summary>exact class name of the rules for a class written in any case</summary>
     public string? RuleClass(string? cls)
@@ -317,6 +338,29 @@ public sealed partial class Campaign : ICampaignStep
                 }
         return res;
     }
+    static readonly Regex LuaString = new(@"[""']([A-Za-z][A-Za-z0-9_]{2,63})[""']", RegexOptions.CultureInvariant);
+    /// <summary>
+    /// the classes a Lua mission's own code names (custom.lua's string literals that are rule classes): what it will
+    /// spawn (api.units.spawn) - their models are loaded with the mission, not when the first one is made. Kacper
+    /// 2026-11-20 (Outbreak): the guards a village sends when attacked, the kennel's sabre-tooths and the night's dead
+    /// were loaded the moment the first of a kind appeared - a 100 - 400 ms frame each (the container: the eusmilus
+    /// 195 - 373 ms), when a village was attacked or its kennel bred
+    /// </summary>
+    public List<string> LuaClasses()
+    {
+        var res = new List<string>();
+        if (string.IsNullOrEmpty(Data.Folder)) return res;
+        var f = System.IO.Path.Combine(Data.Folder, "custom.lua");
+        if (!System.IO.File.Exists(f)) return res;
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (Match m in LuaString.Matches(System.IO.File.ReadAllText(f)))
+        {
+            var w = m.Groups[1].Value;
+            if (seen.Add(w) && RuleClass(w) != null) res.Add(w);
+        }
+        return res;
+    }
+
     /// <summary>the classes of the objects an OCPY action gives the player by name (mission 12's telescope tower ruin): the
     /// player is given that very object, whatever tribe it was chosen to play</summary>
     public HashSet<string> GivenClasses()
@@ -382,6 +426,7 @@ public sealed partial class Campaign : ICampaignStep
         var (preTribes, preClasses) = Prescan(Config.AiData);
         foreach (var t in preTribes) if (!FullTribes.Contains(t)) FullTribes.Add(t);
         foreach (var c in preClasses) NeedClass(c);
+        foreach (var c in LuaClasses()) NeedClass(c);
         var refs = Data.Refs;
         var refNames = new HashSet<string>(StringComparer.Ordinal);
         foreach (var (_, r) in refs) if (r is JsonArray ra && ra.Count > 1 && ra[1].Str().Length > 0) refNames.Add(ra[1].Str());
@@ -428,7 +473,8 @@ public sealed partial class Campaign : ICampaignStep
                 continue;
             }
             // (and the gates of nobody - mission 16's seas_hq_gate: a CGate opens and closes whoever owns it)
-            if (ix != null && ix.Type == "BLDG" && type == "BLDG" && ((owner != null && owner >= 0 && owner < 8 && Data.Players[owner.Value]?["present"].Bool() == true) || (owner == null && D.IsA(rule!, "CGate"))))
+            // (and the remake's indestructible buildings of nobody - attribute indestructible: Outbreak's old walls)
+            if (ix != null && ix.Type == "BLDG" && type == "BLDG" && ((owner != null && owner >= 0 && owner < 8 && Data.Players[owner.Value]?["present"].Bool() == true) || (owner == null && (D.IsA(rule!, "CGate") || IsIndestructible(o)))))
             {
                 pl.Kind = "building"; pl.Cls = rule; Skip.Add(name);
                 ClassModels(rule!);
@@ -563,6 +609,14 @@ public sealed partial class Campaign : ICampaignStep
             list.Add(p);
         }
         Human = PlayerAt(HumanSlot);
+        // the colour the human chose (the campaign menu's "Your colour"): not one another player of the mission has (a
+        // co-op partner on an ally included) - else the mission's own (docs/CAMPAIGN.md "Your colour")
+        if (Human != null && Config.Color != null)
+        {
+            var used = MissionColors.Used(list, new[] { Human });
+            if (MissionColors.Resolve(Config.Color, used) is { } col) MissionColors.Apply(Human, col);
+            else Warn($"the colour {Config.Color} is taken (by {MissionColors.Blocker(Config.Color, used)?.Name ?? "nobody"}) or no colour: the mission's own");
+        }
         Coop?.AddPlayers(this, list);           // (co-op seats: new players, allies taken over - before the filters)
         W.Players = list;
         // debug option "no mission bans" (game/cheats.js): the level's AntiActions do not reach the human (SetFilter)
@@ -812,6 +866,9 @@ public sealed partial class Campaign : ICampaignStep
         // triggers switch the allies' invulnerability on and off where they are meant to fight (the dilo area, Stina's
         // fight). It ends when such an object comes to the human (Occupy) or a trigger sets it (MissionHost.SetInvulnerable).
         // Allied at the start: mission 1's Norsemen, one character and animal of mission 10, the B42 SEAS missions' allies.
+        // the remake's map attribute `indestructible` (Indestructible.cs, docs/MAP_FORMAT.md): nothing damages, targets, sells
+        // or blows it up
+        if (IsIndestructible(o)) World.SetIndestructible(e, true);
         if (o["invulnerable"] is JsonValue iv && iv.TryGetValue(out bool inv) && inv && e.Owner != null && Human != null
             && e.Owner != Human && Human.IsFriend(e.Owner))
         {
@@ -864,6 +921,8 @@ public sealed partial class Campaign : ICampaignStep
         Counts.Buildings++;
         ApplyState(pl, b);
     }
+    /// <summary>the remake's map attribute indestructible = "1" (Indestructible.cs)</summary>
+    static bool IsIndestructible(JsonNode o) => o["attr"]?["indestructible"] is JsonValue v && v.Str() is "1" or "true";
     bool OnWallGrid(string cls, Player? owner) => D.Def(cls, owner)?.WallKind != null;
     /// <summary>a building of another tribe's class (tribes.js) can be bigger than the one the map was made for, and
     /// harbours snap to the coast: the nearest place where it fits (else where it was)</summary>

@@ -63,6 +63,22 @@ public sealed class NetClient : IDisposable
     public event Action<string>? Disconnected;
     public event Action<string>? DesyncDetected;
     public event Action<string, int>? SceneEnded;
+    /// <summary>the lobby's map arrived from the host and is stored (hash, path: My maps/downloaded/&lt;hash&gt;.pwmap)</summary>
+    public event Action<string, string>? MapReceived;
+    /// <summary>the lobby's map could not be received (why)</summary>
+    public event Action<string>? MapFailed;
+
+    // ---- the lobby's map from the host (MapTransfer)
+    /// <summary>where received maps go (null: the user's maps' downloaded/ - MapFiles.DownloadedDir)</summary>
+    public string? MapDir;
+    /// <summary>the hash of the map being received (null: none)</summary>
+    public string? MapReceiving { get; private set; }
+    /// <summary>the share of it received (0 .. 1)</summary>
+    public double MapProgress { get; private set; }
+    /// <summary>why the last transfer failed (null: it did not)</summary>
+    public string? MapError { get; private set; }
+    System.IO.MemoryStream? _mapBuf;
+    long _mapTotal;
 
     public NetClient(string name) { Name = string.IsNullOrWhiteSpace(name) ? "Player" : name.Trim(); }
 
@@ -154,6 +170,10 @@ public sealed class NetClient : IDisposable
                 Chat.Add(line); ChatReceived?.Invoke(line);
                 break;
             }
+            case "map-data": OnMapData(m); break;
+            case "map-fail":
+                if (m["hash"]?.GetValue<string>() == MapReceiving) MapFail(m["reason"]?.GetValue<string>() ?? "the host cannot send it");
+                break;
             case "end":
                 Ended = true; EndReason = m["why"]?.GetValue<string>();
                 Disconnected?.Invoke(EndReason ?? "the game is over");
@@ -180,6 +200,53 @@ public sealed class NetClient : IDisposable
     // ======================================================================================== the lobby
     public LobbyPeer? MyPeer => Lobby?.Peer(Me);
     public void SetReady(bool on) => Send(Msg("ready", ("on", on)));
+    /// <summary>this machine's copy of the lobby's map (LobbyMap.Problem; null: the same as the host's) for the hash it
+    /// was compared with</summary>
+    public void SendMapCheck(string hash, string? problem) => Send(Msg("map-check", ("hash", hash), ("problem", problem)));
+    /// <summary>asks the host for the lobby's map of that content hash (this machine lacks it or has another version): it
+    /// arrives in "map-data" chunks, is checked and stored (MapReceived / MapFailed)</summary>
+    public void RequestMap(string hash)
+    {
+        MapReceiving = hash; MapProgress = 0; MapError = null; _mapBuf = new System.IO.MemoryStream(); _mapTotal = -1;
+        L.Info($"asking the host for the lobby's map {hash}");
+        Send(Msg("map-request", ("hash", hash)));
+    }
+
+    void OnMapData(JsonObject m)
+    {
+        var hash = m["hash"]?.GetValue<string>();
+        if (hash == null || hash != MapReceiving || _mapBuf == null) return;
+        long at = m["at"]?.GetValue<long>() ?? -1, total = m["total"]?.GetValue<long>() ?? -1;
+        byte[] data;
+        try { data = Convert.FromBase64String(m["data"]?.GetValue<string>() ?? ""); }
+        catch (FormatException) { MapFail("a damaged chunk"); return; }
+        if (total <= 0 || total > MapTransfer.MaxBytes) { MapFail($"the map is too big ({total} bytes, at most {MapTransfer.MaxBytes >> 20} MB)"); return; }
+        if (_mapTotal < 0) _mapTotal = total;
+        if (total != _mapTotal || at != _mapBuf.Length || _mapBuf.Length + data.Length > total) { MapFail("the chunks do not fit together"); return; }
+        _mapBuf.Write(data, 0, data.Length);
+        MapProgress = (double)_mapBuf.Length / total;
+        Send(Msg("map-ack", ("hash", hash), ("got", _mapBuf.Length)));
+        if (_mapBuf.Length < total) return;
+        var bytes = _mapBuf.ToArray();
+        _mapBuf = null;
+        try
+        {
+            var dir = MapDir ?? Sim.Maps.MapFiles.DownloadedDir() ?? throw new System.IO.InvalidDataException("this machine has no maps folder");
+            var path = MapTransfer.Store(bytes, hash, dir);
+            L.Info($"the lobby's map {hash} received ({bytes.Length} bytes): {path}");
+            MapReceiving = null;
+            MapReceived?.Invoke(hash, path);
+        }
+        catch (Exception e) { MapFail(e.Message); }
+    }
+
+    void MapFail(string why)
+    {
+        L.Warn("the lobby's map could not be received: " + why);
+        MapError = why; MapReceiving = null; _mapBuf = null;
+        MapFailed?.Invoke(why);
+    }
+
     public void SendChat(string text, string to = "all") => Send(Msg("chat", ("text", text), ("to", to)));
     /// <summary>this player's slot (skirmish): tribe, team, color, hq, preset, army / armyTribe / armyPoints</summary>
     public void SetSlot(JsonObject fields) { var m = Msg("slot-set"); foreach (var (k, v) in fields) m[k] = v?.DeepClone(); Send(m); }
@@ -188,6 +255,14 @@ public sealed class NetClient : IDisposable
     public void SetCoopSeat(int seat) => Send(Msg("coop-seat", ("seat", seat)));
     /// <summary>co-op campaign mode: the faction of this player's seat</summary>
     public void SetCoopTribe(string tribe) => Send(Msg("coop-tribe", ("tribe", tribe)));
+    /// <summary>the colour of this player's own seat (co-op campaign mode; "" the game's) - the host refuses one another
+    /// player has</summary>
+    public void SetCoopColor(string color) => Send(Msg("coop-color", ("color", color)));
+    /// <summary>co-op campaign mode, a mission with an army budget: the army bought for this player's seat (null: the
+    /// level's army) - docs/COOP.md "Armies"</summary>
+    public void SetCoopArmy(Army? army) => Send(Msg("coop-army", ("army", army == null ? null : NetProtocol.ToNode(army))));
+    /// <summary>the host: back to the lobby while the armies are being chosen</summary>
+    public void HostCancelArmies() => Send(Msg("army-cancel"));
     /// <summary>the host: the whole lobby (mode, setup, mission, options)</summary>
     public void HostSetLobby(LobbyState s) => Send(Msg("lobby-set", ("lobby", NetProtocol.ToNode(s))));
     public void HostStart(IReadOnlyDictionary<string, string>? profile)

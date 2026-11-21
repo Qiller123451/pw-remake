@@ -9,6 +9,7 @@
 //     "playableTribes": ["Hu", "Aje", "Ninigi", "SEAS"],
 //     "data": "E:/Paraworld/export/remake/375f3d3a@MIRAGE",  // rules + converted assets (built by the toolkit today)
 //     "install": "E:/Paraworld",                             // the original game (sounds, music, maps)
+//     (data and install may be relative to the configuration's folder)
 //     "language": "uk"
 //   }
 // and missions/ (the campaign as Lua mission folders, docs/LUA_MAPS.md), plus optional overrides/ (files that replace
@@ -45,6 +46,8 @@ public sealed class GameConfiguration
     /// <summary>The folder of this configuration (set when loaded).</summary>
     [JsonIgnore] public string Dir { get; private set; } = "";
     [JsonIgnore] public string MissionsDir => Path.Combine(Dir, "missions");
+    /// <summary>the configuration's maps, converted by Prepare (docs/MAP_FORMAT.md "Where maps are")</summary>
+    [JsonIgnore] public string MapsDir => Path.Combine(Dir, "maps");
     [JsonIgnore] public string OverridesDir => Path.Combine(Dir, "overrides");
     [JsonIgnore] public bool IsMod => !string.IsNullOrEmpty(Mod);
 
@@ -54,10 +57,17 @@ public sealed class GameConfiguration
         var c = Json.Load<GameConfiguration>(path);
         if (c == null) return null;
         c.Dir = dir;
+        // "data" and "install" may be relative to the configuration's folder: a package made by tools/package keeps the
+        // converted data beside the game ("../../../data/<id>")
+        c.Data = Resolve(dir, c.Data);
+        c.Install = Resolve(dir, c.Install);
         if (string.IsNullOrEmpty(c.Id)) c.Id = Path.GetFileName(dir);
         if (string.IsNullOrEmpty(c.Title)) c.Title = c.IsMod ? c.Mod : "ParaWorld";
         return c;
     }
+
+    static string Resolve(string dir, string p) =>
+        string.IsNullOrWhiteSpace(p) || Path.IsPathRooted(p) ? p : Path.GetFullPath(Path.Combine(dir, p));
 
     /// <summary>What is wrong with the configuration (empty = ready to play).</summary>
     public List<string> Problems()
@@ -69,8 +79,13 @@ public sealed class GameConfiguration
             foreach (var f in new[] { "gamedata.json", "techtree.json", "assets/manifest.json" })
                 if (!File.Exists(Path.Combine(Data, f))) p.Add($"missing {f} in {Data}");
         }
-        if (!Directory.Exists(Path.Combine(Install, "Data"))) p.Add($"ParaWorld installation not found: {Install}");
+        if (string.IsNullOrWhiteSpace(Install)) p.Add("the ParaWorld folder is not set (a package: run \"Set ParaWorld folder.bat\")");
+        else if (!Directory.Exists(Path.Combine(Install, "Data"))) p.Add($"ParaWorld installation not found: {Install}");
         if (!Directory.Exists(MissionsDir)) p.Add($"no missions folder: {MissionsDir} (run the prepare tool)");
+        // the map format (docs/MAP_FORMAT.md): content prepared before it has missions of the old layout and no maps
+        else if (Directory.EnumerateDirectories(MissionsDir).Any(d => File.Exists(Path.Combine(d, "mission.json")) && !File.Exists(Path.Combine(d, "map.lua"))))
+            p.Add("the missions are in the old layout: run the prepare tool again (it converts the maps to the remake's map format)");
+        if (!Directory.Exists(MapsDir)) p.Add($"no maps folder: {MapsDir} (run the prepare tool again: it converts the installation's maps)");
         return p;
     }
 

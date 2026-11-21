@@ -1,11 +1,12 @@
-// A mission folder as the game loads it (docs/LUA_MAPS.md, docs/ARCHITECTURE.md "Maps are Lua"):
+// A mission folder as the game loads it (docs/LUA_MAPS.md, docs/MAP_FORMAT.md; the folder is a map of the remake's
+// format - its terrain is read by the map source, Maps/MapFiles):
 //
-//   mission.json      what the menu shows and the setup needs (read by the campaign port; kept here as JSON)
-//   world.json        objects, regions, groups, quests, question marks, variables, dialogues, sequences, and the
-//                     parameter defaults of the trigger node types ("trigger_defaults")
+//   map.lua           `mission = { ... }`: what the menu shows and the setup needs (the campaign reads it as JSON nodes)
+//   world.lua         objects, regions, groups, quests, question marks, variables, dialogues, sequences, and the
+//                     parameter defaults of the trigger node types ("trigger_defaults") - Lua data (Maps/LuaData)
 //   triggers.lua      the triggers (declarative: `trigger "name" { ... }`)
 //   custom.lua        optional: own code
-//   texts/<lang>.json the texts
+//   texts/<lang>.lua  the texts
 //
 // Load() runs the Lua files in the sandbox (LuaHost) and turns every `trigger` into a TriggerDef; the C# engine
 // (TriggerEngine) is built from them. Bind() then gives the Lua code the Game API (GameApi.cs).
@@ -51,18 +52,15 @@ public sealed class LuaMission
     /// triggers.lua and custom.lua.</summary>
     public static LuaMission Load(string folder, string? stdDir = null, string lang = "uk")
     {
+        if (Maps.PwMapReader.IsOldMissionFolder(folder))
+            throw new InvalidOperationException($"{folder}: a mission folder of the old layout (mission.json, world.json) - run Prepare again to convert it to the map format (docs/MAP_FORMAT.md)");
         var lua = new LuaHost(stdDir ?? DefaultStdDir(), folder);
         var m = new LuaMission(folder, lua);
-        m.Mission = Json.TryParseFile(Path.Combine(folder, "mission.json"));
-        m.World = Json.TryParseFile(Path.Combine(folder, "world.json"));
+        m.Mission = Maps.PwMapReader.MissionOf(folder);
+        m.World = Maps.PwMapReader.WorldOf(folder);
         if (m.World != null) MissionScript.ReadCommon(m.Script, m.World, m.World["trigger_defaults"]);
         m.Script.Name = m.Mission?["key"].Str() ?? Path.GetFileName(folder.TrimEnd('/', '\\'));
-        var td = Path.Combine(folder, "texts");
-        if (Directory.Exists(td))
-        {
-            var f = new[] { lang, "uk" }.Select(l => Path.Combine(td, l + ".json")).FirstOrDefault(File.Exists) ?? Directory.GetFiles(td, "*.json").OrderBy(x => x, StringComparer.Ordinal).FirstOrDefault();
-            if (f != null && Json.TryParseFile(f) is JsonObject tx) foreach (var (k, v) in tx) m.Script.Texts[k] = v.Str();
-        }
+        foreach (var (k, v) in Maps.PwMapReader.TextsOf(folder, lang)) m.Script.Texts[k] = v;
         m.Install();
         if (lua.RunString("require 'triggers'", "std") == null) m.Ok = false;
         foreach (var file in new[] { "triggers.lua", "custom.lua" })

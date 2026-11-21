@@ -65,9 +65,11 @@ public partial class World
         if (!A.Has(name)) { u.IdleCur = null; A.Play(u.IdleAnim); return; }
         u.IdleCur = name;
         if (idx == 0) { u.IdleLeft = A.PlayLoops(name, 1, true, true, 1, null, 0.25); return; }      // SetAnim(stand, 1, 0): once
-        // GetRandomLoop: Random % (max + 1 - min) + min
+        // GetRandomLoop: Random % (max + 1 - min) + min - of the loop part: a clip without loop marks (an animal's
+        // "menace" roar, "feeding") is played once (StartAnim: SetSLEAnim gives no length -> SetAnim(anim, 1, 0))
         int span = Math.Max(1, pick.MaxLoops + 1 - pick.MinLoops);
         int loops = (int)Math.Floor(IdleRoll(u, 1) * span) + pick.MinLoops;
+        if (!A.Has(name + "#l")) loops = 1;
         u.IdleLeft = A.PlayLoops(name, loops, true, true, 1, null, 0.25);
     }
 

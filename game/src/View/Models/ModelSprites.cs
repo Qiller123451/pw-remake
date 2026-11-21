@@ -40,7 +40,8 @@ public static class ModelSprites
     static float[] Uv(JsonObject f) => f["uv"] is JsonArray a && a.Count >= 4 ? new[] { (float)a[0].Num(), (float)a[1].Num(), (float)a[2].Num(), (float)a[3].Num() } : new[] { 0f, 0f, 1f, 1f };
 
     /// <summary>A building's billboard node as a sprite set. f: a root extras.foliage entry; map: the texture of the
-    /// billboard's material; glow: the material adds its picture (GSF material flag 0x4 - the halos of lamps at night).</summary>
+    /// billboard's material; glow: the material adds its picture (GSF material flag 0x4 - the halos of lamps at night;
+    /// its uniform "green" draws it green: an infected model, ModelInstance.SetInfected).</summary>
     public static MultiMeshInstance3D Create(JsonObject f, Texture2D map, bool glow)
     {
         s_quad ??= new QuadMesh { Size = new Vector2(1, 1) };
@@ -139,7 +140,7 @@ uniform sampler2D map : " + (glow ? "" : "source_color, ") + @"filter_linear_mip
 uniform vec4 uv_rect;
 uniform vec2 size;
 uniform vec3 light = vec3(1.0);
-varying float v_tint;
+" + (glow ? "uniform bool green = false; // an infected model's halo (ModelInstance.SetInfected: InfectedLook.GreenGlsl)\n" : "") + @"varying float v_tint;
 void vertex() {
     // the instance's centre in view space, the quad spread in the screen plane (scaled with the model)
     vec4 mv = MODELVIEW_MATRIX * vec4(0.0, 0.0, 0.0, 1.0);
@@ -153,12 +154,12 @@ void vertex() {
     UV = mix(uv_rect.xy, uv_rect.zw, vec2(VERTEX.x + 0.5, 0.5 - VERTEX.y));
     POSITION = PROJECTION_MATRIX * mv;
 }
-" + (glow ? PwRemake.View.Fx.GammaBlend.Glsl : "") + @"
+" + (glow ? PwRemake.View.Fx.GammaBlend.Glsl + PwRemake.View.Materials.InfectedLook.GreenGlsl : "") + @"
 void fragment() {
     vec4 t = texture(map, UV);
 " + (glow
         // (a glow sprite - a lantern's halo - is added as the original adds: to the screen's sRGB value, its texture
         // sampled as sRGB values; Fx/GammaBlend)
-        ? "    ALBEDO = pw_gamma_add(t.rgb);\n" : "    if (t.a < 0.5) discard;\n    ALBEDO = t.rgb * light" + (tree ? " * (0.55 + 0.55 * v_tint)" : "") + ";\n") + @"}
+        ? "    ALBEDO = pw_gamma_add(green ? pw_green(t.rgb) : t.rgb);\n" : "    if (t.a < 0.5) discard;\n    ALBEDO = t.rgb * light" + (tree ? " * (0.55 + 0.55 * v_tint)" : "") + ";\n") + @"}
 ";
 }

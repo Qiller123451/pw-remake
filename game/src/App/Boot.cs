@@ -3,7 +3,8 @@
 // campaign menu -> game -> back. A screen is a Control (menus) or a Node3D scene (the game) added under Screen.
 //
 // Command line (after --): --config <id> picks the configuration, --mission <n> [--tribe T] [--difficulty d]
-// [--debug] starts a mission at once (tests, quick starts), --skirmish [map] [--players ...] a skirmish (SkirmishMenu), --quit-after <seconds> ends the run (tests),
+// [--debug] starts a mission at once (tests, quick starts), --skirmish [map] [--players ...] a skirmish (SkirmishMenu),
+// --editor [--map <name>] the map editor (docs/MAP_EDITOR.md), --quit-after <seconds> ends the run (tests),
 // --screenshot <file> saves a picture before quitting; --no-intro skips the start films (--intro plays them in a test run).
 using System;
 using System.Linq;
@@ -36,6 +37,7 @@ public partial class Boot : Node
     public override void _Ready()
     {
         GetWindow().Title = "ParaWorld Remake";
+        GetTree().AutoAcceptQuit = false;                // (closing the window asks first when the map editor has unsaved changes: RequestQuit)
         _screenRoot = new Node { Name = "Screen" };
         AddChild(_screenRoot);
         _overlay = new CanvasLayer { Name = "Overlay", Layer = 100 };
@@ -68,7 +70,7 @@ public partial class Boot : Node
         }
         // the start films (IntroScreen: the original's logos and intro) before the title screen - not when the command
         // line starts something else, not in test runs (--quit-after, --screenshot) unless --intro asks for them
-        string[] starts = { "screen", "mission", "skirmish", "sequel", "scenario", "army-mission", "load", "continue", "host", "join" };
+        string[] starts = { "screen", "editor", "custom-map", "mission", "skirmish", "sequel", "scenario", "army-mission", "load", "continue", "host", "join" };
         bool test = args.ContainsKey("quit-after") || args.ContainsKey("screenshot") || args.ContainsKey("shots");
         var intro = GameApp.Configurations.Count > 0 && !args.ContainsKey("no-intro") && GameApp.Settings.IntroFilms
                     && !starts.Any(args.ContainsKey) && (!test || args.ContainsKey("intro"))
@@ -79,8 +81,14 @@ public partial class Boot : Node
 
         if (args.TryGetValue("screen", out var scr))          // tests and screenshots of single menus
             Show(scr switch { "campaign" => new CampaignMenu(), "sequel" => new PwRemake.UI.Sequel.SequelMenu(), "scenarios" => new PwRemake.UI.Sequel.ScenarioMenu(), "skirmish" => new SkirmishMenu(), "army" => SkirmishMenu.ArmyOf(0), "debug" => new DebugOptionsWindow(() => new TitleScreen()), "setup" => new SetupScreen(), "load" => new LoadGameScreen(),
-                "options" => new OptionsScreen(tab: args.TryGetValue("options-tab", out var ot) && int.TryParse(ot, out var oti) ? oti : 0), "controls" => new ControlsScreen(), "multiplayer" => new MultiplayerMenu(), _ => new TitleScreen() });
-        if (args.ContainsKey("mission")) CampaignMenu.QuickStart(args);
+                "options" => new OptionsScreen(tab: args.TryGetValue("options-tab", out var ot) && int.TryParse(ot, out var oti) ? oti : 0), "controls" => new ControlsScreen(), "multiplayer" => new MultiplayerMenu(), "custom" => new CampaignMenu(1), _ => new TitleScreen() });
+        if (args.ContainsKey("editor") && GameApp.Config != null) Show(new PwRemake.Editor.MapEditor());       // the map editor (docs/MAP_EDITOR.md)
+        else if (args.TryGetValue("custom-map", out var cm) && GameApp.Config != null)                  // a user's map with triggers as a mission
+        {
+            var path = System.IO.Path.IsPathRooted(cm) ? cm : PwRemake.Sim.Maps.MapFiles.Find(GameApp.Config, cm.Contains('/') ? cm : "User/" + cm);
+            if (path != null) CustomPlay.Play(path); else L.Error($"--custom-map {cm}: no such map in My maps");
+        }
+        else if (args.ContainsKey("mission")) CampaignMenu.QuickStart(args);
         else if (args.ContainsKey("skirmish")) SkirmishMenu.QuickStart(args);
         else if (args.ContainsKey("sequel") || args.ContainsKey("scenario")) PwRemake.UI.Sequel.SequelMenu.QuickStart(args);   // (the remake's own campaigns: docs/SEQUEL.md)
         else if (args.TryGetValue("army-mission", out var am)) CampaignMenu.ArmyFor(am);
@@ -204,6 +212,21 @@ public partial class Boot : Node
         }
     }
 
+    /// <summary>the player wants to quit (the title screen's Quit, the game's Exit, closing the window): when the map
+    /// editor's map has unsaved changes the editor's question first (Save - where the map has a place of its own in My
+    /// maps -, back to the editor, quit anyway, cancel); else Quit</summary>
+    public void RequestQuit()
+    {
+        if (!PwRemake.Editor.EditorSession.Unsaved || _quitAsked) { Quit(); return; }
+        _quitAsked = true;
+        var layer = new CanvasLayer { Name = "QuitQuestion", Layer = 120 };
+        AddChild(layer);
+        void Close() { _quitAsked = false; layer.QueueFree(); }
+        var d = PwRemake.Editor.EditorQuit.Dialog(() => { Close(); Quit(); }, () => { Close(); Show(new PwRemake.Editor.MapEditor()); }, Close);
+        layer.AddChild(d);
+    }
+    bool _quitAsked;
+
     public void Quit()
     {
         if (_windowApplied == "windowed" && DisplayServer.WindowGetMode() == DisplayServer.WindowMode.Windowed)
@@ -216,7 +239,7 @@ public partial class Boot : Node
 
     public override void _Notification(int what)
     {
-        if (what == NotificationWMCloseRequest) { GameApp.Settings.Save(); Log.Flush(); }
+        if (what == NotificationWMCloseRequest) { GameApp.Settings.Save(); Log.Flush(); RequestQuit(); }
         if (what == NotificationCrash) { Log.Write("Crash", LogLevel.Fatal, "the engine crashed", null); Log.Flush(); }
     }
 }

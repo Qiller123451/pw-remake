@@ -4,7 +4,9 @@
 //   [ / ]      the brush's biome: the previous / next of game/maps/biomes.json
 //   - / =      the brush's radius (20 .. 400 m)
 //   left mouse paint where the cursor points (Alt + left drag still turns the camera)
-//   Ctrl+S     save: --biomes-out, else the map's own (a remake map's biomes file, else <map>.biomes.json next to the .ula)
+//   Ctrl+S     save: --biomes-out (a biome layer file, docs/BIOMES.md), else into the map itself (its map.lua and
+//              terrain/biomes/*.png - docs/MAP_FORMAT.md; a .pwmap zip is written again; a .ula opened directly: its
+//              <map>.biomes.json beside it, which Prepare takes into the converted map)
 // A biome the map's layer does not have yet is added to it, and the map is drawn again with its ground textures (a
 // second or two); painting then repaints only the ground and the grass under the brush. A map without a layer gets one
 // on the first stroke (its setting's biome everywhere).
@@ -132,10 +134,21 @@ public partial class MapViewer
         var l = _view.Source.BiomeLayer;
         if (l == null) { L.Warn("no biome layer to save"); return; }
         string path = _args.TryGetValue("biomes-out", out var o) ? o
-            : MapFiles.IsRemake(_mapPath) && MapFiles.ReadRemake(_mapPath).Biomes is System.Text.Json.Nodes.JsonValue v && v.TryGetValue<string>(out var f)
-                ? Path.Combine(Path.GetDirectoryName(_mapPath) ?? "", f)
-                : BiomeLayer.SidecarOf(_mapPath);
-        try { l.Write(path); _dirty = false; L.Info($"biome layer saved: {path}"); }
+            : PwMapReader.IsMap(_mapPath) ? _mapPath
+            : BiomeLayer.SidecarOf(_mapPath);
+        try
+        {
+            if (PwMapReader.IsMap(path))
+            {
+                // the map document with the new layer, written again (the writer is deterministic: only the biome
+                // pictures and map.lua change)
+                var doc = PwMapReader.Read(path);
+                doc.Biomes = l;
+                if (Directory.Exists(path)) PwMapWriter.WriteFolder(doc, path); else PwMapWriter.WriteZip(doc, path);
+            }
+            else l.Write(path);
+            _dirty = false; L.Info($"biome layer saved: {path}");
+        }
         catch (Exception e) { L.Warn($"biome layer not saved ({path}): {e.Message} - give --biomes-out=<file>"); }
     }
 }

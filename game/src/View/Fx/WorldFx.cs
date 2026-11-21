@@ -39,7 +39,8 @@ public partial class WorldFx : Node3D
     readonly Func<Entity, ModelInstance?> _model;
     readonly Func<Entity, Vector3> _pos;
     /// <summary>is a place visible to the player now / explored (fog of war); null: everything</summary>
-    public Func<double, double, bool>? Visible, Explored;
+    public new Func<double, double, bool>? Visible;
+    public Func<double, double, bool>? Explored;
     /// <summary>the effects a mission's triggers play (EFCT: MissionHost.Effects)</summary>
     public List<MissionEffect>? MissionEffects;
     /// <summary>the question marks to show: (key, model, x, z in game coordinates)</summary>
@@ -323,7 +324,9 @@ public partial class WorldFx : Node3D
     {
         foreach (var b in W.Buildings)
         {
-            bool want = b.Alive && b.ReadyFx != null;
+            // (an infected temple - stage 2 and 3, docs/INFECTED_LOOK.md - shows no healing area: the tall rays of light,
+            // fx_heal_area, stood over the Outbreak's plague villages in daylight; its healing itself is the simulation's)
+            bool want = b.Alive && b.ReadyFx != null && !(b.Infection >= 2 && b.ReadyFx == "fx_heal_area");
             _ready.TryGetValue(b, out var r);
             var host = want ? _model(b) : null;
             if (r.Fx != null && (!want || host != r.Host || !GodotObject.IsInstanceValid(r.Host)))

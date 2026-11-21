@@ -20,9 +20,9 @@ namespace PwRemake.UI;
 
 public partial class IntroScreen : Control
 {
-    static readonly Logger L = Log.For("UI.Intro");
+	static readonly Logger L = Log.For("UI.Intro");
 
-    /// <summary>the client's start films in the order it plays them (PWClient.exe 0x456abf, 0x456ad5, 0x456aeb, 0x456b09)</summary>
+	/// <summary>the client's start films in the order it plays them (PWClient.exe 0x456abf, 0x456ad5, 0x456aeb, 0x456b09)</summary>
     public static readonly string[] StartFilms = { "sf_logo", "sek_logo", "partner", "intro" };
 
     /// <summary>the converted start films of a configuration, in order (assets/video/&lt;name&gt;.ogv)</summary>
@@ -86,24 +86,24 @@ public partial class IntroScreen : Control
     {
         if (_over) return;
         _t += delta;
-        // the film's picture as large as the window allows, its shape kept; the bars painted into the films go off the
-        // screen (FilmFit)
-        _fit.Apply(_video, Vector2.Zero, GetViewportRect().Size, delta);
-        // (a stream that stopped without its Finished signal - a broken file - must not hold the start)
-        if (_t > 1 && !_video.IsPlaying()) Next();
-    }
+		// the film's picture as large as the window allows, its shape kept; the bars painted into the films go off the
+		// screen (FilmFit)
+		_fit.Apply(_video, Vector2.Zero, GetViewportRect().Size, delta);
+		// (a stream that stopped without its Finished signal - a broken file - must not hold the start)
+		if (_t > 1 && !_video.IsPlaying()) Next();
+	}
 
-    public override void _Input(InputEvent e)
-    {
-        if (_over) return;
-        // the event is marked handled first: Finish (Esc, or Next after the last film) hands over to the title screen,
-        // which takes this screen out of the tree - GetViewport() is null after it
-        if (e is InputEventKey { Pressed: true, Echo: false } k)
-        {
-            if (k.Keycode == Key.Escape) { GetViewport()?.SetInputAsHandled(); L.Info("start films skipped"); Finish(); }
-            else if (k.Keycode is Key.Space or Key.Enter) { GetViewport()?.SetInputAsHandled(); Next(); }
-        }
-        else if (e is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left or MouseButton.Right })
-        { GetViewport()?.SetInputAsHandled(); Next(); }
-    }
+	public override void _Input(InputEvent e)
+	{
+		if (_over) return;
+		// the event is marked handled first: Finish (Esc, or Next after the last film) hands over to the title screen,
+		// which takes this screen out of the tree - GetViewport() is null after it
+		if (e is InputEventKey { Pressed: true, Echo: false } k)
+		{
+			if (k.Keycode == Key.Escape) { GetViewport()?.SetInputAsHandled(); L.Info("start films skipped"); Finish(); }
+			else if (k.Keycode is Key.Space or Key.Enter) { GetViewport()?.SetInputAsHandled(); Next(); }
+		}
+		else if (e is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left or MouseButton.Right })
+		{ GetViewport()?.SetInputAsHandled(); Next(); }
+	}
 }

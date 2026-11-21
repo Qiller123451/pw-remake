@@ -197,7 +197,7 @@ public static class Moves
             {
                 double a = W.Rng.Next() * 3.13;
                 var c = W.SpawnUnit(u.Name, u.Owner, u.Pos.X + SMath.Cos(a) * 4, u.Pos.Z + SMath.Sin(a) * 4, u.Level, u.Heading, new UnitOpts { Illusion = true });
-                if (c != null) W.Later(60, "expire", new Args { ["u"] = c });
+                if (c != null) { W.InheritInfection(u, c); W.Later(60, "expire", new Args { ["u"] = c }); }
             }
             return true;
         } });
@@ -747,7 +747,7 @@ static class MovesDelayed
     }
 
     [Delayed("multishot")]
-    static void Multishot(World W, Args a) { var u = a.U("u")!; var e = a.E("e")!; if (u.Alive && e.Alive) { W.Penetrate(u, e, u.Cs(), 10); W.FireUnit(u, u.Weapons.Long, e); } }
+    static void Multishot(World W, Args a) { var u = a.U("u")!; var e = a.E("e")!; if (u.Alive && e.Alive) { W.Penetrate(u, e, u.Cs()!, 10); W.FireUnit(u, u.Weapons.Long, e); } }
 
     [Delayed("lacerate")]
     static void Lacerate(World W, Args a)

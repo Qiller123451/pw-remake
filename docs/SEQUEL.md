@@ -36,7 +36,9 @@ tools/prepare/sequel_art.py                       the sequel's built art the con
 
 ## Playing
 
-The title screen has **Containment (1964)** and **Scenarios** beside Campaign and Skirmish.
+**Containment (1964)** is in the campaign menu's **Custom campaigns** tab ("The remake's campaigns": Start opens its
+menu, Back returns to the tab; it is no longer a title screen button). **Scenarios** is on the title screen (beside
+Campaign and Skirmish) and in the same tab.
 
 * **Containment** is played with the **MIRAGE** configuration (its SEAS: more units and buildings, the heroes' bonuses
   for the SEAS) - as in the browser remake (rules.js `SEQUEL_MOD`). The menu says so and offers to switch. A mission

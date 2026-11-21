@@ -18,6 +18,8 @@ public static class CampaignStatus
         // BoosterPack 1's missions 4-1 .. 4-3 (ids 41-43, after mission 4 in the menu) and MIRAGE's SEAS missions (20-22:
         // their SEAS versions, 23 "Seeking Ada") were won with every tribe (2026-11-02: PlayB41/B42/B43/Seas02).
         [("*", 0)] = (MissionState.Playable, ""),
+        // the remake's own missions (game/missions): 90 Outbreak (docs/OUTBREAK.md)
+        [("*", 90)] = (MissionState.Playable, ""),
         [("*", 1)] = (MissionState.Playable, ""),
         [("*", 2)] = (MissionState.Playable, ""),
         [("*", 3)] = (MissionState.Playable, ""),

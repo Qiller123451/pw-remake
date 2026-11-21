@@ -1,6 +1,7 @@
 // The info window at the bottom left (hud/infowin_bg_open.tga, 209 x 197; Info.usl CInfo): for one object its
-// portrait card (64 x 61 at 33, 38), name (33, 7) and level / owner line (33, 19), the hit points on the line under all,
-// the values in the frame's six rows (117, 34 + 17 i: attack, range, armour, shield, passengers, gate, skulls, the load
+// portrait card (64 x 61 at 33, 38) with its hit point bar in the card's bottom and "hp/max" under it (33, 101), the class
+// icon (33, 7), the name beside it (51, 7), the owner's name (33, 19), the six values in the frame's rows (117, 34 + 17 i:
+// attack, ranged attack, shield, armour, range, skulls; "-" for none - an object without any: passengers, gate, the load
 // it carries), its buffs in the frame's five circles (31 + 17 i, 121), the item it carries (the slot at 167, 1), a
 // building site's progress, the production queue with its progress (a click cancels an entry); for a group the members'
 // cards with their hit points; for a resource its amount and gatherers; for an item its help text; for a healing well
@@ -58,7 +59,7 @@ public partial class HudInfo : HudPanel
                 Name_(m.Name, 33, 165);
                 // (.carry.big: 18, 44; 14 px, the 20 px icon)
                 HudSprites.Draw(this, m.ResIcon, null, new Rect2(18, 44, 20, 20));
-                HudSprites.Text(this, HudSprites.SerifBold, new Vector2(43, 59), Sim.Rules.TT.JsString(m.Amount), 14, TEXT);
+                HudSprites.Text(this, HudSprites.SerifBold, new Vector2(43, 59), m.Infinite ? "∞" : Sim.Rules.TT.JsString(m.Amount), m.Infinite ? 20 : 14, TEXT);
                 AddHit(new Rect2(18, 44, 80, 20), "amount", () => Tooltips.ButtonTip(D, "_iw_resourceamount"));
                 Wrapped(m.Hint, new Vector2(104, 38), 94, 11, SUB);
                 break;
@@ -81,9 +82,11 @@ public partial class HudInfo : HudPanel
     void Portrait(string? icon, int level, string? obj, Player? owner)
     {
         var r = new Rect2(33, 38, 64, 61);
-        DrawRect(r.Grow(1), DARK);
-        DrawRect(r.Grow(1), FRAME, false, 1);
+        // (the card: its background, the picture, its clear frame - Info.usl "4, layer info_crdbg_std, layer <class>,
+        // layer info_crdframe_clear")
+        if (!HudSprites.Draw(this, "info_crdbg_std", level, r)) DrawRect(r, DARK);
         HudSprites.Draw(this, icon, level, r);
+        HudSprites.Draw(this, "info_crdframe_clear", level, r);
         if (obj != null) AddHit(r, "portrait", () => Tooltips.ObjectTip(Hud.Data, obj, owner));
     }
 
@@ -112,22 +115,46 @@ public partial class HudInfo : HudPanel
         if (tipKey != null) AddHit(r.Grow(2), "bar_" + tipKey, () => Tooltips.ButtonTip(Hud.Data, tipKey));
     }
 
+    static readonly Color VALUE = new(205 / 255f, 205 / 255f, 150 / 255f), NAME_C = new(1f, 1f, 200 / 255f);
+
     void PaintObject(InfoModel m)
     {
         var D = Hud.Data;
+        // Info.usl CInfo: the class icon (16 x 19 at 33, 7), the name beside it (51, 7), the owner's name (33, 19)
+        if (m.TypeIcon != null)
+        {
+            var tr = new Rect2(33, 8, 16, 16);
+            HudSprites.Draw(this, m.TypeIcon, -1, tr);
+            var tk = "_iw_ut_" + m.TypeIcon.Replace("tt_class_", "");
+            AddHit(tr, "type", () => Tooltips.ButtonTip(D, tk));
+        }
+        HudSprites.Text(this, HudSprites.SerifBold, new Vector2(51, 18), HudSprites.Fit(HudSprites.SerifBold, m.Name, 12, m.Item != null ? 114 : 146), 12, NAME_C);
+        if (m.Line.Length > 0) HudSprites.Text(this, HudSprites.Serif, new Vector2(33, 31), HudSprites.Fit(HudSprites.Serif, m.Line, 10, 165), 10, VALUE);
+        // CUnitIcon: the card (64 x 61 at 33, 38) with the hit point bar in its bottom (the card's layers of 64 x 65:
+        // HudHpBar, Info.usl 890-925), "hp/max" under it (33, 101)
         Portrait(m.Portrait, 4, m.ObjName, m.Owner);
-        Name_(m.Name, 33, m.Item != null ? 132 : 165);
-        HudSprites.Text(this, HudSprites.Serif, new Vector2(33, 30), HudSprites.Fit(HudSprites.Serif, m.Line, 10, 165), 10, SUB);
-        Bar(new Rect2(32, 136, 165, 8), m.MaxHp > 0 ? m.Hp / m.MaxHp : 0, $"{Math.Ceiling(m.Hp)} / {Math.Round(m.MaxHp)}", "_iw_hitpoints");
-        // the values: one per row of the frame (117, 34 + 17 i), icon then value
+        if (m.MaxHp > 0) CardHp(new Rect2(33, 38, 64, 65), m);
+        if (m.MaxHp > 0)
+        {
+            var hr = new Rect2(33, 103, 64, 12);
+            HudSprites.Text(this, HudSprites.Serif, new Vector2(33, 113), $"{Math.Ceiling(m.Hp)}/{Math.Round(m.MaxHp)}", 10, VALUE);
+            AddHit(hr, "hp", () => Tooltips.ButtonTip(D, "_iw_hitpoints"));
+        }
+        // CAttribIcon: the values, one per row of the frame (117, 34 + 17 i): the 20 x 20 icon, the value 24 px right of it
         for (int i = 0; i < m.Stats.Count; i++)
         {
             var (icon, value, key) = m.Stats[i];
             var y = 34 + 17 * i;
-            HudSprites.Draw(this, icon, null, new Rect2(119, y, 16, 16));
-            HudSprites.Text(this, HudSprites.Serif, new Vector2(140, y + 12), HudSprites.Fit(HudSprites.Serif, value, 11, 58), 11, TEXT);
+            HudSprites.Draw(this, icon, null, new Rect2(117, y, 20, 20));
+            HudSprites.Text(this, HudSprites.Serif, new Vector2(141, y + 14), HudSprites.Fit(HudSprites.Serif, value, 11, 58), 11, VALUE);
             m.StatLines.TryGetValue(i, out var lines);
-            if (key != null) { var k = key; AddHit(new Rect2(119, y, 79, 17), "st" + i, () => Tooltips.ButtonTip(D, k, lines == null ? null : t => { foreach (var s in lines) t.Lines.Add((s, false)); })); }
+            if (key != null) { var k = key; AddHit(new Rect2(117, y, 82, 17), "st" + i, () => Tooltips.ButtonTip(D, k, lines == null ? null : t => { foreach (var s in lines) t.Lines.Add((s, false)); })); }
+        }
+        // what a fighter carries: under the values (the original shows it on the worker; the remake keeps the number)
+        if (m.Carry is { } cy)
+        {
+            HudSprites.Draw(this, cy.Icon, null, new Rect2(117, 144, 16, 16));
+            HudSprites.Text(this, HudSprites.Serif, new Vector2(137, 157), cy.Amount, 11, VALUE);
         }
         // the item it carries (Info.usl m_pxItemslot)
         if (m.Item != null)
@@ -138,12 +165,13 @@ public partial class HudInfo : HudPanel
             AddHit(r, "item", () => Tooltips.ObjectTip(D, it));
         }
         if (m.Progress != null)
-            Bar(new Rect2(32, 118, 165, 12), m.Progress.Value, $"Under construction {Math.Round(m.Progress.Value * 100)}%", null, true, 9);
-        // the production queue (.queue: 33, 146; 31 x 30 cards, the part still to do darkened; a click cancels the entry)
+            Bar(new Rect2(32, 146, 165, 12), m.Progress.Value, $"Under construction {Math.Round(m.Progress.Value * 100)}%", null, true, 9);
+        // the production queue (CProdQueue at 33, 144: 31 x 30 cards 3 px apart, the part still to do darkened; a click
+        // cancels the entry)
         for (int i = 0; i < m.Queue.Count; i++)
         {
             var (icon, done, idx) = m.Queue[i];
-            var r = new Rect2(34 + i * 35, 147, 31, 30);
+            var r = new Rect2(33 + i * 34, 144, 31, 30);
             if (r.End.X > W - 4) break;
             DrawRect(r.Grow(1), DARK);
             DrawRect(r.Grow(1), FRAME, false, 1);
@@ -155,6 +183,20 @@ public partial class HudInfo : HudPanel
             var h = AddHit(r, "q" + i);
             h.Click = (_, _, _) => Hud.Model.G.CancelQueueAt(e, ii);
         }
+    }
+
+    /// <summary>the card's hit point bar (Info.usl 906-925): with the option AlternativeColoringACHP
+    /// (settings.cardHpHealth, the remake's default) "layer ovl_hpbar_bg, hslicehp ovl_hpbar hp%" - green .. yellow ..
+    /// red by the health left, for every owner; off: "layer ovl_hpbar_bg, hslicebar ovl_hpbar 100 0 0 0 256, hslicebar
+    /// ovl_hpbar hp% dark" - black under the owner's ACColors "dark" (HpBarRule)</summary>
+    void CardHp(Rect2 r, InfoModel m)
+    {
+        int p = HpBarRule.Slice(m.Hp, m.MaxHp);
+        if (PwRemake.App.GameApp.Settings.CardHpHealth) { HudHpBar.Draw(this, r, 4, p, null, null); return; }
+        var e = m.Entity;
+        int rgb = e?.Owner is { } o ? HpBarRule.OwnerRgb(o.ColorSlot, o.Color, false, 0)
+            : HpBarRule.OwnerRgb(null, 0, e is ResNode, e != null && e.Cls == "ANML" ? (int)(e.Def?.Aggressive ?? 0) : 0);
+        HudHpBar.Draw(this, r, 4, p, rgb, 0x000000);
     }
 
     void PaintGroup(InfoModel m)
@@ -173,8 +215,10 @@ public partial class HudInfo : HudPanel
                 var tex = PwRemake.UI.Mission.HudArt.Tex(en.Value.File);
                 if (tex != null) DrawTextureRectRegion(tex, new Rect2(r.Position, new Vector2(27, 26)), new Rect2(en.Value.X, en.Value.Y, 27, 26));
             }
-            var c = hp > 0.6 ? HudSprites.Hex("#77cc33") : hp > 0.3 ? HudSprites.Hex("#ddcc33") : HudSprites.Hex("#dd4422");
-            DrawRect(new Rect2(r.Position.X, r.End.Y - 3, (float)(r.Size.X * Math.Clamp(hp, 0, 1)), 3), c);
+            // (the remake's own view - the original's info window shows one object: its bar in the cards' colour,
+            // hslicehp's green .. yellow .. red, HpBarRule)
+            int pg = e.MaxHp > 0 ? HpBarRule.Slice(e.Hp, e.MaxHp) : 100;
+            DrawRect(new Rect2(r.Position.X, r.End.Y - 3, (float)(r.Size.X * Math.Clamp(hp, 0, 1)), 3), HudSprites.Rgb(HpBarRule.HealthRgb(pg)));
             var ent = e;
             var h = AddHit(r, "gi" + e.Id, () => Tooltips.ObjectTip(Hud.Data, ent.Name, ent.Owner));
             h.Click = (shift, _, _) => { if (shift) Hud.Model.G.Deselect(ent); else Hud.Model.G.Select(new[] { ent }); };

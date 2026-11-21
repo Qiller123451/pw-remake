@@ -132,6 +132,43 @@ public partial class GameInput
         return "";
     }
 
+    /// <summary>the Attack mode's cursor (SecondaryInputController.usl GetCursor): "attack", + "_area_weapon" with an area
+    /// weapon in the selection (+ "_invalid" inside its minimum range), + "_walk" out of reach (Cursors falls back to
+    /// the shorter names the data has)</summary>
+    string AttackModeCursor(Entity? h, Vector3? g)
+    {
+        var I = SelectionInfo();
+        if (I.MaxObj is not { } mo) return "attack";
+        double px, pz, hs = 0;
+        if (h != null && h is not ResNode) { px = h.Pos.X; pz = h.Pos.Z; hs = h.Radius; }
+        else if (g is Vector3 gp) { px = gp.X; pz = gp.Z; }
+        else return "attack";
+        double d = Math.Sqrt((px - mo.Pos.X) * (px - mo.Pos.X) + (pz - mo.Pos.Z) * (pz - mo.Pos.Z));
+        string c = "attack";
+        if (I.Area > 0) { c += "_area_weapon"; if (d < I.MinRange + mo.Radius) c += "_invalid"; }
+        if (d > mo.Radius + hs + I.MaxRange) c += "_walk";
+        return c;
+    }
+
+    /// <summary>the Attack mode with an area weapon in the selection: the circle of its largest splash follows the mouse
+    /// (SecondaryInputController.usl AddRangeMarker(m_fAreaRange)) - grey inside the minimum range</summary>
+    void UpdateAimArea()
+    {
+        var O = G.Overlay;
+        if (O == null) return;
+        O.AimArea = null;
+        if (Mode != "attack" || G.Cinematic || G.Hud?.IsOverHud(_mouse) == true) return;
+        var I = SelectionInfo();
+        if (!(I.Area > 0) || GroundPoint(_mouse) is not Vector3 g) return;
+        bool ok = true;
+        if (I.MaxObj is { } mo)
+        {
+            double d = Math.Sqrt((g.X - mo.Pos.X) * (g.X - mo.Pos.X) + (g.Z - mo.Pos.Z) * (g.Z - mo.Pos.Z));
+            ok = d >= I.MinRange + mo.Radius;
+        }
+        O.AimArea = (g.X, g.Z, I.Area, ok);
+    }
+
     // ======================================================================================== orders
     void Marker(double x, double z, int color) => G.Overlay.Marker(x, z, color);
     /// <summary>the object a rally point is set on (FightingObj.SetRallyPoint): a resource, MIRAGE's portal (its destination,
@@ -200,7 +237,7 @@ public partial class GameInput
         if (t is Well || PwRemake.Sim.World.World.IsSeasWell(t))
         {
             var ok = units.Where(u => W.CanUseWell(u, t)).ToList();
-            if (ok.Count > 0) { Order(ok, "fountain", t); G.PlayOrdered("heal", ok); Marker(t.Pos.X, t.Pos.Z, 0x7dff6a); return; }
+            if (ok.Count > 0) { Order(ok, "fountain", t); G.PlayOrdered("heal", ok); Marker(t!.Pos.X, t.Pos.Z, 0x7dff6a); return; }
         }
         // a MIRAGE portal terminus (GameInputController.usl:1026 "EnterPortal" for characters, animals and vehicles): into it
         // when it works, else they walk there (the simulation decides: World.PortalOrder)
@@ -457,6 +494,16 @@ public partial class GameInput
                 if (towers.Count > 0) G.Submit(new AimTowersCommand { Towers = Ids(towers), Target = t.Id });
                 Order(units, "attack", t);
                 Marker(t.Pos.X, t.Pos.Z, 0xff3a2a);
+            }
+            // the Attack mode on open ground with area weapons: they fire at the spot, the others walk there
+            // (SecondaryInputController.usl: "Fight" "Scape" for hitrange > 0, "/Walk" for the rest; World "attackground")
+            else if (g is Vector3 ag && mode == "attack" && units.Any(W.CanAttackGround))
+            {
+                var area = units.Where(W.CanAttackGround).ToList();
+                var walk = units.Where(u => !W.CanAttackGround(u)).ToList();
+                Order(area, "attackground", null, ag.X, ag.Z);
+                if (walk.Count > 0) MoveGroup(walk, ag.X, ag.Z, "move", false, false);
+                Marker(ag.X, ag.Z, 0xff3a2a);
             }
             else if (g is Vector3 og) { MoveGroup(units, og.X, og.Z, mode == "move" ? "move" : "attackmove", false, false); Marker(og.X, og.Z, mode == "move" ? 0x7dff6a : 0xff3a2a); }
             G.PlayOrdered(mode == "move" ? "move" : mode == "attack" ? "attack" : "amove", units);

@@ -103,7 +103,12 @@ silent - checked headless).
   trigger action MUSI. Sequence: silence during a cutscene. Loading (the original's JOURNAL_MUSIC): silence while a
   journal entry is read on the loading screen (`Music.Journal`). Opening and Trigger play once. Fades: the switch's fade in
   / out (the higher switch's fade in when going up, the lower's fade out going down). The track's own volume is its
-  fade x the duck (0.5 while a mission's speech plays); the bus has the music and master volumes.
+  fade x the duck (0.5 while a mission's speech plays); the bus has the music and master volumes. The end of a game
+  (defeat, victory): the combat switch off (`EndGame`), the rest goes on behind the end screen (MusicMgr.OnGameEnd has
+  no caller, so no win / lose jingle). Leaving the game by any way (menu, load, retry, back to the editor, co-op
+  closed): every game switch off with its attacks and playlist, the ambience off, the main theme (`Music.StopGame` via
+  `GameAudio.Menu` from `GameSession._ExitTree`; MusicMgr.usl UpdateMusicSwitch while `!IsGameRunning`) - also on the
+  loading screen, as in the original.
 * **Ambience** (CAtmoSoundMgr): the state = ground material (0..8) + 9 x (camera more than 12 m above the ground) +
   18 x day. The state's bed loops, faded in over 1.5 s; another material switches after 0.5 s, height or daytime at
   once. Its event playlist plays an entry's wav a..b times every c..d s at volume e..f (0: a pause) and pan g..h - 100 %,
@@ -152,6 +157,33 @@ Measured:
 (In the xvfb runs few idle sounds reach the speakers at all: the ridden dinosaurs' idle sets use `ride_idle_*` clips
 without sound events - the noisy idle clips are the wild animals' and the titan triceratops' `standanim`, `feeding`,
 `rest`, `shake`, and the soldiers' `*_stand_to_fight` / `*_fight_to_stand`.)
+
+### When an animal roars (checked against the original, 2026-11-20)
+
+User report: "unit sounds are still playing a bit weirdly ... when a roar of an animal would be playing". In the
+original an animal's cries are sound events of its clips (GSF sound table; e.g. the apatosaurus' `standanim` cries at
+0.96 s, its `menace` roars at 0.32 s, `feeding` chews, `rest` breathes). The cries play whenever those clips play:
+
+- The server plays the `standanim` looping while the animal stands (Animal.usl SetIdleAnim).
+- On screen, the client's CIdleAnimMgr (Scripts/Game/mgr/IdleAnimMgr.usl) swaps in an IdleAnims.txt clip:
+  - The set's `standanim` is played once (`SetAnim(.., 1, 0)`).
+  - An entry with start / loop / end marks gets min .. max loops (`SetSLEAnim`).
+  - **A clip without loop marks is played once.** `SetSLEAnim` gives it no length, so StartAnim falls back to
+    `SetAnim(anim, 1, 0)`. The animals' `menace` roar and most `feeding` clips have no marks.
+
+The remake played those clips min .. max times whole (`AnimCtl.PlayLoops` repeats an unmarked clip). An idle wild
+animal roared or chewed 2 - 4 times back to back, and an owned unit's fidgets repeated too (and its standanim
+looped). Fixed in `WildIdle.cs` and `Unit.IdleTick`: the standanim and unmarked clips play once. The draws are
+unchanged, so World.Rng and replays stay the same; the animation names / times in the world hash change.
+
+The cries' pitch was also lost on the way: the simulation's `AnimSoundEvent` had no pitch, so every animation sound
+got the random 0.95 .. 1.05. It now carries the 7th value (`ModelManifest`, `GameSession.Feedback`). Data prepared
+before the toolkit exported the pitch has only 5 values per event: re-run the toolkit's *Prepare the game data* to get
+the GSF pitches (the T-rex's idle cries 1.3 / 1.6 ...).
+
+Not taken, still: on screen the original looks at a standing animal every 4 s, and while it is busy (walking) again
+6 s later. After it stops, its looping standanim cries for up to ~6 s before the first idle clip is drawn. The remake
+draws at once.
 
 ## Crowd sounds (soundeffects.txt)
 
@@ -216,6 +248,7 @@ Sfx.Music.Sequence(true / false);                           // a cutscene starts
 Sfx.Music.Journal(true / false);                            // the loading screen's journal voice starts / ends
 Sfx.Duck(true / false);                                     // music down while a dialogue line plays
 GameAudio.I.EndGame();                                      // the fights are over: no combat music behind the end screen
+GameAudio.Current?.Menu();                                  // the game left (GameSession._ExitTree): the main theme
 ```
 
 The world events reach the interface's feedback (ui/feedback.js, ported in game/src/UI); it decides what is seen

@@ -85,6 +85,57 @@ public sealed class MissionHost : IMissionHost
     public bool OwnerMatches(int actual, int query) => Co?.OwnerMatches(actual, query) ?? actual == query;
     public bool IsHumanSide(int slot) => slot == C.HumanSlot || (Co?.IsSeatSlot(slot) == true && Co.SeatOfSlot(slot)?.Ai == false);
     void StopPatrol(Unit u) => Patrols.Delete(u);
+    // the remake's own (IMissionHost): the day-night cycle, the infected stage, classes, the seats
+    public DayNightState? DayNight => W.DayNightNow;
+    public bool SetInfection(int obj, int stage) { var e = E(obj); return e != null && (W.SetInfection(e, stage) || e.Infection == Math.Clamp(stage, 0, 3)); }
+    public int Infection(int obj) => E(obj)?.Infection ?? 0;
+    // (the rules spell some classes with capitals - Wild_Boar, Mammoth: as given, else in lower case)
+    public bool ClassExists(string cls) => W.Data.Exists(cls) || W.Data.Exists(cls.ToLowerInvariant());
+    public void SetDayNightTimes(double? day, double? night, double? firstDay)
+    {
+        if (W.DayNight == null) return;
+        var s = W.DayNight.Clone();
+        if (day is double d && d > 0) s.Day = d;
+        if (night is double n && n > 0) s.Night = n;
+        if (firstDay is double f && f > 0) s.FirstDay = f;
+        W.SetDayNight(s);
+    }
+    public int RaiseEpoch(int slot, int epoch)
+    {
+        var p = P(slot);
+        if (p == null) return 1;
+        int n0 = W.Events.Count;
+        PwRemake.Sim.Game.Cheats.RaiseEpoch(W, p, epoch);
+        // (no "Epoch II reached!" for an epoch the mission starts in)
+        for (int i = W.Events.Count - 1; i >= n0; i--) if (W.Events[i].Type == "upgrade") W.Events.RemoveAt(i);
+        return p.Epoch();
+    }
+    public int SpawnOwn(string cls, int slot, double x, double y, int? level)
+    {
+        var p = P(slot);
+        if (p == null) return -1;
+        if (Co != null && Co.SeatOf(p) is { Seat: > 1 } cs) cls = Co.SeatClass(cs, cls);
+        return Id(C.Spawn(cls, slot, x, y, level));
+    }
+    public void SetDrawScale(int obj, double scale) { var e = E(obj); if (e != null) { e.DrawScale = scale > 0 ? scale : 1; e.LookChanged(); } }
+    public void SetMaxHp(int obj, double maxHp) { var e = E(obj); if (e != null && e.Alive && maxHp > 0) { e.MaxHp = maxHp; e.Hp = maxHp; } }
+    public bool Burn(int obj, double seconds) => U(obj) is { } u && W.Ignite(u, seconds);
+    public bool OrderGather(int obj, string res)
+    {
+        var u = U(obj);
+        if (u == null || !u.IsWorker || u.Owner == null) return false;
+        res = (res ?? "").ToLowerInvariant();
+        Entity? t = null;
+        if (res == "food")
+            t = W.Buildings.Where(b => b.Alive && b.Built && b.Owner == u.Owner && W.IsFarm(b) && b.Def!.Unlimited.Contains("food") && b.Workers.Count < W.FarmSlots(b) && b.DistTo(u) < 120)
+                           .OrderBy(b => b.DistTo(u)).ThenBy(b => b.Id).FirstOrDefault();
+        t ??= W.NearestResource(u.Pos.X, u.Pos.Z, res, 120);
+        if (t == null) return false;
+        StopPatrol(u);
+        W.Order(u, new Order("gather") { Target = t });
+        return true;
+    }
+    public IReadOnlyList<int> SeatSlots => Co != null ? Co.Seats.Select(s => s.Slot).ToList() : new List<int> { C.HumanSlot };
 
     /// <summary>the host's work of a step before the trigger engine runs (Campaign.Update): patrols, effects, highlights</summary>
     public void Tick(double dt)
@@ -553,7 +604,7 @@ public sealed class MissionHost : IMissionHost
         {
             "food" => Math.Floor(p["food"]), "wood" => Math.Floor(p["wood"]), "stone" => Math.Floor(p["stone"]),
             "iron" or "skulls" => Math.Floor(p["skulls"]),
-            "units" => p.Units,
+            "units" => p.Units, "max_units" or "maxunits" => p.MaxUnits, "epoch" => p.Epoch(),
             "max_food" or "rescap_food" => p.Caps["food"], "max_wood" or "rescap_wood" => p.Caps["wood"], "max_stone" or "rescap_stone" => p.Caps["stone"],
             _ => null,
         };
@@ -710,10 +761,15 @@ public sealed class MissionHost : IMissionHost
         var seq = FindByFile(C.Data.Sequences, r.Path);
         var play = new SequencePlay { Request = r, Data = seq, SnapBack = r.SnapBack, Camera = r.Camera is MapPos cam && !cam.IsZero ? G(cam.X, cam.Y) : null };
         SeqPlay = play;
-        // disable_fow: the area named by the action is shown for the sequence
+        // disable_fow: the area named by the action is shown for the sequence. The original's client stamps the circle
+        // whenever the flag is set (PWClient 0x44eb81: CSequenceInfo +0xa, the circle at +0xc with radius +0x18, every
+        // fog update while the sequence runs) - also round the map's corner 0, 0: mission 12's sc_4030 / sc_4038 reveal
+        // "0.0, 0.0, 0.0" with radius 1000, and every camera of both looks inside that circle (this port skipped a zero
+        // position: the scenes showed unexplored ground)
         _seqReveal = null;
-        if (r.Fow && r.FowPos is MapPos fp && !fp.IsZero && C.Human != null)
+        if (r.Fow && C.Human != null)
         {
+            var fp = r.FowPos ?? new MapPos(0, 0, 0);
             var (x, z) = G(fp.X, fp.Y);
             _seqReveal = W.RevealArea(C.Human, x, z, r.FowRadius > 0 ? r.FowRadius : 30, 0);
             // co-op: the other human seats see it too (their reveals end with the sequence's)

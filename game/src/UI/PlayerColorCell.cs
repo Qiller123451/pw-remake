@@ -10,6 +10,12 @@
 //
 // While the popup is open every change is reported (Picking: the lobby checks the colours at once, without rebuilding
 // itself); when it closes the choice is final (Chosen: saved, sent to the other machines).
+//
+// The campaign menus (CampaignMenu "Your colour", the co-op lobby's seats: docs/CAMPAIGN.md "Your colour") use two more
+// things: a first entry for "the mission's colour" (defaultLabel; the id "" then) and the colours another player has
+// (BlockedBy: the player's name or null) - greyed out in the list and in the picker's palette with the tooltip
+// "used by <name>"; a colour picked in the square that is too close to one of them is not taken (the cell goes back to
+// the choice before it).
 using System;
 using Godot;
 using SimColors = PwRemake.Sim.Rules.Colors;
@@ -28,34 +34,100 @@ public partial class PlayerColorCell : HBoxContainer
     readonly ColorPickerButton _btn;
     readonly OptionButton _list;
     string _id;
+    /// <summary>the last colour that was allowed (a blocked pick goes back to it)</summary>
+    string _lastOk;
+    /// <summary>1 with the "mission's colour" entry before the palette, else 0</summary>
+    readonly int _off;
+    readonly string? _defaultLabel;
+    readonly System.Collections.Generic.List<(Button Btn, string Id, Color Col)> _swatches = new();
+    /// <summary>the swatch's colour for the default entry (the mission's colour of the player)</summary>
+    Color _defaultColor = new(0.6f, 0.6f, 0.6f);
+    /// <summary>the name of the player who has this colour already (null: free) - those are greyed out (UpdateBlocked)</summary>
+    public Func<string, string?>? BlockedBy { get; set; }
 
-    public PlayerColorCell(string? id, float width = 200)
+    /// <summary>id: palette id, "#rrggbb", or "" (with defaultLabel: the default, "As in the mission")</summary>
+    public PlayerColorCell(string? id, float width = 200, string? defaultLabel = null)
     {
-        _id = id ?? SimColors.PLAYER_COLORS[0].Id;
+        _defaultLabel = defaultLabel;
+        _off = defaultLabel != null ? 1 : 0;
+        _id = id ?? (defaultLabel != null ? "" : SimColors.PLAYER_COLORS[0].Id);
+        _lastOk = _id;
         CustomMinimumSize = new Vector2(width, 0);
         AddThemeConstantOverride("separation", 4);
         _btn = new ColorPickerButton
         {
             CustomMinimumSize = new Vector2(38, 24), EditAlpha = false, EditIntensity = false, FocusMode = FocusModeEnum.None,
-            Color = ToColor(_id), TooltipText = "Any colour: the colour square, hue, RGB values or a hex code",
+            Color = ColorOf(_id), TooltipText = "Any colour: the colour square, hue, RGB values or a hex code",
         };
         _btn.PickerCreated += ConfigurePicker;          // (the popup is made when first opened)
         _btn.Pressed += () => Open = true;
         _btn.ColorChanged += c => { _id = IdOf(c); ShowName(); Picking?.Invoke(_id); };
-        _btn.PopupClosed += () => { Open = false; Chosen?.Invoke(_id); };
+        _btn.PopupClosed += () =>
+        {
+            Open = false;
+            if (Blocker(_id) is { } who)
+            {
+                // (too close to another player's colour: the choice before stays)
+                _id = _lastOk; _btn.Color = ColorOf(_id); ShowName();
+                _list.TooltipText = $"That colour is too close to {who}'s: {_list.TooltipText} stays";
+                return;
+            }
+            _lastOk = _id;
+            Chosen?.Invoke(_id);
+        };
         AddChild(_btn);
         _list = new OptionButton { CustomMinimumSize = new Vector2(width - 42, 26), FocusMode = FocusModeEnum.None, FitToLongestItem = false };
+        if (defaultLabel != null) { _list.AddIconItem(Swatch(_defaultColor), defaultLabel); _list.SetItemMetadata(0, ""); }
         foreach (var c in SimColors.PLAYER_COLORS) { _list.AddIconItem(Swatch(Rgb(c.Light)), c.Name); _list.SetItemMetadata(_list.ItemCount - 1, c.Id); }
-        _list.AddIconItem(Swatch(ToColor(_id)), "Custom");
+        _list.AddIconItem(Swatch(ColorOf(_id)), "Custom");
         _list.SetItemMetadata(_list.ItemCount - 1, "custom");
         _list.ItemSelected += i =>
         {
             var v = _list.GetItemMetadata((int)i).AsString();
-            if (v == "custom") { _btn.Color = ToColor(_id); return; }
-            _id = v; _btn.Color = ToColor(v);
+            if (v == "custom") { _btn.Color = ColorOf(_id); return; }
+            if (Blocker(v) != null) { ShowName(); return; }
+            _id = v; _lastOk = v; _btn.Color = ColorOf(v);
+            ShowName();
             Chosen?.Invoke(_id);
         };
         AddChild(_list);
+        ShowName();
+    }
+
+    /// <summary>the colour id shown ("" = the default entry)</summary>
+    public string Id
+    {
+        get => _id;
+        set { _id = _lastOk = value ?? ""; _btn.Color = ColorOf(_id); ShowName(); }
+    }
+
+    /// <summary>the default entry's swatch: the mission's colour of the player (null: grey, none)</summary>
+    public void SetDefaultColor(Color? c)
+    {
+        _defaultColor = c ?? new Color(0.6f, 0.6f, 0.6f);
+        if (_off == 1) _list.SetItemIcon(0, Swatch(_defaultColor));
+        if (_id == "") _btn.Color = _defaultColor;
+    }
+
+    string? Blocker(string id) => id.Length == 0 ? null : BlockedBy?.Invoke(id);
+
+    /// <summary>greys out the colours BlockedBy names (list and palette), with "used by &lt;name&gt;"</summary>
+    public void UpdateBlocked()
+    {
+        for (int i = 0; i < SimColors.PLAYER_COLORS.Count; i++)
+        {
+            var c = SimColors.PLAYER_COLORS[i];
+            var who = Blocker(c.Id);
+            _list.SetItemDisabled(i + _off, who != null);
+            _list.SetItemTooltip(i + _off, who != null ? $"used by {who}" : c.Name);
+        }
+        foreach (var (b, id, _) in _swatches)
+        {
+            var who = Blocker(id);
+            b.Disabled = who != null;
+            b.Text = who != null ? "x" : "";
+            b.TooltipText = who != null ? $"{SimColors.ColorById(id)?.Name} - used by {who}" : SimColors.ColorById(id)?.Name ?? id;
+        }
         ShowName();
     }
 
@@ -75,11 +147,16 @@ public partial class PlayerColorCell : HBoxContainer
     {
         int k = SimColors.IndexOf(_id);
         int custom = _list.ItemCount - 1;
-        _list.SetItemIcon(custom, Swatch(ToColor(_id)));
-        _list.SetItemDisabled(custom, k >= 0);
-        _list.Select(k >= 0 ? k : custom);
-        _list.TooltipText = k >= 0 ? SimColors.PLAYER_COLORS[k].Name : $"Custom colour {_id}";
+        bool dflt = _off == 1 && _id.Length == 0;
+        _list.SetItemIcon(custom, Swatch(ColorOf(_id)));
+        _list.SetItemDisabled(custom, k >= 0 || dflt);
+        _list.Select(dflt ? 0 : k >= 0 ? k + _off : custom);
+        var who = Blocker(_id);
+        _list.TooltipText = (dflt ? _defaultLabel! : k >= 0 ? SimColors.PLAYER_COLORS[k].Name : $"Custom colour {_id}") + (who != null ? $" - used by {who}" : "");
     }
+
+    /// <summary>the swatch colour of an id (the default entry: its colour)</summary>
+    Color ColorOf(string id) => id.Length == 0 && _off == 1 ? _defaultColor : ToColor(id);
 
     void ConfigurePicker()
     {
@@ -110,12 +187,18 @@ public partial class PlayerColorCell : HBoxContainer
             st.SetBorderWidthAll(1);
             var hov = new StyleBoxFlat { BgColor = col, BorderColor = PwTheme.Hi };
             hov.SetBorderWidthAll(2);
+            // (another player's colour, the campaign menus: dark, with an x - BlockedBy)
+            var off = new StyleBoxFlat { BgColor = col.Darkened(0.65f), BorderColor = new Color(0, 0, 0, 0.7f) };
+            off.SetBorderWidthAll(1);
             sw.AddThemeStyleboxOverride("normal", st); sw.AddThemeStyleboxOverride("hover", hov); sw.AddThemeStyleboxOverride("pressed", hov);
+            sw.AddThemeStyleboxOverride("disabled", off);
             var id = c.Id;
             sw.Pressed += () => { _id = id; p.Color = col; _btn.Color = col; ShowName(); Picking?.Invoke(_id); };
             grid.AddChild(sw);
+            _swatches.Add((sw, id, col));
         }
         p.AddChild(grid);
+        if (BlockedBy != null) UpdateBlocked();
     }
 
     // ---------------------------------------------------------------- colours <-> ids

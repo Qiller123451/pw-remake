@@ -38,6 +38,13 @@ public static class GameApp
         L.Info($"user folder {AppPaths.UserDir}; log file {Log.Sink<FileLogSink>()?.FilePath}");
         L.Info($"command line: {string.Join(" ", OS.GetCmdlineArgs())} {string.Join(" ", OS.GetCmdlineUserArgs())}");
 
+        // the user's maps folder (the map editor saves there; the skirmish list's "My maps"); Test map's mission folders
+        // that earlier runs left behind are removed
+        Directory.CreateDirectory(AppPaths.MapsDir);
+        PwRemake.Sim.Maps.MapFiles.UserDir = AppPaths.MapsDir;
+        PwRemake.Sim.Campaign.UserCampaign.Dir = AppPaths.CampaignsDir;          // the user's campaigns (docs/CAMPAIGN.md "Custom campaigns")
+        PwRemake.Sim.Editor.Triggers.TestMission.CleanStale();
+
         Settings = AppSettings.Load();
         PwRemake.View.Materials.ModelMaterials.SetOriginalColours(Settings.OriginalColors);
         PwRemake.View.Materials.UnitsBehind.SetEnabled(Settings.ShowUnitsBehind);

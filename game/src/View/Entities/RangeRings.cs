@@ -63,7 +63,6 @@ void fragment() {
     {
         public MeshInstance3D M = null!;
         public double X = double.NaN, Z, R;
-        public int Seen;
         public ShaderMaterial? Mat;
     }
     sealed class Ring { public readonly Circle Outer = new(), Inner = new(); public int Seen; }

@@ -206,15 +206,19 @@ public sealed class NavGrid
             label++;
         }
         Regions = label;
+        _farT = -1;
     }
 
-    /// <summary>nearest free cell of region reg around cell c (ring search), or -1</summary>
-    public int NearestInRegion(int c, int reg, int maxR = 80)
+    /// <summary>nearest free cell of region reg around cell c (straight-line distance; ring search from ring minR on), or -1.
+    /// The rings go on past the first one that holds a cell of the region until no nearer one can come: a ring is a
+    /// square, and its first cell found was the nearest by the square's measure only - up to 41 % farther than the
+    /// nearest (a goal 280 m off across mission 9's channel took the cell 350 m off, round the corner of the island).</summary>
+    public int NearestInRegion(int c, int reg, int maxR = 80, int minR = 0)
     {
         int n = N, ci = c % n, cj = c / n; var R = Region!;
-        for (int r = 0; r < maxR; r++)
+        int best = -1; double bd = 1e18;
+        for (int r = minR; r < maxR && (double)r * r <= bd; r++)
         {
-            int best = -1; double bd = 1e9;
             for (int j = cj - r; j <= cj + r; j++)
             {
                 if (j < 0 || j >= n) continue;
@@ -226,9 +230,19 @@ public sealed class NavGrid
                     if (R[k] == reg && Block[k] == 0) { double d = (double)(i - ci) * (i - ci) + (double)(j - cj) * (j - cj); if (d < bd) { bd = d; best = k; } }
                 }
             }
-            if (best >= 0) return best;
         }
-        return -1;
+        return best;
+    }
+
+    // (FarCell's last answer: a group sent to one far goal asks for the same cell once per unit)
+    int _farT = -1, _farReg = -1, _farVer = -1, _farK = -1;
+    /// <summary>the cell of region reg nearest cell c beyond NearestInRegion's 80 cells (the whole map), or -1</summary>
+    int FarCell(int c, int reg)
+    {
+        if (c == _farT && reg == _farReg && Version == _farVer) return _farK;
+        int k = NearestInRegion(c, reg, N, 80);
+        _farT = c; _farReg = reg; _farVer = Version; _farK = k;
+        return k;
     }
 
     /// <summary>cells a unit of radius r needs between its centre and the nearest obstacle</summary>
@@ -713,17 +727,29 @@ public sealed class NavGrid
         int sIdx = Idx(sx, sz);
         int s = Ok(sIdx) ? sIdx : NearestFit(sIdx, need, 8);
         int tIdx = Idx(tx, tz);
-        // a goal the start's ground region does not reach (across mountains or water): the nearest point that it does
+        // a goal the start's ground region does not reach (across mountains or water): the nearest point that it does,
+        // however far (FarCell beyond NearestInRegion's 80 cells = 160 m) - the unit walks there and stops, as in the
+        // original. (Within 160 m only, a goal farther off got the search that fails, which ends at the cell it reached
+        // nearest the goal - another one by where the unit stood and by its size: a big unit's search, without the coarse
+        // route, ran out after 30,000 cells, and units sent on wandered from one such end to the next.) A goal farther
+        // than 160 m stays "not found" (Found false: NoWay, Combat gives up on a foe there), as it was.
         var R = Region;
+        bool farOff = false;
         if (R != null && R[s] >= 0)
         {
-            int tr = R[Block[tIdx] != 0 ? NearestFree(tIdx, 6) : tIdx];
-            if (tr != R[s]) { int k = NearestInRegion(tIdx, R[s]); if (k >= 0) { tIdx = k; (tx, tz) = Center(k); } }
+            int tf = Block[tIdx] != 0 ? NearestFree(tIdx, 6) : tIdx;
+            int tr = tf >= 0 ? R[tf] : -1;
+            if (tr != R[s])
+            {
+                int k = NearestInRegion(tIdx, R[s]);
+                if (k < 0) { k = FarCell(tIdx, R[s]); farOff = k >= 0; }
+                if (k >= 0) { tIdx = k; (tx, tz) = Center(k); }
+            }
         }
         bool tb = !Ok(tIdx);
         int t = tb ? NearestFit(tIdx, need) : tIdx;
-        if (!tb && Ok(sIdx) && Los(sx, sz, tx, tz, need)) { Found = true; return new NavPath { new Waypoint(tx, tz) }; }
-        if (s == t) { Found = true; var (cx0, cz0) = Center(t); return new NavPath { tb ? new Waypoint(cx0, cz0) : new Waypoint(tx, tz) }; }
+        if (!tb && Ok(sIdx) && Los(sx, sz, tx, tz, need)) { Found = !farOff; return new NavPath { new Waypoint(tx, tz) }; }
+        if (s == t) { Found = !farOff; var (cx0, cz0) = Center(t); return new NavPath { tb ? new Waypoint(cx0, cz0) : new Waypoint(tx, tz) }; }
         // the fine search (A*) from cell s0 to t0: the cells after s0 up to t0 - or, when maxIter runs out, up to the cell
         // nearest t0 that it reached (found false)
         Leg Astar(int s0, int t0, int iterMax)
@@ -786,7 +812,7 @@ public sealed class NavGrid
         _lastCoarse = far != null;
         List<int> cellsR; bool foundR;
         if (far is Leg fr) { cellsR = fr.Cells; foundR = fr.Found; } else { var r = Astar(s, t, maxIter); cellsR = r.Cells; foundR = r.Found; }
-        Found = foundR;
+        Found = foundR && !farOff;
         int gk = -1;
         if (breach) foreach (var c in cellsR) if (EnemyGate(c)) { gk = c; break; }
         var pts = new List<(double X, double Z)>(cellsR.Count);

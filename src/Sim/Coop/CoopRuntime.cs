@@ -65,7 +65,7 @@ public sealed class CoopRuntime
     double _enemyThink;
 
     // ---- the hero phase (docs/COOP.md "Hero phase"): before seat 1 has a base, seats 2 / 3 have no base of their own;
-    // the gifts of the triggers are dealt over the seats; the enemies get no more units
+    // the gifts of the triggers are dealt over the seats; the enemies are not scaled (EnemyScaling)
     /// <summary>the mission has a hero phase (decided at the start: the definition's `phase.hero`, else seat 1 starts
     /// with neither a worker nor a building in a building mission)</summary>
     public bool HasHeroPhase { get; private set; }
@@ -75,8 +75,10 @@ public sealed class CoopRuntime
     public double? HandedOverAt { get; private set; }
     /// <summary>the gifts of the triggers are dealt over the seats now (a hero phase or a no-build mission)</summary>
     public bool Dealing => (Def.NoBuild || HeroPhase) && Def.Phase.Gifts == "deal";
-    /// <summary>the enemies get more units for the extra seats (not in a hero phase, not in a no-build mission)</summary>
-    public bool CountScaling => !Def.NoBuild && !HeroPhase;
+    /// <summary>the enemies are scaled for the extra seats - more units, health and damage (CoopScaling) - only while
+    /// the players can build: never in a no-build mission, nor in a hero phase (Kacper 2026-11-20: "no enemy scaling
+    /// during no-build missions"; docs/COOP.md "Enemy scaling")</summary>
+    public bool EnemyScaling => !Def.NoBuild && !HeroPhase;
     /// <summary>the seats' starts kept for the hand-over: where, facing</summary>
     readonly List<(CoopSeatRun Seat, double X, double Z, double Heading)> _pending = new();
     /// <summary>units dealt to each seat (tests, the log)</summary>
@@ -227,10 +229,15 @@ public sealed class CoopRuntime
             if (!c.FullTribes.Contains(s.Tribe)) c.FullTribes.Add(s.Tribe);     // (the view loads every model of a played tribe)
             if (CampaignT.MAIN_BUILDING.TryGetValue(s.Tribe, out var mb)) c.ClassModels(mb);
             foreach (var cls in ArmyOf(s)) c.ClassModels(cls);
+            if (BoughtArmy(s) is { } ba) { var pb = new Game.PointBuy(c.D, null); foreach (var card in ba.Cards.Values) c.ClassModels(pb.Resolve(card, s.Tribe).Cls); }
         }
         Enemies.Plan(c);
         L.Info($"co-op: {string.Join(", ", Seats)}; scaling {Scaling}");
     }
+
+    /// <summary>the army a human seat (2, 3) bought on the army screen (CoopSeat.Army; seat 1's is the campaign's
+    /// Config.Army); null: the definition's `army`</summary>
+    public static Game.Army? BoughtArmy(CoopSeatRun s) => s.Seat != 1 && !s.Ai && s.Start.Army is { Cards.Count: > 0 } a ? a : null;
 
     /// <summary>the classes of a seat's start army (rule classes of its tribe)</summary>
     public List<string> ArmyOf(CoopSeatRun s)
@@ -266,6 +273,9 @@ public sealed class CoopRuntime
         var human = c.PlayerAt(c.HumanSlot) ?? throw new InvalidOperationException("co-op: the mission has no human player");
         var hd = human.Data ?? new JsonObject();
         var usedColors = new HashSet<int>(list.Select(p => p.ColorSlot));
+        // the colours the human seats 2 / 3 chose (CoopSeat.Color): a new seat's own colour never takes one of them
+        var picks = Seats.Where(s => s.Seat != 1 && !s.Ai && s.Start.Color != null).Select(s => Colors.ColorById(s.Start.Color)).Where(c => c != null).Select(c => Colors.Hex(c!.Light)).ToList();
+        bool NearPick(int ci) => picks.Any(l => Colors.Distance(Colors.Hex(Colors.PLAYER_COLORS[ci].Light), l) < Colors.NEAR_DISTANCE);
         foreach (var s in Seats)
         {
             if (s.Seat == 1) { s.Player = human; if (s.Start.Name.Length > 0) human.Name = s.Start.Name; continue; }
@@ -285,7 +295,7 @@ public sealed class CoopRuntime
                 s.Player = p;
                 continue;
             }
-            int ci = Enumerable.Range(0, Colors.PLAYER_COLORS.Count).FirstOrDefault(i => !usedColors.Contains(i), 0);
+            int ci = Enumerable.Range(0, Colors.PLAYER_COLORS.Count).Where(i => !usedColors.Contains(i)).OrderBy(i => NearPick(i) ? 1 : 0).FirstOrDefault(0);
             usedColors.Add(ci);
             var col = Colors.PLAYER_COLORS[ci];
             var np = new Player(s.Slot, s.Tribe, new PlayerOpts
@@ -305,6 +315,15 @@ public sealed class CoopRuntime
             c.Players[s.Slot] = np;
             list.Add(np);
             s.Player = np;
+        }
+        // the human seats' own colours (seat 1's: Campaign.Build), in seat order: not one of a mission player or of another
+        // seat - else the seat keeps the one it has (docs/CAMPAIGN.md "Your colour")
+        foreach (var s in Seats)
+        {
+            if (s.Seat == 1 || s.Ai || s.Start.Color == null) continue;
+            var used = MissionColors.Used(list, new[] { s.Player });
+            if (MissionColors.Resolve(s.Start.Color, used) is { } col) MissionColors.Apply(s.Player, col);
+            else c.Warn($"co-op seat {s.Seat}: the colour {s.Start.Color} is taken (by {MissionColors.Blocker(s.Start.Color, used)?.Name ?? "nobody"}): the seat's own");
         }
         // diplomacy: a new seat stands to everybody as seat 1 does (and everybody to it); the seats are allies
         foreach (var s in Seats.Where(x => x.New))
@@ -389,10 +408,24 @@ public sealed class CoopRuntime
         {
             double stand = 3;
             bool wantBase = !Def.NoBuild && (sd.Base ?? true);
+            var bought = BoughtArmy(s);
+            // (an Aje army bought with its resource collector card brings the main building itself: Campaign's rule for
+            // seat 1, SL:386-390)
+            if (bought != null && s.Tribe == "Aje" && bought.Cards.Values.Contains("aje_resource_collector")) wantBase = false;
             if (wantBase && CampaignT.MAIN_BUILDING.TryGetValue(s.Tribe, out var mb))
             {
                 var e = W.Spawn(mb, p, x, z, new SpawnOpts { Heading = heading });
                 if (e != null) stand = e.Radius; else c.Warn($"co-op seat {s.Seat}: {mb} could not be placed at {x:0},{z:0}");
+            }
+            c.StartLocations[s.Slot] = new StartLocation { X = x, Z = z, Heading = heading, Data = new JsonObject() };
+            if (bought != null)
+            {
+                // the army screen's army (as seat 1's: Campaign.PlaceStart - its units round the start, its resources;
+                // skulls the mission's)
+                foreach (var e in new Game.PointBuy(c.D, null).Place(W, p, bought, x, z, 0.99 * stand + 1.5, heading))
+                    if (e is Unit bu) { bu.HomeX = bu.Pos.X; bu.HomeZ = bu.Pos.Z; }
+                p.Res["skulls"] = Math.Max(0, hd?["resources"]?["iron"].Num() ?? 0);
+                return;
             }
             int i = 0;
             foreach (var cls in ArmyOf(s))
@@ -448,7 +481,7 @@ public sealed class CoopRuntime
         foreach (var n in Def.Mortal)
             if (c.Objects.Get(n) is { } mr && mr.Entity != null) c.SetAppearance(mr, (mr.Flags ?? 7) | 7);
         // (a hero phase: no more enemy units and no enemy bases of the definition until the bases are handed out)
-        if (CountScaling && Def.Scaling.Garrisons) ScaleGarrisons(c);
+        if (EnemyScaling && Def.Scaling.Garrisons) ScaleGarrisons(c);
         // ---- the enemy bases of the definition (after the garrisons: their units are scaled as they are placed)
         if (!HeroPhase) Enemies.Place(c, _aiData);
         c.DiplomacyChanged += _ => _dipDirty = true;
@@ -514,8 +547,9 @@ public sealed class CoopRuntime
             if (on)
             {
                 Scaled.Add(p.Id);
-                p.CoopDamage = Scaling.Damage; p.CoopHealth = Scaling.Health;
-                if (Def.Scaling.Production && CountScaling) { p.CoopPopBase = p.PopMax; p.PopMax = Math.Ceiling(p.PopMax * Scaling.Count); }
+                // (health and damage too only while the seats can build: a hero phase's HandOver computes them again)
+                if (EnemyScaling) { p.CoopDamage = Scaling.Damage; p.CoopHealth = Scaling.Health; }
+                if (Def.Scaling.Production && EnemyScaling) { p.CoopPopBase = p.PopMax; p.PopMax = Math.Ceiling(p.PopMax * Scaling.Count); }
             }
             else
             {
@@ -523,7 +557,7 @@ public sealed class CoopRuntime
                 p.CoopDamage = 1; p.CoopHealth = 1;
                 if (p.CoopPopBase is double b) { p.PopMax = b; p.CoopPopBase = null; }
             }
-            if (W.Brains.Get(p.Id) is Ai.TribeAI t) t.WaveScale = on && Def.Scaling.Waves && CountScaling ? Scaling.Count : 1;
+            if (W.Brains.Get(p.Id) is Ai.TribeAI t) t.WaveScale = on && Def.Scaling.Waves && EnemyScaling ? Scaling.Count : 1;
         }
     }
     public bool IsScaled(int slot) => Scaled.Has(slot);
@@ -558,7 +592,7 @@ public sealed class CoopRuntime
     /// <summary>a unit the triggers spawn for player `slot`: how many in all (1 = no extra)</summary>
     public int SpawnCount(int slot, string cls)
     {
-        if (!Def.Scaling.Spawns || !IsScaled(slot) || !CountScaling) return 1;
+        if (!Def.Scaling.Spawns || !IsScaled(slot) || !EnemyScaling) return 1;
         var r = C.RuleClass(cls);
         if (r == null || C.D.Info(r) is not { } ix || ix.Type == "BLDG" || C.D.Def(r, null)?.Unique == true) return 1;
         int n = Scaling.Units(slot, 1);

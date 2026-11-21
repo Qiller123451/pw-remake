@@ -129,11 +129,26 @@ public sealed partial class World
     /// <summary>rangeZone(u, x).zone - 0: out of reach</summary>
     public int RangeZone(Unit u, Entity x) => RangeZoneOf(u, x).Zone;
 
+    /// <summary>
+    /// The primary weapon a unit takes against a building, null: its own. MIRAGE's Scorpion (CSeasScorpion
+    /// GetRightHandWeapon / UpdateEquipment): with a building as its enemy its weapon is the flamethrower of its level,
+    /// /Objects/SEAS/Weapons/seas_boss_weapon_flamer_a .. _e (GetLevel 0 .. 4; it is no weapon of the class's own - its
+    /// "Users" list does not name it), with its clip attack_2 on the build-up. The remake's Scorpion struck buildings
+    /// with its claws.
+    /// </summary>
+    public Weapon? AgainstBuilding(Unit u, Entity v)
+    {
+        if (v is not Building || !Compose.FightsWithBuildUp(Data, u.Name)) return null;
+        int lv = Math.Clamp(u.Level - 1, 0, 4);
+        return Data.WeaponAt("/Objects/SEAS/Weapons/seas_boss_weapon_flamer_" + (char)('a' + lv), u.RulesOwner());
+    }
+
     /// <summary>which weapon zone the victim is in: 0 = out of range, 1 = short, 2 = medium, 3 = primary</summary>
     public ZoneHit RangeZoneOf(Unit u, Entity v)
     {
         var W = u.Weapons;
-        var pcs = u.Cs(W.Long);
+        var lw = AgainstBuilding(u, v) ?? W.Long;
+        var pcs = u.Cs(lw);
         if (pcs == null) return new ZoneHit { Zone = 0 };
         double d = Reach(u, v);
         bool proj = pcs.W.Projectile != null; double inner = u.Radius * 0.5;
@@ -156,12 +171,12 @@ public sealed partial class World
         double lowH = low is Building lb ? (lb.Ht != 0 ? lb.Ht : 7) : low is Unit lu ? (lu.Height != 0 ? lu.Height : 2) : 2;
         bool heightOk = Math.Abs(dy) < Math.Min(7, lowH);
         if (pp && dy > 0) atk += 0.5 * dy;
-        if (!heightOk) return pp && d <= atk && !(minR > 0 && d <= minR) ? new ZoneHit { Zone = 3, W = W.Long, D = d } : new ZoneHit { Zone = 0, W = W.Long, D = d, High = true };
+        if (!heightOk) return pp && d <= atk && !(minR > 0 && d <= minR) ? new ZoneHit { Zone = 3, W = lw, D = d } : new ZoneHit { Zone = 0, W = lw, D = d, High = true };
         ZoneHit z;
         if (d <= secS) z = new ZoneHit { Zone = 1, W = W.Short, D = d };
         else if (d <= secM) z = minR > 0 && W.Medium == null ? new ZoneHit { Zone = 2, Min = true, W = W.Short, D = d } : new ZoneHit { Zone = 2, W = W.Medium ?? W.Short, D = d };
-        else if (d <= atk) z = new ZoneHit { Zone = 3, W = W.Long, D = d };
-        else return new ZoneHit { Zone = 0, W = W.Long, D = d };
+        else if (d <= atk) z = new ZoneHit { Zone = 3, W = lw, D = d };
+        else return new ZoneHit { Zone = 0, W = lw, D = d };
         // the line of sight (CheckLineOfSightFight, FO:5105-5110): not for a primary projectile in zone 3, nor when
         // either side is a building - a wall (or a cliff of the walk grid) between them stops a melee blow
         if (!(z.Zone == 3 && pp) && v is Unit vu && !u.Inside && !vu.Inside && !FightLos(u, vu)) return new ZoneHit { Zone = 0, W = z.W, D = d, Los = true };
@@ -545,12 +560,16 @@ public sealed partial class World
         {
             // (MIRAGE's pirate boss ship turns its broadside to the target: PirateShip.cs PirateBroadside)
             off = IsPirateShip(u) ? PirateBroadside(u, tgt!, dt) : u.Face(tgt!.Pos.X, tgt.Pos.Z, dt, 7);
-            if (u.Comp?.Top != null) off = u.Comp.Aim(tgt.Pos.X, tgt.Pos.Z, dt);
+            if (u.Comp?.Top != null) off = u.Comp.Aim(tgt!.Pos.X, tgt.Pos.Z, dt);
         }
         // (+ the last shot's extra time: the first shot of a weapon just raised waits longer - FirstShot below)
         double dur = AttackDuration(u, cs) + u.ShotOvertime;
         // (a first strike under way: the next blow after its hit - the first strike does not count as a blow: LastHitDone)
-        if (Time - u.LastHitDone > dur && Time >= t.FsHit && off < (proj ? (w.Penetration ? Math.PI / 16 : Math.PI / 4) : Math.PI))
+        // (MIRAGE's Scorpion turns until it faces its target within 11.25 degrees before a blow of its penetrating
+        // weapons: CSeasScorpion.AttackEnemy RotateToEnemy and no blow - the other melee fighters strike while they turn)
+        var fighter = u.Comp?.Fighter;
+        double aim = proj ? (w.Penetration ? Math.PI / 16 : Math.PI / 4) : fighter != null && w.Penetration ? Math.PI / 16 : Math.PI;
+        if (Time - u.LastHitDone > dur && Time >= t.FsHit && off < aim)
         {
             u.LastHitDone = Time;
             if (u.RageT != 0) u.RageHit = true;                 // a mammoth's stampede ends with its first real attack
@@ -564,10 +583,16 @@ public sealed partial class World
             var pick = pi < plain.Count ? plain[pi] : anims[0];
             u.FightAnim = pick.Name;          // (GetFightAnim: a victim's beheading asks it - HeadOff)
             var clip = dep != null ? null : u.Anim!.Pick(pick.Name, "attack_front", "attack_1", "res_strike_3", "nat_strike_0");
+            // a unit whose build-up fights for it (MIRAGE's Scorpion: Composite.Fighter) - the clip is the build-up's
+            if (fighter != null && u.Comp!.FighterStrike(pick.Name, w.Penetration, Time)) clip = null;
             // a shot its gun add-on fires (the gun plays its clip) or its rider shoots: an animal carrying them does not
             // strike (Compose.CarrierStrikes) - it stands
             bool gunFires = dep == null && proj && u.Comp?.Gun != null;
-            if (clip != null && proj && !Compose.CarrierStrikes(true, Compose.IsAnimal(u.Cls, Models.Get(u.Gfx)?.Arch), gunFires, u.Comp?.Rider?.Attack != null, Data.IsStrikeOf(u.Name, clip)))
+            // (the carrier's own recoil when its build-up fires the primary weapon: CTransportObj.AttackEnemy plays
+            // "attack_front_secondary" where the model has it - the woolly rhino of hu_rhino_ballista rears back with
+            // every bolt of its ballista; it stood still)
+            if (gunFires && ReferenceEquals(w, u.Weapons.Long) && u.Anim!.Has("attack_front_secondary")) clip = "attack_front_secondary";
+            else if (clip != null && proj && !Compose.CarrierStrikes(true, Compose.IsAnimal(u.Cls, Models.Get(u.Gfx)?.Arch), gunFires, u.Comp?.Rider?.Attack != null, Data.IsStrikeOf(u.Name, clip)))
             {
                 clip = null;
                 if (!u.BusyAnim) u.Anim!.Play(u.FightStand() ?? u.IdleAnim);
@@ -588,7 +613,7 @@ public sealed partial class World
                 bool intro = !(u.FightPos && u.Anim!.Phase == "l");
                 double len = u.Anim!.Duration(clip + "#l") + (intro ? u.Anim.Duration(clip + "#s") : 0);
                 u.BusyAnim = true;
-                u.Anim.PlaySle(clip, intro, len > dur ? len / dur : 1, new AnimDone("busy"));
+                u.Anim.PlaySle(clip!, intro, len > dur ? len / dur : 1, new AnimDone("busy"));
                 u.FightPos = true;
             }
             else if (clip != null)
@@ -845,7 +870,7 @@ public sealed partial class World
         if ((w.Projectile ?? "").ToLowerInvariant() == "aje_ammo_dino" && hatchOwner != null)
         {
             var r = SpawnUnit("aje_velociraptor", hatchOwner, p.Aim.X, p.Aim.Z, 1, 0, new UnitOpts { Autonomous = true });
-            if (r != null) { r.HomeX = p.Aim.X; r.HomeZ = p.Aim.Z; r.HomeRadius = 60; Later(30, "hatchlingGone", new Args { ["u"] = r }); }
+            if (r != null) { r.HomeX = p.Aim.X; r.HomeZ = p.Aim.Z; r.HomeRadius = 60; Later(30, "hatchlingGone", new Args { ["u"] = r }); InheritInfection(A, r); }
         }
         // OnDoDmg (Product.usl:535): area weapons hit the (jittered) aim point, others always hit their target
         if (s.Splash > 0)
@@ -996,6 +1021,7 @@ public sealed partial class World
     public bool Invulnerable(Entity V, bool damageOnly = false)
     {
         double t = Time;
+        if (V.Indestructible) return true;                                  // a map's indestructible object (Indestructible.cs)
         if (V.St.Active("levelInvul", t) || V.St.Active("doping", t)) return true;
         if (V.St.Active("fountain", t)) return true;                       // drank at a SEAS well (MIRAGE m_bFountainHealed: FountainOfYouth)
         if (!damageOnly && V.St.Active("invul", t)) return true;
@@ -1346,6 +1372,26 @@ public sealed partial class World
         e.LookChanged();
     }
 
+    /// <summary>a vehicle's wreck (MIRAGE Vehicle.usl CVehicle.CreateCorpse / CVehicleCorpse.Init - the base game's
+    /// vehicles have the same "&lt;gfx&gt;_dest" models with their clip "destroy"): the model of its current look + "_dest"
+    /// (in the water, an amphibious one: + "_dest_water", clip "destroy_water"), gone after 10 s (CUniversalCorpse).
+    /// BuildingRuinTests.*UnusedDestructionClips: every vehicle's "_dest" with a clip was never shown before.</summary>
+    public bool VehicleWreck(Unit e)
+    {
+        var gfx = (e.Gfx ?? e.Stats?.Gfx)?.ToLowerInvariant();
+        if (gfx == null) return false;
+        string tpl = gfx + "_dest", clipName = "destroy";
+        if (e.Amphib && IsWater(e.Pos.X, e.Pos.Z, 0.5) && Models.Has(tpl + "_water")) { tpl += "_water"; clipName = "destroy_water"; }
+        if (!Models.Has(tpl)) return false;
+        var clips = Models.Clips(tpl);
+        var anim = clips.Count > 0 ? new AnimCtl(clips, null) : null;
+        var clip = anim?.Pick(clipName, "destroy");
+        if (clip != null) anim!.Play(clip, new AnimOpts { Loop = false });
+        e.Wreck = new Wreck { Gfx = tpl, Anim = anim };
+        e.LookChanged();
+        return true;
+    }
+
     /// <summary>GetDirection (FO:3806) of a point seen from the unit: 'f' front, 'b' back, 'l' left, 'r' right, by the
     /// larger of the two components in the unit's frame. The engine's DIR_LEFT is the model's local +X (FO:3812): the
     /// converter mirrors the GSF frame's x (pwexport gsf.py: GSF (x, y, z) -> glTF (-x, z, -y)), so it is the unit's
@@ -1459,7 +1505,14 @@ public sealed partial class World
         // a ship leaves its wreck (Ship.usl Die -> CreateShipCorpse): the model "<gfx>_dest" at destruction level 2,
         // playing its sink animation "destroy" once, gone after 10 s; the ship itself is out at once. Ships that are
         // animals (turtles, the submarine, the cronosaurus) and mines keep their own model and dying animation.
-        if (e.Naval && !e.SilentDeath) ShipWreck(e);
+        // a corpse its script makes itself comes first (ScriptCorpses.cs: MIRAGE's Scorpion, the siege tower, the falling
+        // zeppelins and Dragon Clan airships)
+        if (!e.SilentDeath && !e.Inside && ScriptCorpse(e)) { }
+        else if (e.Naval && !e.SilentDeath) ShipWreck(e);
+        // a vehicle leaves its wreck too (Vehicle.usl Die -> CreateCorpse: a CVehicleCorpse "<gfx>_dest" playing "destroy",
+        // 10 s; an amphibious one in the water "<gfx>_dest_water" playing "destroy_water"), not when it dies inside a
+        // transport (IsDyingInTPO); without such a model it keeps its own dying (the original's leaves nothing)
+        else if (e.Cls == "VHCL" && !e.SilentDeath && !e.Inside) VehicleWreck(e);
         e.WJump = null; e.Climbing = false; if (e.WallH != null) { e.Pos.Y = e.WallH.Value; e.WallH = null; }
         // owned characters and animals leave a spirit that an Aje shaman can resurrect (not illusions, summons; heroes
         // and the special eusmilus only on multiplayer levels - skirmish -, FightingObj.usl:5566-5571)

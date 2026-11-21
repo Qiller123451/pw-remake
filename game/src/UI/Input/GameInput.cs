@@ -134,7 +134,7 @@ public partial class GameInput : Node
             else if (mb.ButtonIndex == MouseButton.Left && overHud)
             {
                 _rot = false;
-                if (_down && _dragging && Mode == null) { _down = _dragging = false; BoxSelect(mb.ShiftPressed); }   // the box ends at the panel
+                if (_down && _dragging && Mode == null) { _down = _dragging = false; BoxSelect(mb.ShiftPressed, mb.CtrlPressed); }   // the box ends at the panel
                 else _down = _dragging = false;
             }
             return;
@@ -211,7 +211,7 @@ public partial class GameInput : Node
         if (_dragging)
         {
             _dragging = false;
-            BoxSelect(e.ShiftPressed);
+            BoxSelect(e.ShiftPressed, e.CtrlPressed);
             return;
         }
         var t = EntityAt(_mouse);
@@ -226,15 +226,17 @@ public partial class GameInput : Node
         }
         else if (t != null)
         {
-            if (e.ShiftPressed && t.Owner == G.Me && t is Unit) G.Selection.Toggle(t);
+            // Shift adds (never removes), Ctrl adds or removes - buildings with buildings, units win over buildings, own
+            // over others (GameInputController.usl MT_MouseLBtnUp; Selection.Combine)
+            if (e.ShiftPressed || e.CtrlPressed) G.Selection.Modify(new[] { t }, e.ShiftPressed, e.CtrlPressed);
             else G.Selection.Set(new[] { t });
         }
         else if (ClickMark(_mouse, e.ShiftPressed)) _hoverT = 0;     // a question mark: selected, its tooltip at once
-        else if (!e.ShiftPressed) G.Selection.Set(Array.Empty<Entity>());
+        else if (!e.ShiftPressed && !e.CtrlPressed) G.Selection.Set(Array.Empty<Entity>());
         _lastClick = (now, t);
     }
 
-    void BoxSelect(bool shift)
+    void BoxSelect(bool shift, bool ctrl)
     {
         float x0 = Math.Min(_start.X, _mouse.X), x1 = Math.Max(_start.X, _mouse.X), y0 = Math.Min(_start.Y, _mouse.Y), y1 = Math.Max(_start.Y, _mouse.Y);
         // an entity is inside when its centre or a good part of its rectangle is in the box
@@ -255,7 +257,9 @@ public partial class GameInput : Node
         List<Entity> list = W.Units.Where(u => u.Alive && u.Owner == G.Me && !u.Inside && !u.Autonomous && !u.Parked && !u.Unselectable && G.Entities.Shown(u) && InBox(u)).Cast<Entity>().ToList();
         // no unit in the box: the own buildings in it (not the wall pieces - a wall line would swamp the selection)
         if (list.Count == 0) list = W.Buildings.Where(b => b.Alive && b.Owner == G.Me && !b.Unselectable && b.Def?.WallKind != "wall" && InBox(b)).Cast<Entity>().ToList();
-        if (shift) G.Selection.AddRange(list);
+        // Shift: the boxed ones and the selection, Ctrl: each boxed one in or out - sorted out as a Shift click is
+        // (units win over buildings; Selection.Combine)
+        if (shift || ctrl) G.Selection.Modify(list, shift, ctrl);
         else G.Selection.Set(list);
     }
 
@@ -496,6 +500,7 @@ public partial class GameInput : Node
     public void Step(double dt)
     {
         StepWarmUp();                             // (the placement warm-up's objects go after their first frames)
+        UpdateAimArea();                          // (the Attack mode's splash circle under the mouse)
         // a cutscene, a film, the mission UI holding the game (a dialogue, the quest log), the pause menu, the end of the
         // mission: a mode ends there (as ui/mission.js does when a sequence starts) - placing above all, so its ghost and
         // dots do not stay drawn over the scene
@@ -511,7 +516,7 @@ public partial class GameInput : Node
             UpdateMarks(overHud);
             // the original mouse cursors (Data/Base/Cursors): what a right click would do here
             string cur = "standard";
-            if (Mode != null) cur = Mode switch { "move" or "rally" => "walk", "amove" => "walk_aggro", "attack" => "attack", "place" or "lay" or "repair" => "build", "target" => "special", "mapping" => "mapping", _ => "standard" };
+            if (Mode != null) cur = Mode switch { "move" or "rally" => "walk", "amove" => "walk_aggro", "attack" => AttackModeCursor(overHud ? null : Hover, overHud ? null : GroundPoint(_mouse)), "place" or "lay" or "repair" => "build", "target" => "special", "mapping" => "mapping", _ => "standard" };
             else if (!overHud) cur = CursorFor(Hover, GroundPoint(_mouse), Godot.Input.IsKeyPressed(Key.Shift)) is { Length: > 0 } c ? c : "standard";
             if (cur == "healing") cur = "special";                // CCursorMgr: healing shows Special.cur
             var size = GetViewport().GetVisibleRect().Size;

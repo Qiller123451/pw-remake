@@ -194,7 +194,7 @@ public static class SoakTests
     {
         public TribeAI B = null!; public Player P = null!;
         public List<double> Epochs = new(); public int Peak, WPeak, IdleSamples, Samples; public (int W, int A)? At10;
-        public double Ms, MaxMs; public HashSet<string> Builds = new();
+        public HashSet<string> Builds = new();
     }
     static string Mmss(double t) => $"{(int)(t / 60)}:{(int)(t % 60):00}";
 

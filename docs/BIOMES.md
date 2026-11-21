@@ -15,9 +15,9 @@ those stay per map.
 ```
 src/Sim/Maps/Biomes.cs          Biome, BiomeSet (biomes.json), BiomeLayer (the per-map layer), GroundLayers, LayerPick
 src/Sim/Maps/BiomeAuthoring.cs  Gradient (two biomes along a line), Split, Paint (a soft noisy blob)
-src/Sim/Maps/MapFiles.cs        reading a map with its additions: <map>.ula + <map>.biomes.json, remake maps .pwmap.json
+src/Sim/Maps/MapFiles.cs        reading a map (the map format: its biome layer in map.lua + terrain/biomes/*.png - MAP_FORMAT.md)
 game/maps/biomes.json           every biome (the original settings + the remake's own)
-game/maps/*.pwmap.json          the remake's own maps (the skirmish list's "Remake" folder) + their .biomes.json
+game/maps/*.pwmap.json          the remake's own maps' recipes + their .biomes.json (Prepare converts them: maps/Remake/)
 game/src/View/Terrain           TerrainMesh (layers per vertex, palettes per tile), TerrainShader (texture array)
 game/src/View/World/WorldView   GroundLayers, one grass layer per biome, RefreshBiomes
 game/src/View/World/BiomeAmbience.cs   light / fog / sky, weather and ambience by the biome mix at the camera
@@ -76,11 +76,16 @@ Any number of biomes. A map with a layer of only its own setting at 100 % gives 
 
 ## Files
 
-* **Next to an original map**: `<name>.biomes.json` beside `<name>.ula` - any map (the installation's, a community
-  map) gets its layer without changing the .ula; the remake reads both (`MapFiles.Read`).
-* **A remake map** (`game/maps/<name>.pwmap.json`): an original map of the player's installation plus what the remake
-  adds. The skirmish list shows them in the folder "Remake" (after the installation's maps; only those whose base map
-  the installation has). The remake ships no original data: the base map comes from the installation.
+* **In a map of the remake's format** (docs/MAP_FORMAT.md): `map.lua` `terrain.biomes` (the names, the cell, the
+  corner, the remaps) and one 8-bit picture per biome, `terrain/biomes/<biome>.png` (its weights) - paintable in an
+  image editor. This is what the game reads.
+* **Next to an original map**: `<name>.biomes.json` beside `<name>.ula` (the format above) - any map of the
+  installation or a community map gets its layer without changing the .ula; Prepare's converter takes it into the
+  converted map.
+* **A remake map recipe** (`game/maps/<name>.pwmap.json`): an original map of the player's installation plus what the
+  remake adds. Prepare converts each recipe whose base map the installation has into `content/configs/<config>/maps/
+  Remake/<name>/`; the skirmish list shows them in the folder "Remake" (after the installation's maps). The remake
+  ships no original data: the base map comes from the installation.
 
 ```json
 { "format": "pw-remake-map", "version": 1,
@@ -89,7 +94,7 @@ Any number of biomes. A map with a layer of only its own setting at 100 % gives 
   "biomes": "frost_to_jungle.biomes.json" }                   (a file beside it, or the layer itself)
 ```
 
-A setup addresses it as `Remake/<file>` (`--skirmish frost_to_jungle` finds it too). `game/maps` is found like
+A setup addresses it as `Remake/<file>` (`--skirmish frost_to_jungle` finds it too; the id finds the converted map). `game/maps` is found like
 `game/coop` (from the program's folder upwards; `PW_MAPS` overrides; an exported executable copied elsewhere: `maps\`
 beside it).
 
@@ -147,13 +152,14 @@ dotnet run -- biomes [--write ../../game/maps/biomes.json]
 `gradient`: `from` on one side, `to` on the other: `--split east|west|north|south` (the transition `--band` metres wide
 across the middle) or `--line x0,y0,x1,y1` (`from` at the first point, `to` at the second, the blend between); the
 transition line wanders by up to `--noise` metres (two octaves of value noise, `--seed`). Without `--pwmap` the output
-can be put beside a .ula as its `<name>.biomes.json`.
+can be put beside a .ula as its `<name>.biomes.json`. (The tool reads `.ula` and recipes through the converter; run
+Prepare after it to convert the result.)
 
 **Map viewer brush** (`res://scenes/MapViewer.tscn`, `--map=Remake/frost_to_jungle.pwmap.json` or any map; `--brush=<biome>`
 starts with the brush on; `--biomes=<file>` draws a map with another layer): **B** brush on / off, **[ ]** the brush's
 biome (every biome of biomes.json), **- =** its radius (20 .. 400 m), **left mouse** paints (a soft round brush with a
-noisy edge, 30 % per stroke step), **Ctrl+S** saves (`--biomes-out=<file>`, else the remake map's biomes file, else
-`<map>.biomes.json` beside the .ula). A biome the map has not got yet is added and the map drawn again (a second or
+noisy edge, 30 % per stroke step), **Ctrl+S** saves (`--biomes-out=<file>`, else into the map itself - its `map.lua` and
+`terrain/biomes/*.png`; a `.ula` opened by its path: `<map>.biomes.json` beside it). A biome the map has not got yet is added and the map drawn again (a second or
 two); then only the ground and grass under the brush are redone. The info line (F1) shows the mix at the camera.
 
 ## The demo map: Frost and Jungle

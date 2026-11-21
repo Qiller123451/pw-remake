@@ -99,6 +99,7 @@ public sealed class Attack : IClaimer
         State = "over";
         var ai = Ai; var us = Alive();
         ai.Release(us);
+        ai.FerryDone(this);                                                     // (a crossing still on: its transports free, home)
         foreach (var u in us) if (u.Stance != 3) u.Stance = 2;               // fighters aggressive again (GA:417)
         // back to the pool = back to the village guard (GuardVillage orders its pool to the guard position): without
         // this the survivors would walk on to wherever the attack was going. Scripted waves stay where they are.
@@ -399,6 +400,7 @@ public sealed partial class TribeAI
         // Nightmare)
         bool own = ExtraSquads && !Data.HasArmies(P.Tribe) && a.Goal != "quick";
         var army = a.ArmyName != null ? Data.Army(P.Tribe, table, a.ArmyName) ?? (own ? FallbackArmy(S, a.ArmyName) : null) : null;
+        if (army != null) army = SpecUnits(S, army);
         if (army == null)
         {
             // no army table (GetUnits fails): pool units only (SU:116-151)
@@ -462,6 +464,15 @@ public sealed partial class TribeAI
         // (The JS ended such a squad as "squad failed" unless 60 % of it was there; the scripts have no such rule.)
         if (open.Count > 0) L.Debug($"player {P.Id}: {a.Type}: squad incomplete after the timeout ({string.Join(", ", open.Select(o => o.Cls))} missing): goes with {us.Count} + pool units");
         foreach (var o in open) if (o.Job is { } job && job.Producer.Alive) { int i = job.Item != null ? job.Producer.Queue.IndexOf(job.Item) : -1; if (i > 0) Hands.CancelQueue(p, job.Producer, i); }
+        // SpawnUnits (BS:482-509 MIRAGE, BS:546-577 base): the missing units come from the cheat manager - on skirmish
+        // maps at difficulty 9 only (CheatSpawn)
+        if (open.Count > 0 && CheatSpawnAllowed)
+        {
+            int made = 0;
+            foreach (var o in open) if (CheatSpawn(S, o.Cls, o.Flag, o.Level, S.Home ?? Start) is { } u) { a.Add(new[] { u }); o.Done = true; made++; }
+            if (made > 0) L.Debug($"player {P.Id}: {a.Type}: the cheat manager spawned {made} of {open.Count} missing units");
+            us = a.Alive();
+        }
         a.Orders = new List<SquadOrder>();
         if (!a.Scripted || !a.Spawned)
         {
@@ -730,6 +741,7 @@ public sealed partial class TribeAI
             return a.State == "over" ? null : a.Id;
         }
         // from the village: the army's units out of the pool, the rest trained, plus a few pool units (SP:145-369)
+        army = SpecUnits(S, army);
         var taken = new OrderedSet<Unit>();
         foreach (var e in army)
         {
@@ -781,6 +793,101 @@ public sealed partial class TribeAI
             }
         }
         return outp;
+    }
+    /// <summary>MIRAGE's UpdateSolutionWithSpecUnits, flyers part (AiGoalGeneralAttack.usl:642-686, called by GetUnits
+    /// :526-528 for a squad of the main village from difficulty 4): with the game option FlyingEnabled and from the third
+    /// epoch every attack squad also asks for 2 flyers - Aje / Hu pteranodons, Dragon Clan cargolifters (and from the
+    /// fourth epoch 1 dirigible), SEAS flying helicopters (ObjFlag seas_helicopter_flying). They come out of the pool
+    /// first, the rest is trained like the squad's other units. (Its hero part - Babbage's mobile suit, Schliemann's
+    /// zombies ... - the remake does not have yet. The spawned waves (SpawnUnits) and the ship attacks' own squads
+    /// (Naval.cs) do not get them.)</summary>
+    public List<ArmyRow> SpecUnits(Census S, List<ArmyRow> army)
+    {
+        if (!OptFlying || Difficulty < 4 || S.Age < 3) return army;
+        var add = new List<(string Cls, string? Flag, int N)>();
+        switch (P.Tribe)
+        {
+            case "Aje": add.Add(("aje_pteranodon", null, 2)); break;
+            case "Hu": add.Add(("hu_pteranodon", null, 2)); break;
+            case "Ninigi": add.Add(("ninigi_cargolifter", null, 2)); if (S.Age >= 4) add.Add(("ninigi_dirigible", null, 1)); break;
+            case "SEAS": add.Add(("seas_helicopter", "seas_helicopter_flying", 2)); break;
+        }
+        if (add.Count == 0) return army;
+        var outp = new List<ArmyRow>(army);
+        foreach (var (cls, flag, n) in add)
+            if (D.Exists(cls)) outp.Add(new ArmyRow { Min = n, Max = n, Alternatives = { new ArmyAlt { Cls = cls, ObjFlag = flag } } });
+        return outp;
+    }
+
+    // ------------------------------------------------------------------ the cheat manager's free units
+    // CAiCheatMgr.SpawnUnit (AiImprovementMgr.usl:125-296, MIRAGE master; the base game's has the same rules without
+    // m_bCustommap): it returns at once when !m_bMultimap (MIRAGE: || m_bCustommap - a CampaignAI player of
+    // CustomMapSettings.txt), and on a skirmish map unless the difficulty (GetOldDifficultyInt) is 9 (:156); there the
+    // location is never ignored (:158), so the unit
+    //   * is no trade unit (hu_cart, aje_trade_dino, ninigi_cart; MIRAGE also seas_trade_dino) (:169),
+    //   * stays below the tech tree's instance limit (CheckMaxInstanceCount: the heroes and other unique classes),
+    //   * finds a free place in the pyramid plus 5 / 2 / 1 / 1 / 0 extra places per level (SolarsSponsoredUnitTuner
+    //     :794-847: the AI pyramid 25 / 15 / 8 / 3 / 1, the units of that level; MIRAGE adds its virtual_units_<n>,
+    //     which the remake does not have),
+    //   * is no fishing boat / floating harbour (MIRAGE also seas_carrier) (:179),
+    //   * is a worker only while the player has fewer than 15 (CheckNumWorker :1239),
+    //   * has a visible build action (no hidden one - the options' flying_disabled / titans_disabled, a later epoch)
+    //     whose producing building stands, finished, with 5 hit points or more, nearest to the position (:189-244),
+    // and appears there, gets its ObjFlag upgrade (upgradecheatai) and its level (setlevelcheatai: the need's "level"
+    // flag, else GetProperLevel :446) and walks out (CTheLite).
+    // Callers in the scripts: BuildSquad's timeout (AttackBuild), GeneralAttack's spawned solutions, the outposts, the
+    // ministry of defence's p_bSpawn, the SEAS special attack's triceratops and the naval scouting - the remake has the
+    // squads' (the others are goals it does not run).
+    static readonly HashSet<string> CHEAT_TRADE = new(StringComparer.Ordinal) { "hu_cart", "aje_trade_dino", "ninigi_cart" };
+    static readonly HashSet<string> CHEAT_BOATS = new(StringComparer.Ordinal) { "hu_fishing_boat", "ninigi_fishing_boat", "aje_floating_harbour" };
+    static readonly HashSet<string> CHEAT_WORKERS = new(StringComparer.Ordinal) { "hu_worker", "aje_worker", "ninigi_worker", "seas_worker" };
+    static readonly int[] CHEAT_EXTRA = { 5, 2, 1, 1, 0 };
+    /// <summary>GetProperLevel (CHT:446-470): the level (0-based) of a class whose need has no "level" flag</summary>
+    static readonly Dictionary<string, int> CHEAT_LEVEL = new(StringComparer.Ordinal)
+    {
+        ["hu_jetpack_warrior"] = 1, ["hu_spearman"] = 1, ["hu_pikeman"] = 1, ["hu_archer"] = 1, ["hu_marksman"] = 2,
+        ["seas_cannon_turtle"] = 2, ["seas_rex"] = 3, ["seas_gigantosaurus"] = 2,
+    };
+    /// <summary>does the cheat manager spawn units for this player at all (CHT:139, 156): a skirmish map (not a
+    /// CampaignAI player), difficulty 9; never for a co-op AI commander (an AI assist: its cheater is disabled, CM:495)</summary>
+    public bool CheatSpawnAllowed => Multimap && !Custommap && Difficulty == 9 && !CoopAlly;
+    /// <summary>CAiCheatMgr.SpawnUnit on a skirmish map (see above) -> the new unit, or null</summary>
+    public Unit? CheatSpawn(Census S, string cls, string? flag, int level, Pt? at)
+    {
+        var p = P;
+        if (!CheatSpawnAllowed || at == null) return null;
+        bool mirage = D.Extra.Mod == "MIRAGE";
+        if (CHEAT_TRADE.Contains(cls) || (mirage && cls == "seas_trade_dino")) return null;
+        if (CHEAT_BOATS.Contains(cls) || (mirage && cls == "seas_carrier")) return null;
+        if (D.Def(cls, p) is not { } def || (def.Unique && p.Heroes.Has(cls))) return null;
+        int lv = level > 0 ? level : (CHEAT_LEVEL.TryGetValue(cls, out var pl) ? pl : 0) + 1;
+        lv = Math.Clamp(Math.Max(lv, D.MinLevel(cls, p)), 1, 5);
+        var pyr = p.Pyramid ?? D.Pyramid;
+        if (!(pyr[lv - 1] + CHEAT_EXTRA[lv - 1] > p.AtLevel[lv - 1])) return null;
+        if (CHEAT_WORKERS.Contains(cls) && S.Workers.Count >= 15) return null;
+        var R0 = Resolve("CHTR/" + cls, "");
+        if (R0 == null || R0.Kind != "unit") return null;
+        Building? best = null; double bd = double.MaxValue;
+        foreach (var pr in ProducersOf(S, R0.Action))
+        {
+            if (pr is not Building b || b.Hp < 5) continue;
+            var why = D.Check(b.RulesOwner(), LocalAction(b, R0.Action), b);
+            if (why == "hidden" || why == "disabled") continue;
+            double d = at.Value.Dist(b);
+            if (d < bd) { bd = d; best = b; }
+        }
+        if (best == null) return null;
+        var g = S.Home != null ? GuardPoint(S) : at.Value;
+        var nv = W.NavFor(false, Unit.AMPHIBIOUS.IsMatch(cls));
+        var (x, z) = best.SpawnPoint(g.X, g.Z, nv);
+        var u = W.SpawnUnit(cls, p, x, z, lv, Geo.HeadingTo(g.X - x, g.Z - z));
+        if (u == null) return null;
+        if (flag != null && flag != cls) { var up = Acts(u).FirstOrDefault(y => y.Kind == "Upgrades" && y.Id == flag); if (up != null) W.CompleteUpgrade(u, up); }
+        best.SpawnAnim();
+        W.Emit("spawnfx", new Args { ["unit"] = u });
+        var (qx, qz) = best.ExitPoint(g.X, g.Z, nv);
+        W.Order(u, new Order("move") { X = qx, Z = qz, Auto = true });
+        return u;
     }
     /// <summary>a scripted wave is as big as its table says: the fixed number, else by the campaign difficulty of the slot</summary>
     int ScriptedCount(ArmyRow e) => Scaled(e.Min == e.Max ? (int)e.Min : SquadCount(e));

@@ -37,7 +37,8 @@ public sealed class CmdButton
 }
 
 /// <summary>A row of the flyout: its title and its cards.</summary>
-public sealed record FlyoutRow(string Title, List<HudAction> Cards);
+/// <summary>a row of the flyout: its name, its cards, its category (Flyout.usl: the picture at its left; null: none)</summary>
+public sealed record FlyoutRow(string Title, List<HudAction> Cards, string? Cat = null);
 
 /// <summary>A card of the army pyramid (a unit, a building that counts, or a queued unit) at its place.</summary>
 public sealed class PyrCard
@@ -50,6 +51,7 @@ public sealed class PyrCard
     public string Name = "";
     public string? Icon;
     public double Hp = 1;           // 0..1
+    public int HpSlice = 100;       // the bar's "hp%" (HpBarRule.Slice)
     public string? Task;            // card_task_<task> (or "power")
     public bool CanLevelUp, Selected;
 }
@@ -65,6 +67,10 @@ public sealed class InfoModel
     public Player? Owner;
     public double Hp, MaxHp;          // the bar (well: fill / max)
     public bool ShowHp;
+    /// <summary>the class icon left of the name (Info.usl: tt_class_chtr / anml / bldg / vhcl / other, 16 x 19 at 33, 7)</summary>
+    public string? TypeIcon;
+    /// <summary>what a unit with the six values carries (icon, amount): shown under them</summary>
+    public (string Icon, string Amount)? Carry;
     /// <summary>the stats rows: icon, value, help key (Info.usl: six rows)</summary>
     public readonly List<(string Icon, string Value, string? Key)> Stats = new();
     /// <summary>extra tooltip lines of a stats row (its index): the armour's bonus per attacker type</summary>
@@ -80,6 +86,8 @@ public sealed class InfoModel
     /// <summary>a resource: its amount and icon</summary>
     public string? ResIcon;
     public double Amount;
+    /// <summary>a resource that is never used up (the remake's map attribute infinite: the HUD shows ∞)</summary>
+    public bool Infinite;
 }
 
 public sealed class HudModel
@@ -267,7 +275,7 @@ public sealed class HudModel
             // Info.usl:1404-1436: the resources' help titles (_wood, _stone, _fruit, _food, _fish), the amount _iw_resourceamount
             var key = rn.Type == "bush" ? "_fruit" : rn.Type == "fish" ? "_fish" : "_" + rn.Res;
             m.Kind = "res"; m.Name = D.TextKey(key)?.Name ?? rn.Res;
-            m.ResIcon = RES_ICON.GetValueOrDefault(rn.Res); m.Amount = Math.Ceiling(rn.Amount);
+            m.ResIcon = RES_ICON.GetValueOrDefault(rn.Res); m.Amount = Math.Ceiling(rn.Amount); m.Infinite = rn.Infinite;
             int n = rn.Workers.Count;
             m.Hint = $"{n} worker{(n == 1 ? "" : "s")} gathering";
             return m;
@@ -276,45 +284,53 @@ public sealed class HudModel
         m.Kind = "object"; m.Name = tx.Name; m.ObjName = x.Name; m.Owner = x.Owner;
         m.Portrait = UiAtlas.IconFor(x.Name);
         m.ShowHp = true; m.Hp = Math.Max(0, x.Hp); m.MaxHp = x.MaxHp;
-        string lvl = x.Kind == "unit" && x.Level > 0 ? $"Level {x.Level}" : x.Kind == "building" ? "Building" : "";
-        int rel = x.Owner != null && x.Owner != Me ? Me.Relation(x.Owner) : 2;
-        string owner = x.Owner != null
-            ? (x.Owner == Me ? "" : $" · {(H.Campaign ? x.Owner.Name + " (" : "")}{(rel == 2 ? "ally" : rel == 1 ? "neutral" : "enemy")}{(H.Campaign ? ")" : "")}")
-            : (x is Unit { Wild: true } ? " · wild" : "");
-        m.Line = lvl + owner;
+        // Info.usl CInfo.Update: the class icon, the name beside it, the owner's (player's) name under them
+        m.TypeIcon = x.Kind == "building" ? "tt_class_bldg" : x.Cls switch { "CHTR" => "tt_class_chtr", "ANML" => "tt_class_anml", "VHCL" => "tt_class_vhcl", _ => "tt_class_other" };
+        m.Line = x.Owner == null ? "" : x.Owner.Name.StartsWith("_") ? D.Ui(x.Owner.Name, x.Owner.Name) : x.Owner.Name;
+        // the six values in the frame's rows (CAttribIcon: attack, rangeattack, shield, armor, range, skulls - "-" for 0,
+        // "min - max" for a range with a minimum), shown when any of them is not 0
+        var mw = x.Weapons.Short != null && string.IsNullOrEmpty(x.Weapons.Short.Projectile) ? x.Weapons.Short
+               : x.Weapons.Long != null && string.IsNullOrEmpty(x.Weapons.Long.Projectile) ? x.Weapons.Long : null;
+        var rw = x.Weapons.Long != null && !string.IsNullOrEmpty(x.Weapons.Long.Projectile) ? x.Weapons.Long : null;
         var w = x.Weapons.Long ?? x.Weapons.Short;
-        if (w != null)
+        if (w != null || (x.Stats != null && x.Stats.Scalps != 0))
         {
-            // values after the tribe's upgrades (Damage / Defence / RangedDefence / Range modifiers)
-            var cs = x.Cs(w);
-            double dmg = cs?.Dmg ?? w.Dmg, prot = cs?.Prot ?? w.Def, rprot = cs?.RProt ?? w.RDef, range = cs?.Range ?? w.Range;
-            bool proj = !string.IsNullOrEmpty(w.Projectile);
-            // the attack's icon and help item (Info.usl Generate_AttribBitmapSource_And_Tooltip): info_attack /
-            // info_rangeattack with _pierce, _poison, _area - the kind of damage is the icon (the green poison drop, the
-            // blast), the row's text only the damage, as in the original
-            var kind = (proj ? "rangeattack" : "attack") + (w.Ap != 0 ? "_pierce" : "") + (w.Poison != 0 ? "_poison" : "") + (w.Splash != 0 ? "_area" : "");
-            var icn = UiAtlas.Entry("info_" + kind, 9) != null ? "info_" + kind : proj ? "info_rangeattack" : "info_attack";
-            m.Stats.Add((icn, R(dmg), "_iw_" + kind));
-            if (proj) m.Stats.Add(("info_range", $"{(w.MinRange != 0 ? TT.JsString(w.MinRange) + "–" : "")}{R(range)} m", "_iw_range"));
-            m.Stats.Add(("info_armor", R(prot), "_iw_defense_melee"));
+            string Kind(Weapon wp, string b) => b + (wp.Ap != 0 ? "_pierce" : "") + (wp.Poison != 0 ? "_poison" : "") + (wp.Splash != 0 ? "_area" : "");
+            string Icon(string k, string b) => UiAtlas.Entry("info_" + k, 9) != null ? "info_" + k : "info_" + b;
+            string V(double v) => v == 0 || double.IsNaN(v) ? "-" : R(v);
+            var mcs = mw != null ? x.Cs(mw) : null; var rcs = rw != null ? x.Cs(rw) : null; var wcs = w != null ? x.Cs(w) : null;
+            var mk = mw != null ? Kind(mw, "attack") : "attack";
+            var rk = rw != null ? Kind(rw, "rangeattack") : "rangeattack";
+            m.Stats.Add((Icon(mk, "attack"), mw != null ? V(mcs?.Dmg ?? mw.Dmg) : "-", "_iw_" + mk));
+            m.Stats.Add((Icon(rk, "rangeattack"), rw != null ? V(rcs?.Dmg ?? rw.Dmg) : "-", "_iw_" + rk));
+            m.Stats.Add(("info_shield", w != null ? V(wcs?.RProt ?? w.RDef) : "-", "_iw_defense_arrow"));
+            m.Stats.Add(("info_armor", w != null ? V(wcs?.Prot ?? w.Def) : "-", "_iw_defense_melee"));
             // the armour's bonus per attacker type (MIRAGE's mirage_item_stat_display, Info.usl CAttribIcon): the weapon's
             // DefenseBonus with the tech tree's Defence_<type> modifiers - the bony amulet's +10 against animals
-            // (World.DefenceBonusVs, as TakeDmg applies it). The shield gets none: the rules give ranged attacks no bonus.
             var vs = DefenceLines(x);
-            if (vs.Count > 0) m.StatLines[m.Stats.Count - 1] = vs;
-            m.Stats.Add(("info_shield", R(rprot), "_iw_defense_arrow"));
+            if (vs.Count > 0) m.StatLines[3] = vs;
+            var lw = rw ?? w;
+            double range = lw != null ? (x.Cs(lw)?.Range ?? lw.Range) : 0;
+            m.Stats.Add(("info_range", lw != null && lw.MinRange != 0 && range != 0 ? $"{TT.JsString(lw.MinRange)} - {R(range)}" : V(range), "_iw_range"));
+            m.Stats.Add(("info_skulls", x.Stats != null && x.Stats.Scalps != 0 ? ScalpsText(x) : "-", "_iw_skulls"));
+            if (m.Stats.All(st => st.Value == "-")) { m.Stats.Clear(); m.StatLines.Clear(); }
         }
+        bool attribs = m.Stats.Count > 0;
         var pax = W.PassengersOf(x);
-        if (pax != null && pax.Count > 0) m.Stats.Add(("resicon_unit", $"{pax.Count} inside", null));
-        if (x is Building gb && gb.Def?.Gate == true && gb.Built)
+        if (!attribs && pax != null && pax.Count > 0) m.Stats.Add(("resicon_unit", $"{pax.Count} inside", null));
+        if (!attribs && x is Building gb && gb.Def?.Gate == true && gb.Built)
             m.Stats.Add(("info_armor", new[] { "open", "closed", "automatic" }[Math.Clamp(gb.GateState, 0, 2)] + (gb.GateOpen ? " (open)" : ""), null));
         // MIRAGE's SEAS well: its energy (Info.usl "energystate" / "maxenergyamount")
-        if (x is Building hw && hw.SeasWell is { } sw && sw.Max > 0) m.Stats.Add((UiAtlas.Entry("bufficon_heal", 9) != null ? "bufficon_heal" : "info_armor", $"{Math.Floor(sw.Energy)} / {R(sw.Max)}", null));
-        if (x is Building wb && wb.WarpT != null) m.Stats.Add(("info_skulls", $"victory in {Math.Max(0, Math.Ceiling(wb.WarpT.Value))} s", null));
-        if (x.Stats != null && x.Stats.Scalps != 0 && x.Owner != Me) m.Stats.Add(("info_skulls", ScalpsText(x), "_iw_skulls"));
-        // what it carries: a row too
+        if (!attribs && x is Building hw && hw.SeasWell is { } sw && sw.Max > 0) m.Stats.Add((UiAtlas.Entry("bufficon_heal", 9) != null ? "bufficon_heal" : "info_armor", $"{Math.Floor(sw.Energy)} / {R(sw.Max)}", null));
+        if (!attribs && x is Building wb && wb.WarpT != null) m.Stats.Add(("info_skulls", $"victory in {Math.Max(0, Math.Ceiling(wb.WarpT.Value))} s", null));
+        if (!attribs && x.Stats != null && x.Stats.Scalps != 0 && x.Owner != Me) m.Stats.Add(("info_skulls", ScalpsText(x), "_iw_skulls"));
+        // what it carries: a row too, or (beside the six) under them
         if (x is Unit cu && cu.Carry != null && cu.Carry.Amount > 0)
-            m.Stats.Add((RES_ICON.GetValueOrDefault(cu.Carry.Res == "food" ? "food" : cu.Carry.Res) ?? "resicon_food", TT.JsString(cu.Carry.Amount), null));
+        {
+            var ci = RES_ICON.GetValueOrDefault(cu.Carry.Res == "food" ? "food" : cu.Carry.Res) ?? "resicon_food";
+            if (!attribs) m.Stats.Add((ci, TT.JsString(cu.Carry.Amount), null));
+            else m.Carry = (ci, TT.JsString(cu.Carry.Amount));
+        }
         // Info.usl CInfo: one value per row of the window's frame, ATTR_BASE 117, 34, ATTR_OFFSET 17 (six rows)
         if (m.Stats.Count > 6) m.Stats.RemoveRange(6, m.Stats.Count - 6);
         // the item it carries (Info.usl: the item slot, with the item's help as its tooltip)
@@ -407,7 +423,7 @@ public sealed class HudModel
         if (sel.Count == 0) { Menu = null; _selSig = ""; _selIds.Clear(); _menuNew = false; return res; }
         var workers = sel.Where(e => e is Unit u && u.IsWorker && u.CanBuild).ToList();     // (harvesting vehicles build nothing)
         var units = sel.OfType<Unit>().ToList();
-        var producer = sel.Count == 1 && G.ProducerActions(sel[0]).Any(a => a.Kind != "Moves") ? sel[0] : null;
+        var producer = G.Producer(sel);       // (one object, or several buildings: the first that produces)
         // a selection the player makes - by click, box, double click, control group, the pyramid, the info window, again
         // the same one - opens its main menu (OnSelectionChanged); so does one with something new in it that came another
         // way (a game loaded). What only shrinks it by itself (deaths, a unit lost) leaves the menu as it is.
@@ -509,22 +525,23 @@ public sealed class HudModel
         {
             var acts = G.BuildActions();
             // MIRAGE puts more in the build menu: subcat UNIT (the SEAS carrier, the launch pads, the floating harbour, the
-            // final boss) - a row of its own, like any other subcat the remake doesn't know
-            var BROWS = new[] { ("ECON", "Economy"), ("COMB", "Military"), ("DEFE", "Defence"), ("UNIT", "Special") };
-            foreach (var (k, t) in BROWS) rows.Add(new FlyoutRow(t, ByPos(acts.Where(a => a.Subcat == k))));
+            // final boss) - a row of its own, the top one (MIRAGE CommandBar.usl: SetCategory 0 UNIT, 1 ECON, 2 COMB,
+            // 3 DEFE; the base game's ECON, COMB, DEFE), like any other subcat the remake doesn't know
+            var BROWS = new[] { ("UNIT", "Special"), ("ECON", "Economy"), ("COMB", "Military"), ("DEFE", "Defence") };
+            foreach (var (k, t) in BROWS) rows.Add(new FlyoutRow(t, ByPos(acts.Where(a => a.Subcat == k)), k));
             var brest = acts.Where(a => !BROWS.Any(b => b.Item1 == a.Subcat)).ToList();
             if (brest.Count > 0) rows.Add(new FlyoutRow("More", ByPos(brest)));
         }
         else if (Menu == "produce")
         {
             // Dustriders: UMGR (the farms' modes), UPGR, UNIT; the others: UPGR, UNIT
-            var acts = G.ProducerActions(sel.FirstOrDefault()).Select(a => new HudAction { A = a }).ToList();
+            var acts = G.ProducerActions(G.Producer(sel) ?? sel.FirstOrDefault()).Select(a => new HudAction { A = a }).ToList();
             string Sub(HudAction a) => a.Subcat ?? (a.A!.Kind == "Build" ? "UNIT" : "UPGR");
             // MIRAGE adds rows: ENTY (taverns: the heroes are split over UNIT and ENTY; the SEAS garage's dinosaurs, the Norse
             // animal farm's), EXTE / RESE (laboratory, weapons builder), CONV (the brachiosaurus' and catapult rex's
             // conversions); a subcat the remake doesn't know yet still gets a row rather than disappearing
             var ROWS = new[] { ("UMGR", "Modes"), ("UPGR", "Upgrades"), ("EXTE", "Extensions"), ("RESE", "Research"), ("CONV", "Conversions"), ("UNIT", "Units"), ("ENTY", "Units") };
-            foreach (var (k, t) in ROWS) rows.Add(new FlyoutRow(t, ByPos(acts.Where(a => Sub(a) == k))));
+            foreach (var (k, t) in ROWS) rows.Add(new FlyoutRow(t, ByPos(acts.Where(a => Sub(a) == k)), k));
             var rest = acts.Where(a => !ROWS.Any(r => r.Item1 == Sub(a))).ToList();
             if (rest.Count > 0) rows.Add(new FlyoutRow("More", ByPos(rest)));
         }
@@ -696,6 +713,7 @@ public sealed class HudModel
                 if (u != null)
                 {
                     c.Hp = Math.Clamp(u.MaxHp > 0 ? u.Hp / u.MaxHp : 1, 0, 1);
+                    c.HpSlice = u.MaxHp > 0 ? HpBarRule.Slice(u.Hp, u.MaxHp) : 100;
                     c.Task = TaskIcon(u);
                     c.Selected = sel.Contains(u);
                     c.CanLevelUp = u is Unit uu && lv < 4 && p["skulls"] >= D.LevelupSkulls[lv] && W.CanHaveLevel(uu, lv + 2);

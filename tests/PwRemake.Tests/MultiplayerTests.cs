@@ -270,7 +270,7 @@ public static class MultiplayerTests
     /// computer players on the huge random jungle runs the same on every machine</summary>
     public static void SixteenPlayers(TestContext t)
     {
-        t.Equal(4, NetProtocol.Version, "protocol 4: 16 players, custom colours (3), a mission's game options (4)");
+        t.Equal(8, NetProtocol.Version, "protocol 8: 16 players, custom colours (3), a mission's game options (4), the map's content hash (5), the map sent to a player who lacks it (6), co-op armies per seat (7), the campaign colour (8)");
         using (var r = Make(t, "base", 16, () => SkirmishLobby(16, 0)))
         {
             t.Equal(16, r.Host.Lobby.Skirmish!.Slots.Count(s => s.Type == "human"), "sixteen human slots taken");
@@ -580,6 +580,97 @@ public static class MultiplayerTests
         SameWorlds(t, r, "the two-seat co-op game");
     }
 
+    /// <summary>mode 2, a mission with an army budget (mission 2), over the network (docs/COOP.md "Armies"): each human buys
+    /// the army of its own seat on its own machine - seat 2 before the start (in the lobby), seat 1 after the host pressed
+    /// Start (the lobby state "armies" until every human seat has chosen); a faction change drops a seat's army; the
+    /// armies travel to the host ("coop-army") and into GameStart (CoopSeat.Army, seat 1's GameStart.Army); every machine
+    /// places them the same; the AI commander keeps its definition army. Then: nobody chooses - the host starts after its
+    /// timeout with the level's armies.</summary>
+    public static void CoopCampaignArmies(TestContext t)
+    {
+        const double CREDITS = 4000;
+        LobbyState Lobby()
+        {
+            var l = CoopCampaignLobby(t, 2, new[] { "human", "human", "ai" }, new[] { "", "Aje", "Ninigi" });
+            l.Coop!.ArmyBudget = true; l.Coop.Credits = CREDITS;
+            return l;
+        }
+        using var r = Make(t, "base", 2, Lobby);
+        var c = r.Cfg;
+        var folder = MissionSession.MissionFolderOf(new GameStart { Mission = 2 }, c.Config)!;
+        var mj = PwRemake.Sim.Maps.PwMapReader.MissionOf(folder);
+        var PB = new PointBuy(c.Rules, null);
+        // seat 2 (the second machine): its own shop and budget, no story heroes; it buys two warriors
+        var o2 = CampaignArmy.ForCoopSeat(mj, c.Rules, "Aje", CREDITS, 2);
+        t.True(o2 != null, "mission 2 has an army screen");
+        var a2 = o2!.Defaults();
+        t.True(a2.Cards.Values.All(x => c.Rules.Def(PB.Resolve(x, "Aje").Cls, null)?.Unique != true), "seat 2's army has no story hero");
+        t.True(o2.Allowed == null || o2.Allowed.All(x => c.Rules.Def(PB.Resolve(x, "Aje").Cls, null)?.Unique != true), "nor does its shop");
+        t.Log($"seat 2: total {o2.Total}, left {PB.Left(a2, o2.Total, "Aje")}, warrior {PB.Price("aje_warrior", 1, "Aje")}, blocked {string.Join("/", o2.Blocked)}, cards {string.Join(" ", a2.Cards.Select(kv => kv.Key + ":" + kv.Value))}, allowed {(o2.Allowed == null ? "all" : string.Join(" ", o2.Allowed))}");
+        t.True(PB.BuyLowest(a2, "aje_warrior", o2.Total, "Aje", o2.Blocked) != null && PB.BuyLowest(a2, "aje_warrior", o2.Total, "Aje", o2.Blocked) != null, "two warriors bought");
+        int want2 = a2.Cards.Values.Count(x => x == "aje_warrior");
+        r.M[1].Net.SetCoopArmy(a2);
+        r.Until(t, () => r.M[0].Net.Lobby!.Coop!.Seats[1].ArmyDone, "seat 2's army reached the host and the lobby");
+        t.Equal(want2, r.M[0].Net.Lobby!.Coop!.Seats[1].Army!.Cards.Values.Count(x => x == "aje_warrior"), "everybody sees seat 2's army");
+        // a faction change drops it; chosen again
+        r.M[1].Net.SetCoopTribe("Ninigi");
+        r.Until(t, () => r.Host.Lobby.Coop!.Seats[1].Tribe == "Ninigi", "the faction changed");
+        t.True(!r.Host.Lobby.Coop!.Seats[1].ArmyDone, "another faction: the army must be chosen again");
+        r.M[1].Net.SetCoopTribe("Aje");
+        r.Until(t, () => r.Host.Lobby.Coop!.Seats[1].Tribe == "Aje", "the faction back");
+        r.M[1].Net.SetCoopArmy(a2);
+        r.Until(t, () => r.Host.Lobby.Coop!.Seats[1].ArmyDone, "seat 2's army again");
+        // the host starts: seat 1 has not chosen - the armies are waited for
+        r.M[1].Net.SetReady(true);
+        r.Until(t, () => r.Host.Lobby.Players.All(p => p.Ready), "everybody ready");
+        r.M[0].Net.HostStart(null);
+        r.Until(t, () => r.M.All(m => m.Net.Lobby?.State == "armies"), "the lobby state \"armies\" on every machine");
+        t.True(r.M[1].Net.Lobby!.ArmyWait > 0 && r.M[1].Net.Lobby!.Coop!.ArmiesOpen.Select(x => x.Seat).SequenceEqual(new[] { 1 }), "seat 1 is waited for, with the time left");
+        for (int i = 0; i < 20; i++) { r.Pump(); Thread.Sleep(5); }
+        t.True(r.M.All(m => m.Net.Start == null), "no start while seat 1 chooses");
+        // seat 1 (the host's machine): the mission's army with one more warrior
+        var o1 = CampaignArmy.ForCoopSeat(mj, c.Rules, "", CREDITS, 1)!;
+        var a1 = o1.Defaults();
+        t.Log($"seat 1: total {o1.Total}, left {PB.Left(a1, o1.Total, o1.Tribe)}, cards {string.Join(" ", a1.Cards.Select(kv => kv.Key + ":" + kv.Value))}");
+        t.True(PB.BuyLowest(a1, "hu_warrior", o1.Total, o1.Tribe, o1.Blocked) != null, "seat 1 buys a warrior");
+        r.M[0].Net.SetCoopArmy(a1);
+        r.Until(t, () => r.M.All(m => m.Net.Start != null), "the start reached everybody once every army is chosen");
+        var start = r.M[1].Net.Start!;
+        t.True(start.Army != null && start.Army.Cards.Count == a1.Cards.Count, "seat 1's army is the campaign's army (GameStart.Army)");
+        t.True(start.Coop!.SeatOf(2)!.Army is { } sa2 && sa2.Cards.Values.Count(x => x == "aje_warrior") == want2, "seat 2's army in the start");
+        t.True(start.Coop.SeatOf(3)!.Army == null, "the AI commander buys nothing");
+        foreach (var m in r.M) Build(t, r, m, false);
+        r.Until(t, () => r.M.All(m => m.Net.Running) && r.Host.Lobby.State == "running", "the game runs");
+        foreach (var m in r.M)
+        {
+            var co = ((MissionSession)m.Game!.Sim).Campaign.Coop!;
+            var W = m.Game.W;
+            var p1 = co.Seats.First(x => x.Seat == 1).Player; var p2 = co.Seats.First(x => x.Seat == 2).Player; var p3 = co.Seats.First(x => x.Seat == 3).Player;
+            t.True(W.Units.Count(u => u.Alive && u.Owner == p1 && u.Name == "hu_warrior") >= a1.Cards.Values.Count(x => x == "hu_warrior"), $"{m.Name}: seat 1's bought warriors");
+            t.Equal(want2, W.Units.Count(u => u.Alive && u.Owner == p2 && u.Name == "aje_warrior"), $"{m.Name}: seat 2's bought warriors");
+            t.True(W.Units.Any(u => u.Alive && u.Owner == p2 && u.Name == "aje_resource_collector") || W.Buildings.Any(b => b.Alive && b.Owner == p2), $"{m.Name}: seat 2 has its main building (once)");
+            t.True(W.Units.Count(u => u.Alive && u.Owner == p2 && u.Name == "aje_resource_collector") <= 1, $"{m.Name}: not two collectors");
+            t.True(W.Units.Any(u => u.Alive && u.Owner == p3), $"{m.Name}: the AI commander has its definition army");
+        }
+        Play(t, r, 300);
+        SameWorlds(t, r, "the co-op game with bought armies");
+
+        // nobody chooses: the host's timeout starts the game with the level's armies
+        using var r2 = Make(t, "base", 2, Lobby);
+        r2.Host.ArmyTimeout = 1;
+        r2.M[1].Net.SetReady(true);
+        r2.Until(t, () => r2.Host.Lobby.Players.All(p => p.Ready), "everybody ready (2)");
+        r2.M[0].Net.HostStart(null);
+        r2.Until(t, () => r2.M.All(m => m.Net.Lobby?.State == "armies"), "the armies are waited for (2)");
+        r2.Until(t, () => r2.M.All(m => m.Net.Start != null), "the start after the timeout", 15000);
+        var st2 = r2.M[0].Net.Start!;
+        t.True(st2.Army == null && st2.Coop!.Seats.All(x => x.Army == null), "the level's armies for every seat");
+        foreach (var m in r2.M) Build(t, r2, m, false);
+        r2.Until(t, () => r2.M.All(m => m.Net.Running), "the game runs (2)");
+        Play(t, r2, 100);
+        SameWorlds(t, r2, "the co-op game after the army timeout");
+    }
+
     // ======================================================================================== saves and replays
     /// <summary>a networked co-op game saved by the host's machine (its recorder, as the game's): the save replays to the same
     /// world in a fresh session (the lockstep presenter answers again); the host's own record of the turns (a dedicated
@@ -622,6 +713,117 @@ public static class MultiplayerTests
         t.Equal(r.Host.LastIssued, server.Steps, "the host's turns to the last issued step");
         // (the machines stand at the last turn: the server's replay ends there too)
         t.Equal(want, Replay(server, "the server's replay"), "the host's record of the turns replays to the same world");
+    }
+
+    // ======================================================================================== the map sent to a player
+    /// <summary>MapFiles.UserDir set for a while (two machines in one process: each has its own maps folder)</summary>
+    sealed class UserDirScope : IDisposable
+    {
+        readonly string? _was;
+        public UserDirScope(string dir) { _was = PwRemake.Sim.Maps.MapFiles.UserDir; PwRemake.Sim.Maps.MapFiles.UserDir = dir; }
+        public void Dispose() => PwRemake.Sim.Maps.MapFiles.UserDir = _was;
+    }
+
+    /// <summary>Warcraft 3 style (protocol 6, docs/MULTIPLAYER.md "Maps"): the host's machine has a map of its own (My maps),
+    /// the second player has none - it asks, the host sends the .pwmap in chunks over the lobby's connection (the progress
+    /// at the player's name, the start refused meanwhile), the player checks and keeps it in My maps/downloaded/&lt;hash&gt;.pwmap;
+    /// then the problem is gone, the game starts and both worlds - one built from the host's folder, one from the received
+    /// file - are the same at every hash check. A damaged or foreign map is refused.</summary>
+    public static void MapTransferToPlayerWithoutMap(TestContext t)
+    {
+        var root = Path.Combine(Path.GetTempPath(), "pw_mp_maps_" + Guid.NewGuid().ToString("N")[..8]);
+        string dirA = Path.Combine(root, "A"), dirB = Path.Combine(root, "B");
+        Directory.CreateDirectory(dirA); Directory.CreateDirectory(dirB);
+        string hash;
+        using (new UserDirScope(dirA))
+        {
+            var d = EditorSaveTests.Edited();
+            d.Save(Path.Combine(dirA, "Arena"));
+            // (a bigger map: a file of the folder - a module custom.lua could load - so that it goes in several chunks)
+            var extra = new byte[400_000];
+            uint x = 7;
+            for (int i = 0; i < extra.Length; i++) { x = x * 1664525 + 1013904223; extra[i] = (byte)(x >> 24); }
+            File.WriteAllBytes(Path.Combine(dirA, "Arena", "notes.bin"), extra);
+            hash = PwRemake.Sim.Maps.MapFiles.ContentHash(Path.Combine(dirA, "Arena"));
+        }
+        var lobby = SkirmishLobby(2, 0);
+        lobby.Skirmish!.Map = "User/Arena"; lobby.Skirmish.MapName = "Arena"; lobby.Skirmish.MapHash = hash;
+        using var r = Make(t, "base", 2, () => lobby, new[] { "Kacper", "Zidell" });
+        var cfg = r.Cfg.Config;
+        r.Host.MapFile = (id, h) => { using (new UserDirScope(dirA)) { var b = MapTransfer.PackFor(cfg, id, h, out var why); return (b, why); } };
+        var hostM = r.M[0]; var other = r.M[1];
+        other.Net.MapDir = Path.Combine(dirB, PwRemake.Sim.Maps.MapFiles.DownloadedFolder);      // (its maps folder: in the game MapFiles.UserDir's)
+        var syncA = new LobbyMapSync(hostM.Net, () => cfg);
+        var syncB = new LobbyMapSync(other.Net, () => cfg);
+        var progress = new SortedSet<double>();
+        // (every lobby the host sends: the player's progress as everybody sees it)
+        other.Net.LobbyChanged += l => { if (l.Peers.FirstOrDefault(p => p.Name == "Zidell")?.MapProgress is double mp) progress.Add(mp); };
+        void Pump()
+        {
+            r.Pump();
+            using (new UserDirScope(dirA)) syncA.Update();
+            using (new UserDirScope(dirB)) syncB.Update();
+        }
+        void Until(Func<bool> ok, string what)
+        {
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+            while (!ok()) { if (sw.ElapsedMilliseconds > 15000) t.True(false, "timed out waiting for: " + what); Pump(); Thread.Sleep(1); }
+        }
+        // the player without the map asks for it; while it arrives the host cannot start
+        string? seenProblem = null;
+        Until(() => (seenProblem ??= r.Host.Lobby.Peers.FirstOrDefault(p => p.Name == "Zidell")?.Problem is { } pr && pr.Contains("receiving the map") ? pr : null) != null
+                    || File.Exists(Path.Combine(dirB, "downloaded", hash + ".pwmap")), "Zidell asks for the map");
+        t.True(seenProblem != null, "the lobby shows the transfer at the player's name: " + seenProblem);
+        Until(() => File.Exists(Path.Combine(dirB, "downloaded", hash + ".pwmap")) && r.Host.Lobby.Peers.All(p => p.Problem == null)
+                    && other.Net.Lobby?.Peers.All(p => p.Problem == null) == true, "the map arrived and the problem is gone (as the player sees the lobby too)");
+        t.True(progress.Count >= 3 && progress.Max == 1, $"the progress in the lobby went up in steps: {string.Join(", ", progress.Select(x => x.ToString("0.00")))}");
+        var got = Path.Combine(dirB, "downloaded", hash + ".pwmap");
+        t.Equal(hash, PwRemake.Sim.Maps.MapFiles.ContentHash(got), "the received .pwmap has the host's content hash");
+        using (new UserDirScope(dirB))
+        {
+            t.True(LobbyMap.Problem(cfg, r.Host.Lobby.Skirmish) == null, "the player's copy is the host's now");
+            t.Equal(got, PwRemake.Sim.Game.SkirmishMaps.Resolve(cfg, "User/Arena", hash), "the setup's map id finds the received copy by its hash");
+            t.True(PwRemake.Sim.Maps.MapFiles.Find(cfg, "User/Arena") == null, "(the player has no map of that name of its own)");
+        }
+        t.True(other.Net.MapError == null && other.Net.MapReceiving == null, "no error on the player's side");
+        // the game: each machine builds its world from its own copy of the map
+        other.Net.SetReady(true);
+        Until(() => r.Host.Lobby.Players.All(p => p.Ready) && LobbyStart.Problem(r.Host.Lobby) == null, "everybody ready, nothing refuses the start");
+        hostM.Net.HostStart(null);
+        r.Until(t, () => r.M.All(m => m.Net.Start != null), "the start reached everybody");
+        foreach (var (m, dir) in new[] { (hostM, dirA), (other, dirB) })
+        {
+            var start = m.Net.Start!;
+            string? path;
+            using (new UserDirScope(dir)) path = PwRemake.Sim.Game.SkirmishMaps.Resolve(cfg, start.Skirmish!.Map, start.Skirmish.MapHash);
+            t.True(path != null && PwRemake.Sim.Maps.MapFiles.ContentHash(path) == hash, $"{m.Name}: the map of the start ({path})");
+            var c = r.Cfg;
+            var sk = SkirmishSession.Create(start.Skirmish!.Clone(), path, c.Rules, c.Models, c.Forest, c.Brushes, c.Ai, flags: SimFlags.Game);
+            Seats.Apply(sk.World, start.Seats);
+            m.Ui.W = sk.World;
+            m.Game = new LockstepGame(m.Net, sk, start, m.Net.Seat, null) { DumpDir = r.DumpDir };
+            m.Net.Loaded();
+        }
+        r.Until(t, () => r.M.All(m => m.Net.Running) && r.Host.Lobby.State == "running", "the game runs");
+        Play(t, r, 600);
+        SameWorlds(t, r, "30 s on the sent map");
+        t.True(hostM.Game!.W.Players.Count == 2 && hostM.Game.W.Buildings.Count > 0, "two players on the map");
+        // what the player refuses
+        var bytes = File.ReadAllBytes(got);
+        var bad = Path.Combine(root, "bad");
+        bool Refused(Action a, string what) { try { a(); return false; } catch (InvalidDataException e) { t.Log($"refused ({what}): {e.Message}"); return true; } }
+        t.True(Refused(() => MapTransfer.Store(bytes, "0123456789abcdef", bad), "another hash"), "a map whose content is not the lobby's hash");
+        t.True(Refused(() => MapTransfer.Store(bytes, "../../evil", bad), "a bad name"), "a hash that is no hash (a path)");
+        t.True(Refused(() => MapTransfer.Store(new byte[] { 1, 2, 3 }, hash, bad), "not a zip"), "not a zip");
+        using (var ms = new MemoryStream())
+        {
+            using (var z = new System.IO.Compression.ZipArchive(ms, System.IO.Compression.ZipArchiveMode.Create, true))
+            using (var w = new StreamWriter(z.CreateEntry("../outside.lua").Open())) w.Write("return {}");
+            var evil = ms.ToArray();
+            t.True(Refused(() => MapTransfer.Store(evil, hash, bad), "an entry outside"), "an entry outside the map");
+        }
+        t.True(!Directory.Exists(bad) || Directory.GetFiles(bad).Length == 0, "nothing of the refused maps stays");
+        try { Directory.Delete(root, true); } catch (IOException) { }
     }
 }
 

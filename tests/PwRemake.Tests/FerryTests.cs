@@ -14,6 +14,8 @@
 //   Mission12ShipCrossing  base mission 12: the Hu (transport ship) and the Aje (turtle, amphibious) cross to the player's
 //                          island with a transport each; boarding begins at once (it waited for every 7th think of the
 //                          attack goal: up to 30 s, then 35 s between the rounds) and the squads land within 4 minutes.
+//                          The attack is ordered once each of the two has a fighter (the Aje start with workers only; their
+//                          first raptor handler comes at 30 - 50 s by the seed: at 30 s seeds 2, 6 and 7 had none).
 //
 // A transport shot down on its way is a legitimate end of a crossing, not a transport that stood (LandedOrShotDown). Mission
 // 15's p3 hovercraft sails the last ~80 m along the player's shore, where the player's heroes and fighters (Bela, Tesla,
@@ -100,10 +102,14 @@ public static class FerryTests
         public readonly Dictionary<(int P, int A), (double T, string By, bool Enemy, double Covered)> Lost = new();
     }
     static double DistP(Entity e, Pt p) => Math.Sqrt((e.Pos.X - p.X) * (e.Pos.X - p.X) + (e.Pos.Z - p.Z) * (e.Pos.Z - p.Z));
-    static Crossings Run(TestContext t, MissionSession s, double warm, double minutes, Func<TribeAI, bool> who, bool giveTransport)
+    static Crossings Run(TestContext t, MissionSession s, double warm, double minutes, Func<TribeAI, bool> who, bool giveTransport, bool waitFighter = false)
     {
         var W = s.World; var C = new Crossings();
         s.Run(warm);
+        // (waitFighter: a player with no fighter yet waits for its first one, up to two minutes more: base mission 12's Aje start with
+        // workers only, and their first raptor handler comes out at 30 - 50 s by the seed - at 30 s it was there on seed 1
+        // alone, and on seeds 2, 6 and 7 the Aje never attacked: "p5: a crossing" failed)
+        for (int i = 0; waitFighter && i < 120 && W.Players.Any(pl => W.Brains.Get(pl.Id) is TribeAI ai && who(ai) && ai.Census(true).Pool.Count == 0); i++) s.Run(1);
         var hum = W.Players.First(x => !x.Ai);
         var hb = W.Buildings.Where(b => b.Alive && b.Owner == hum).OrderByDescending(b => b.Def!.Script == "CHQ" ? 1 : 0).First();
         var brains = new List<TribeAI>();
@@ -207,9 +213,11 @@ public static class FerryTests
 
     public static void Mission12ShipCrossing(TestContext t)
     {
-        var s = CampaignTests.Session(t, "base", 12, "", difficulty: 1);
+        // (PW_FERRY_SEED: another seed - the crossings were checked on seeds 1-8)
+        ulong seed = ulong.TryParse(Environment.GetEnvironmentVariable("PW_FERRY_SEED"), out var sd) ? sd : 1;
+        var s = CampaignTests.Session(t, "base", 12, "", difficulty: 1, seed: seed);
         // the Hu (player 4: transport ship at its harbour) and the Aje (player 5: transport turtle, amphibious)
-        var C = Run(t, s, 30, 5, ai => ai.P.Id is 4 or 5, true);
+        var C = Run(t, s, 30, 5, ai => ai.P.Id is 4 or 5, true, waitFighter: true);
         foreach (var id in new[] { 4, 5 })
         {
             var mine = C.Log.Where(kv => kv.Key.P == id).OrderBy(kv => kv.Value.Start).ToList();
@@ -222,5 +230,50 @@ public static class FerryTests
         }
         t.True(C.Log.Any(kv => kv.Key.P is 4 or 5 && kv.Value.Landed != null && kv.Value.Landed - kv.Value.Start <= 240), "a squad landed within 4 minutes");
         t.True(C.Still.Max <= 15, $"no squad stood more than 15 s with its transports (longest {C.Still.Max:0} s: {C.Still.Who})");
+    }
+
+    /// <summary>a crossing that ends without landing clears its state and frees its transports (2026-11-20: only a landing
+    /// cleared FerryState; an attack ended from outside kept its transports claimed). Base mission 12, players 4 (Hu,
+    /// transport ship) and 5 (Aje, turtle): p4's crossing ends with its transport destroyed while boarding, p5's attack
+    /// is ended from outside during its crossing.</summary>
+    public static void FerryStateCleared(TestContext t)
+    {
+        var s = CampaignTests.Session(t, "base", 12, "", difficulty: 1);
+        var W = s.World;
+        s.Run(30);
+        var hum = W.Players.First(x => !x.Ai);
+        var hb = W.Buildings.Where(b => b.Alive && b.Owner == hum).OrderByDescending(b => b.Def!.Script == "CHQ" ? 1 : 0).First();
+        var brains = new List<TribeAI>();
+        foreach (var id in new[] { 4, 5 })
+        {
+            if (W.Brains.Get(id) is not TribeAI ai) continue;
+            var S = ai.Census(true);
+            var cls = id == 4 ? "hu_transport_ship" : "aje_transport_turtle";
+            var hp = S.Blds.FirstOrDefault(b => System.Text.RegularExpressions.Regex.IsMatch(b.Name, "harbour|carrier"))?.Pos ?? new V3(S.Home!.Value.X, 0, S.Home.Value.Z);
+            var wn = W.WaterNav!; var (wx, wz) = wn.Center(wn.NearestFree(wn.Idx(hp.X, hp.Z), 40));
+            t.True(W.SpawnUnit(cls, ai.P, wx, wz, null, 0) != null, $"p{id}: a {cls}");
+            ai.StartAutoAttack(new List<Entity> { hb });
+            brains.Add(ai);
+        }
+        t.True(brains.Count == 2, "players 4 and 5 are computer players");
+        // wait until each has a crossing with its transport
+        Attack? Crossing(TribeAI ai) => ai.Attacks.FirstOrDefault(a => a.State == "ferry" && a.FerryState is { Ships.Count: > 0 });
+        double t0 = W.Time;
+        while (W.Time - t0 < 120 && brains.Any(b => Crossing(b) == null)) s.Run(1);
+        var a4 = Crossing(brains[0]); var a5 = Crossing(brains[1]);
+        t.True(a4 != null && a5 != null, "both cross (a transport each)");
+        // p4: its transport destroyed while boarding -> "transport lost", the state cleared
+        var ships4 = a4!.FerryState!.Ships.ToList();
+        bool boarding = a4.FerryState.Phase == "board";
+        foreach (var sh in ships4) W.Kill(sh, null);
+        s.Run(10);
+        t.True(a4.State != "ferry", $"p4: the crossing is over ({a4.State} {a4.Result})");
+        t.True(a4.FerryState == null, $"p4: its FerryState is cleared ({a4.Result}, lost while {(boarding ? "boarding" : "sailing")})");
+        // p5: the attack ended from outside during the crossing -> the transport is free again
+        var ships5 = a5!.FerryState!.Ships.ToList();
+        a5.End("test");
+        t.True(a5.FerryState == null, "p5: an attack ended during its crossing clears it");
+        t.True(ships5.All(sh => !brains[1].Claims.Has(sh)), "p5: its transport is free again (not claimed by the ended attack)");
+        t.True(brains.All(b => b.Attacks.Where(a => a.State == "over").All(a => a.FerryState == null)), "no ended attack keeps a crossing");
     }
 }

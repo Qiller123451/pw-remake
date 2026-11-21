@@ -194,6 +194,7 @@ public sealed partial class World
         if (b != null && !hull && !(info?.Type == "SHIP" && !amph) && TeslaSpawn(b) is var (tx, tz, tr)) { x = tx; z = tz; heading = tr; }
         var u = SpawnUnit(name, p, x, z, item.Level, heading);
         if (u == null) return;
+        InheritInfection(e, u);                   // (an infected building trains infected units: Infection.cs)
         b?.SpawnAnim();
         Emit("trained", new Args { ["unit"] = u, ["producer"] = e });
         // a trade cart's home is the market it came out of (TransportObj.usl: the CTheLite event sets m_xHome); it

@@ -45,7 +45,7 @@ public partial class GameSession
             {
                 case "itemTaken": if (e.U("unit") is { } iu && Vis(iu.Pos)) F?.ItemTaken(iu.Pos); break;
                 case "storagefull": if (e.P("player") == me) F?.StorageFull(e.Str("res") ?? ""); break;
-                case "placed": if (e.B("building") is { } pb && pb.Owner == me) F?.Placed(me.Tribe); break;
+                case "placed": if (me != null && e.B("building") is { } pb && pb.Owner == me) F?.Placed(me.Tribe); break;
                 case "built": if (e.B("building") is { } bb && bb.Owner == me) F?.Built(bb.Pos); break;
                 case "delivered": if (e.U("unit") is { } du && du.Owner == me && Entities.OnScreen(du)) F?.Delivered(du.Name); break;
                 case "trained": if (e.U("unit") is { } tu && tu.Owner == me) F?.Trained(tu.Pos); break;
@@ -131,7 +131,7 @@ public partial class GameSession
                         var ev = alts.Count == 1 ? alts[0] : alts[_rnd.Next(alts.Count)];
                         // (the slot it takes: an idle unit's chatter gives way to walking and work, they to the fights)
                         var prio = AnimSounds.Priority(e.Str("clip"), ev.Group, ae is Unit au ? au.Task.Type : ae is Building ? "building" : null);
-                        try { Sfx.Anim(new PwRemake.View.Audio.AnimSoundEvent(ev.T, ev.Wav, ev.Volume, ev.MaxHear, ev.Group, ev.MinFade), ae.Pos, prio, ae is Unit ? AudioChannel.Unit : AudioChannel.Sfx); } catch (Exception) { }
+                        try { Sfx.Anim(new PwRemake.View.Audio.AnimSoundEvent(ev.T, ev.Wav, ev.Volume, ev.MaxHear, ev.Group, ev.MinFade, ev.Pitch), ae.Pos, prio, ae is Unit ? AudioChannel.Unit : AudioChannel.Sfx); } catch (Exception) { }
                         break;
                     }
             }

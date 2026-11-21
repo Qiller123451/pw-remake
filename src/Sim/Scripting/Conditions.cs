@@ -639,4 +639,23 @@ public static class Conditions
             return Node.Lua.CallCheck(Node.Function, $"Check in \"{T.Name}\"");
         }
     }
+
+    /// <summary>The remake's own: the map's day-night cycle (map.lua day_night, World/DayNight.cs) is in a phase -
+    /// `phase` day / dusk / night / dawn, and `night` (optional, a count expression: `>=3`, `==1`) the night number
+    /// (how many dusks have begun). A trigger without `once` fires each time the phase begins. False on a map without
+    /// a cycle.</summary>
+    public sealed class DAYN : Condition
+    {
+        PwRemake.Sim.World.DayPhase? phase; string night = "";
+        public override void Init() { phase = PwRemake.Sim.World.DayNightState.Parse(P.S("phase")); night = P.S("night"); }
+        public override void OnEnabled() { State = 0; Check(); StartPoll(0.25, 0); }
+        public override void OnDisabled() => StopPoll();
+        public override void Poll() => Check();
+        void Check()
+        {
+            if (H.DayNight is not { } s) { Change(false); return; }
+            bool ok = (phase == null || s.Phase == phase) && (night.Length == 0 || TrigUtil.Compare(s.NightNo, night, Vars));
+            Change(ok);
+        }
+    }
 }

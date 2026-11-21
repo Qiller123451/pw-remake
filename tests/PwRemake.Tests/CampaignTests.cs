@@ -84,14 +84,14 @@ public static class CampaignTests
         return res;
     }
 
-    internal static MissionSession Session(TestContext t, string cfgId, int mission, string tribe = "", int difficulty = 1, ulong seed = 1, IMissionPresenter? presenter = null, DebugOptions? debug = null)
+    internal static MissionSession Session(TestContext t, string cfgId, int mission, string tribe = "", int difficulty = 1, ulong seed = 1, IMissionPresenter? presenter = null, DebugOptions? debug = null, string? color = null)
     {
         var c = LoadCfg(cfgId);
         if (c == null) t.Skip($"configuration {cfgId} or its data not found");
-        var start = new GameStart { Configuration = cfgId, Mission = mission, Tribe = tribe, Difficulty = difficulty, Seed = seed, Debug = debug };
+        var start = new GameStart { Configuration = cfgId, Mission = mission, Tribe = tribe, Difficulty = difficulty, Seed = seed, Debug = debug, Color = color };
         if (MissionSession.MissionFolderOf(start, c!.Config) == null) t.Skip($"mission {mission} not in {cfgId}");
         var e = MissionEntry.LoadIndex(c.Config.MissionsDir).First(x => x.Id == mission);
-        if (WorldBuilder.FindMap(c.Config, e.Map) == null) t.Skip($"map {e.Map} not staged");
+        if (!File.Exists(Path.Combine(c.Config.MissionsDir, e.Folder, "map.lua"))) t.Skip($"mission {mission} not converted to the map format (run Prepare / tools/mapconvert)");
         return MissionSession.Create(start, c.Config, new SessionOptions
         {
             Presenter = presenter, Rules = c.Rules, Models = c.Models, Forest = c.Forest, Brushes = c.Brushes, AiData = c.Ai, DataDir = c.Data,
@@ -175,7 +175,7 @@ public static class CampaignTests
         var human = C.Human!;
         t.True(human != null, "human player");
         // what the data gives the player at the start (the tutorial: nothing - its triggers bring Cole in later) is there
-        var pd = human.Data!;
+        var pd = human!.Data!;
         bool given = (pd["start_army"]?.AsArray().Count ?? 0) > 0 || pd["include_buildings"].Bool() || s.Data.Objects.Any(o => o?["owner"] is System.Text.Json.Nodes.JsonValue ov && ov.GetValue<double>() == human.Id && o["type"].Str() is "CHTR" or "ANML" or "VHCL" or "SHIP" or "BLDG");
         if (given) t.True(s.World.Units.Any(u => u.Owner == human) || s.World.Buildings.Any(b => b.Owner == human) || human.FreeMains.Count > 0, "the player has what the data gives");
         s.Run((minutes ?? Minutes) * 60);
@@ -399,9 +399,9 @@ public static class CampaignTests
             if (c == null) continue;
             foreach (var dir in Directory.GetDirectories(c.Config.MissionsDir).OrderBy(d => d))
             {
-                var wf = Path.Combine(dir, "world.json");
-                if (!File.Exists(wf)) continue;
-                foreach (var o in Json.ParseFile(wf)!["objects"]!.AsArray())
+                var wj = PwRemake.Sim.Maps.PwMapReader.WorldOf(dir);
+                if (wj == null) continue;
+                foreach (var o in wj["objects"]!.AsArray())
                 {
                     var type = o!["type"]!.GetValue<string>(); var ix = c.Rules.Info(o["class"]!.GetValue<string>());
                     if (ix != null && ix.Type != type && FIGHT.Contains(type) && FIGHT.Contains(ix.Type)) odd.Add($"{cfgId} {Path.GetFileName(dir)} {o["name"]} {type}->{ix.Type}");

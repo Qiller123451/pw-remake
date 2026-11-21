@@ -462,12 +462,47 @@ public sealed partial class World
         if (t.Phase == "go")
         {
             bool arrived = t.BSlot is { } sl ? Math.Sqrt((u.Pos.X - sl.X) * (u.Pos.X - sl.X) + (u.Pos.Z - sl.Z) * (u.Pos.Z - sl.Z)) < 1.2 : u.EdgeDist(b) < 1.8;
+            if (!arrived && u.Path.Count == 0 && WayEndedShort(u, b)) return;
             if (arrived || u.Path.Count == 0) { t.Phase = "work"; u.Path = new NavPath(); }
             else { double sp = u.Steer(dt, u.Speed, 0.5); u.MoveAnim(sp, false); return; }
         }
         u.Vel = V3.Zero;
         u.Face(b.Pos.X, b.Pos.Z, dt);
         WorkAnim(u, b);
+    }
+
+    /// <summary>
+    /// a builder (or repairer) whose way ended more than 10 m from the building did not get there: it set to work where
+    /// it stood, and the building went up from across the water (mission 9: the tower at the airplane built from the
+    /// village's shore 465 m off, the launch ramp from the village for 50 minutes; since 2026-11-20 a unit sent to a
+    /// goal it cannot reach walks to the point nearest it and stops, docs/SIMULATION.md "Goals out of reach"). Now: the
+    /// cell of the unit's ground region nearest the building - none within 25 m of its walls (another island): the job is
+    /// given up, the worker stands (true); the unit at that cell: it works from there (false - a building on a rock whose
+    /// slots lie on ground no unit reaches: mission 9's launch ramp stands in rocks, the nearest walkable ground 20 m from
+    /// its walls); else it walks there (true while it has a way).
+    /// </summary>
+    const double REACH_WALLS = 25;
+    bool WayEndedShort(Unit u, Building b)
+    {
+        if (u.EdgeDist(b) <= 10) return false;
+        // (not a harbour: a coastal building and one standing in the water are built from the shore, as before)
+        if (b.Def?.Coastal == true || (WaterNav is { } wn && wn.Block[wn.Idx(b.Pos.X, b.Pos.Z)] == 0)) return false;
+        var nav = NavFor(u); var R = nav.Region;
+        if (R == null) return false;
+        int cu = nav.Idx(u.Pos.X, u.Pos.Z);
+        if (nav.Block[cu] != 0) cu = nav.NearestFree(cu, 6);
+        int reg = R[cu];
+        if (reg < 0) return false;
+        int k = nav.NearestInRegion(nav.Idx(b.Pos.X, b.Pos.Z), reg, 60 + (int)(b.Radius / nav.Cell));
+        var (kx, kz) = k >= 0 ? nav.Center(k) : (0.0, 0.0);
+        if (k < 0 || b.SurfDist(kx, kz) > REACH_WALLS)
+        {
+            ReleaseTask(u); u.Task = UnitTask.Idle(); u.BusyAnim = false; u.Vel = V3.Zero;
+            return true;
+        }
+        if (Math.Sqrt((u.Pos.X - kx) * (u.Pos.X - kx) + (u.Pos.Z - kz) * (u.Pos.Z - kz)) < 3) return false;
+        u.SetPath(kx, kz);
+        return u.Path.Count > 0;
     }
 
     static string HammerOf(Unit u) => $"{(u.Owner != null ? u.Owner.Tribe : u.Def!.Tribe).ToLowerInvariant()}_hammer";
@@ -652,6 +687,7 @@ public sealed partial class World
         if (t.Phase == "go")
         {
             bool arrived = t.BSlot is { } sl ? Math.Sqrt((u.Pos.X - sl.X) * (u.Pos.X - sl.X) + (u.Pos.Z - sl.Z) * (u.Pos.Z - sl.Z)) < 1.2 : u.EdgeDist(b) < 1.8;
+            if (!arrived && u.Path.Count == 0 && WayEndedShort(u, b)) return;
             if (arrived || u.Path.Count == 0) { t.Phase = "work"; u.Path = new NavPath(); }
             else { double sp = u.Steer(dt, u.Speed, 0.5); u.MoveAnim(sp, false); return; }
         }
@@ -709,7 +745,7 @@ public sealed partial class World
     /// refund, an unfinished site's cost is lost too</summary>
     public void SelfDestruct(Building b)
     {
-        if (!b.Alive) return;
+        if (!b.Alive || b.Indestructible) return;          // (a map's indestructible object: Indestructible.cs)
         b.SilentDeath = !b.Built;
         KillBuilding(b, null);
     }

@@ -279,7 +279,7 @@ public sealed partial class World
         if (farm != null) { PickUp(u, t, res, true, t.FarmKind == "unlimited"); return; }
         double amt = t.Space;
         amt = Math.Min(amt, node!.Amount);
-        node.Amount -= amt;
+        if (!node.Infinite) node.Amount -= amt;          // (the remake's infinite resources are never used up)
         if (node.Type == "corpse") node.RotT = 120;      // every harvest resets the rot timer (Resource.usl)
         if (node.Amount <= 0.5) DepleteNode(node);
         double have2 = u.Carry != null && u.Carry.Res == res ? u.Carry.Amount : 0;
@@ -318,7 +318,7 @@ public sealed partial class World
         }
         if (t.Work < t.Loops * loopT) return;
         double amt = Math.Min(t.Space, node!.Amount);
-        node.Amount -= amt;
+        if (!node.Infinite) node.Amount -= amt;
         if (node.Amount <= 0.5) DepleteNode(node);
         double have = u.Carry != null && u.Carry.Res == res ? u.Carry.Amount : 0;
         u.SetCarry(res, have + amt, CarryLook(u, res, false));
@@ -513,6 +513,21 @@ public sealed partial class World
     /// <summary>trees: standing tree -> timber log after 6 chops (vegetation.usl CTree.Fall): the stump stays, the log
     /// falls with chop_down_01..03 (CWood.OnInit: Random % 3 + 1), or with the clip a brachio's stomp chose (0..7, away
     /// from it; its logs lie at map rotation 0)</summary>
+    /// <summary>a tree that lies felled from the start (map attribute fallen = 1, WorldBuilder): a log without the fall -
+    /// no "treefall" event (no leaves, no stump, no shake); the view draws its log at rest (ResNode.Fallen)</summary>
+    public void FellTreeQuiet(ResNode node)
+    {
+        if (node.Type != "tree") return;
+        node.Type = "timber";
+        node.FallClip ??= "chop_down_01";
+        node.Chop = 0;
+        if (node.CellsBlocked != null) Nav.Mark(node.CellsBlocked, -1);
+        node.CellsBlocked = new List<int>();
+        node.Radius = 2.2;
+        node.MaxWorkers = 5;
+        node.LookChanged();
+    }
+
     public void FellTree(ResNode node, int? clip = null)
     {
         if (node.Type != "tree") return;

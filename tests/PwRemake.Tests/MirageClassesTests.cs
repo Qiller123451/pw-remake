@@ -329,7 +329,7 @@ public static class MirageClassesTests
         new SetRallyCommand { Player = p.Id, Producers = new[] { a.Id }, Target = b.Id, X = b.Pos.X, Z = b.Pos.Z }.Apply(w);
         t.True(a.Portal!.Dest == b && b.Portal!.Partners.Contains(a), "b is a's destination");
         t.True(w.PortalWorks(a), "a works");
-        var rel = b.Portal.ReleasePos;
+        var rel = b.Portal!.ReleasePos;
         w.Order(u1, new Order("portal") { Target = a });
         w.Order(u2, new Order("portal") { Target = a });
         double t1 = -1, t2 = -1;

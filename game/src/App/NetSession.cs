@@ -32,7 +32,11 @@ public partial class NetSession : Node
         ProcessMode = ProcessModeEnum.Always;
         client.Started += OnStarted;
         client.Disconnected += OnDisconnected;
+        _maps = new LobbyMapSync(client, () => GameApp.Config);
     }
+
+    /// <summary>this machine's copy of the lobby's map: compared with the host's, asked for when missing (LobbyMapSync)</summary>
+    readonly LobbyMapSync _maps;
 
     static string Fingerprint()
     {
@@ -47,6 +51,9 @@ public partial class NetSession : Node
         Close();
         var fp = Fingerprint();
         var host = new NetHost(port) { Build = GameApp.Version, Fingerprint = fp, DumpDir = AppPaths.LogsDir };
+        // (a player who lacks the lobby's map gets it from this machine's maps: MapTransfer)
+        var cfg = GameApp.Config;
+        if (cfg != null) host.MapFile = (id, hash) => { var b = MapTransfer.PackFor(cfg, id, hash, out var why); return (b, why); };
         lobby.Configuration = GameApp.Config?.Id ?? "";
         host.SetLobby(lobby);
         var client = new NetClient(name);
@@ -94,7 +101,8 @@ public partial class NetSession : Node
         try { Host?.Update(delta); } catch (Exception e) { L.Error("the host", e); }
         try { Client.Poll(); } catch (Exception e) { L.Error("the client", e); }
         var l = Client.Lobby;
-        if (AutoReady && !_readySent && l != null && Client.MyPeer != null) { _readySent = true; Client.SetReady(true); }
+        _maps.Update();
+        if (AutoReady && !_readySent && l != null && Client.MyPeer != null && Client.MyPeer.Problem == null) { _readySent = true; Client.SetReady(true); }
         if (AutostartPlayers > 0 && Hosting && l != null && l.State == "lobby" && l.Players.Count() >= AutostartPlayers && LobbyStart.Problem(l) == null)
         {
             AutostartPlayers = 0;
@@ -107,6 +115,11 @@ public partial class NetSession : Node
     void OnStarted(GameStart start, int seat)
     {
         L.Info($"the game starts: seat {seat} of {start}{(Client.Rejoining ? " (rejoining: the turns so far are replayed)" : "")}");
+        if (start.Mode == GameMode.Skirmish && LobbyMap.Problem(GameApp.Config, start.Skirmish) is { } mp)
+        {
+            // (the lobby refuses the start with such a map; a machine that got here anyway does not run a game apart)
+            LastError = "This machine " + mp; Close(); Boot.Instance.Show(new MultiplayerMenu()); return;
+        }
         if (start.Mode == GameMode.Skirmish) Boot.Instance.Show(LoadingScreen.ForSkirmish(start));
         else
         {

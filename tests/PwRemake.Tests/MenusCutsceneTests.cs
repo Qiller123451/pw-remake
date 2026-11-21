@@ -85,9 +85,9 @@ public static class MenusCutsceneTests
         // the shipped missions' day time items have a time of day and weather type 0
         var root = Environment.GetEnvironmentVariable("PW_CONTENT");
         if (string.IsNullOrEmpty(root)) root = "/home/claude/testcontent";
-        var w = Path.Combine(root, "configs", "base", "missions", "01_single_01", "world.json");
-        if (!File.Exists(w)) return;
-        var seq = JsonNode.Parse(File.ReadAllText(w))!["sequences"]!["Cpn_single_001/single_01/sc_1050.seq"]!;
+        var wj = PwRemake.Sim.Maps.PwMapReader.WorldOf(Path.Combine(root, "configs", "base", "missions", "01_single_01"));
+        if (wj == null) return;
+        var seq = wj["sequences"]!["Cpn_single_001/single_01/sc_1050.seq"]!;
         var play = SequenceTimeline.FromJson(seq["play"])!;
         var day = SceneDayTime.At(play.Items, play.End);
         t.True(day != null && day.Value.Weather == 0, "sc_1050: a day time item, no weather");

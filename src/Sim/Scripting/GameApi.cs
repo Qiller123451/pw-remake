@@ -44,6 +44,7 @@ public static class GameApi
         api["human"] = Fn(a => DynValue.NewNumber(H.HumanSlot));
         api["random"] = Fn(a => DynValue.NewNumber(H.Random()));
         api["log"] = Fn(a => { PwRemake.Sim.Core.Log.For("Lua").Info(string.Join(" ", a.GetArray().Select(x => x.ToPrintString()))); return DynValue.Nil; });
+        api["exists"] = Fn(a => DynValue.NewBoolean(H.ClassExists(Str(a, 0, "api.exists"))));
         api["text"] = Fn(a => DynValue.NewString(E.Text(Str(a, 0, "api.text"))));
         api["win"] = Fn(a => { E.Win(a.Count > 0 ? a[0].CastToString() ?? "" : ""); return DynValue.Nil; });
         api["lose"] = Fn(a => { E.Lose(a.Count > 0 ? a[0].CastToString() : null); return DynValue.Nil; });
@@ -119,13 +120,17 @@ public static class GameApi
         objs["group"] = Fn(a => { int g = H.FindGroup(Str(a, 0, "api.objects.group")); return g >= 0 ? Ids(H.GroupMembers(g)) : DynValue.Nil; });
         objs["add_to_group"] = Fn(a => { int g = H.FindGroup(Str(a, 0, "api.objects.add_to_group")); return DynValue.NewBoolean(g >= 0 && H.AddToGroup(g, (int)Num(a, 1, "api.objects.add_to_group"))); });
         objs["remove"] = Fn(a => DynValue.NewBoolean(H.Remove((int)Num(a, 0, "api.objects.remove"))));
+        // the infected stage 0 .. 3 the view draws (docs/INFECTED_LOOK.md)
+        objs["infect"] = Fn(a => DynValue.NewBoolean(H.SetInfection((int)Num(a, 0, "api.objects.infect"), (int)Num(a, 1, "api.objects.infect", 3))));
+        objs["infection"] = Fn(a => DynValue.NewNumber(H.Infection((int)Num(a, 0, "api.objects.infection"))));
         objs["appear"] = Fn(a => { H.SetAppearance((int)Num(a, 0, "api.objects.appear"), (int)Num(a, 1, "api.objects.appear", 7)); E.Touch(); return DynValue.Nil; });
 
         // ---- units (and buildings)
         var units = Sub("units");
         units["spawn"] = Fn(a =>
         {
-            var o = new SpawnOptions { Level = a.Count > 4 && a[4].Type == DataType.Number ? (int)a[4].Number : null };
+            // (7th argument true: one unit, not more for a co-op's scaled enemy - a unique boss)
+            var o = new SpawnOptions { Level = a.Count > 4 && a[4].Type == DataType.Number ? (int)a[4].Number : null, NoScale = a.Count > 6 && a[6].CastToBool() };
             if (a.Count > 5 && LuaHost.ParamString(a[5]) is { } g) o.Group = H.FindGroup(g);
             int id = H.Spawn(Str(a, 0, "api.units.spawn"), (int)Num(a, 1, "api.units.spawn"), Num(a, 2, "api.units.spawn"), Num(a, 3, "api.units.spawn"), o);
             return id >= 0 ? DynValue.NewNumber(id) : DynValue.Nil;
@@ -139,6 +144,18 @@ public static class GameApi
         units["hp"] = Fn(a => { H.SetHitpoints((int)Num(a, 0, "api.units.hp"), Num(a, 1, "api.units.hp")); return DynValue.Nil; });
         units["invulnerable"] = Fn(a => { H.SetInvulnerable((int)Num(a, 0, "api.units.invulnerable"), a.Count < 2 || a[1].CastToBool(), Num(a, 2, "api.units.invulnerable", 0)); return DynValue.Nil; });
         units["anim"] = Fn(a => DynValue.NewBoolean(H.PlayAnim((int)Num(a, 0, "api.units.anim"), Str(a, 1, "api.units.anim"), (int)Num(a, 2, "api.units.anim", 1))));
+        units["scale"] = Fn(a => { H.SetDrawScale((int)Num(a, 0, "api.units.scale"), Num(a, 1, "api.units.scale", 1)); return DynValue.Nil; });
+        units["maxhp"] = Fn(a => { H.SetMaxHp((int)Num(a, 0, "api.units.maxhp"), Num(a, 1, "api.units.maxhp")); return DynValue.Nil; });
+        // a unit set on fire: it burns to death in `seconds` (Outbreak: the infected in the sunlight)
+        units["burn"] = Fn(a => DynValue.NewBoolean(H.Burn((int)Num(a, 0, "api.units.burn"), Num(a, 1, "api.units.burn", 8))));
+        // a worker to the nearest source of a resource ("food": its owner's field first)
+        units["gather"] = Fn(a => DynValue.NewBoolean(H.OrderGather((int)Num(a, 0, "api.units.gather"), Str(a, 1, "api.units.gather"))));
+        // a class in the slot's own tribe (the tribe swap; co-op seats too): a house for every seat's tribe
+        units["spawn_own"] = Fn(a =>
+        {
+            int id = H.SpawnOwn(Str(a, 0, "api.units.spawn_own"), (int)Num(a, 1, "api.units.spawn_own"), Num(a, 2, "api.units.spawn_own"), Num(a, 3, "api.units.spawn_own"), a.Count > 4 && a[4].Type == DataType.Number ? (int)a[4].Number : null);
+            return id >= 0 ? DynValue.NewNumber(id) : DynValue.Nil;
+        });
 
         // ---- players
         var players = Sub("players");
@@ -154,6 +171,14 @@ public static class GameApi
             int x = (int)Num(a, 0, "api.players.relation"), y = (int)Num(a, 1, "api.players.relation");
             if (a.Count > 2 && !a[2].IsNil()) { H.SetRelation(x, y, (int)Num(a, 2, "api.players.relation")); E.OnDiplomacyChanged(); }
             return H.Relation(x, y) is { } r ? DynValue.NewNumber(r) : DynValue.Nil;
+        });
+        players["seats"] = Fn(a => Ids(H.SeatSlots));
+        // the slot's epoch; with a second argument raised to it first
+        players["epoch"] = Fn(a =>
+        {
+            int s = (int)Num(a, 0, "api.players.epoch");
+            if (a.Count > 1 && a[1].Type == DataType.Number) return DynValue.NewNumber(H.RaiseEpoch(s, (int)a[1].Number));
+            return H.PlayerAttribute(s, "epoch") is { } v ? DynValue.NewNumber(v) : DynValue.NewNumber(1);
         });
         players["tech"] = Fn(a => { H.SetTechFilter((int)Num(a, 0, "api.players.tech"), Str(a, 1, "api.players.tech"), a.Count < 3 || a[2].CastToBool()); return DynValue.Nil; });
 
@@ -171,6 +196,26 @@ public static class GameApi
         ui["sequence"] = Fn(a => { E.PlaySequence(new SequenceRequest { Path = Str(a, 0, "api.ui.sequence"), Quit = a.Count > 1 && a[1].CastToBool(), Trigger = "(script)" }); return DynValue.Nil; });
         ui["sound"] = Fn(a => { H.PlaySound(Str(a, 0, "api.ui.sound"), null); return DynValue.Nil; });
         ui["reveal"] = Fn(a => DynValue.NewNumber(H.RevealArea(H.HumanSlot, Num(a, 0, "api.ui.reveal"), Num(a, 1, "api.ui.reveal"), Num(a, 2, "api.ui.reveal", 20), Num(a, 3, "api.ui.reveal", 0), -1)));
+
+        // ---- the map's day-night cycle (map.lua day_night: docs/LUA_MAPS.md "The Game API")
+        var dn = Sub("daynight");
+        dn["enabled"] = Fn(a => DynValue.NewBoolean(H.DayNight != null));
+        dn["phase"] = Fn(a => H.DayNight is { } s ? DynValue.NewString(s.PhaseName) : DynValue.Nil);
+        dn["is_night"] = Fn(a => DynValue.NewBoolean(H.DayNight is { IsNight: true }));
+        dn["night"] = Fn(a => DynValue.NewNumber(H.DayNight?.NightNo ?? 0));
+        dn["left"] = Fn(a => DynValue.NewNumber(H.DayNight?.Left ?? 0));
+        dn["to_night"] = Fn(a => DynValue.NewNumber(H.DayNight?.ToNight ?? 0));
+        dn["to_day"] = Fn(a => DynValue.NewNumber(H.DayNight?.ToDay ?? 0));
+        dn["darkness"] = Fn(a => DynValue.NewNumber(H.DayNight?.Darkness ?? 0));
+        dn["clock"] = Fn(a => DynValue.NewNumber(H.DayNight?.Clock ?? 0));
+        // new lengths: { day =, night =, first_day = } (seconds) - for the mission's start (its difficulty)
+        dn["set"] = Fn(a =>
+        {
+            var t = a.Count > 0 && a[0].Type == DataType.Table ? a[0].Table : throw new ScriptRuntimeException("api.daynight.set: a table { day, night, first_day }");
+            double? N(string k) => t.Get(k).Type == DataType.Number ? t.Get(k).Number : null;
+            H.SetDayNightTimes(N("day"), N("night"), N("first_day"));
+            return DynValue.Nil;
+        });
 
         // ---- computer players
         var ai = Sub("ai");

@@ -70,6 +70,10 @@ public sealed class SkirmishSetup
     /// absolute path (a map file the player picked), or "" = a random jungle (game/mapgen.js)</summary>
     [JsonPropertyName("map")] public string Map { get; set; } = "";
     [JsonPropertyName("mapName")] public string? MapName { get; set; }
+    /// <summary>multiplayer: the content hash of the host's map (MapFiles.ContentHash of every file of it): a player whose
+    /// copy differs - or who has none - is told so in the lobby (LobbyMap.Problem); null: not checked (a random map, a
+    /// single player game, a dedicated server's setup without it)</summary>
+    [JsonPropertyName("mapHash")] public string? MapHash { get; set; }
     [JsonPropertyName("seed")] public ulong Seed { get; set; } = 1234;
     /// <summary>deathmatch | domination | defender</summary>
     [JsonPropertyName("mode")] public string Mode { get; set; } = "deathmatch";

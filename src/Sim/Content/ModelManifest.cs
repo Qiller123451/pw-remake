@@ -18,14 +18,16 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.Json.Nodes;
 using PwRemake.Sim.Core;
 
 namespace PwRemake.Sim.Content;
 
-/// <summary>An animation sound event: [time, wav, volume, maxHear, group(, minFade)] of the GSF sound table (the min fade
-/// distance only when the toolkit exported it; 0: the view's default).</summary>
-public readonly record struct AnimSoundEvent(double T, string Wav, double Volume, double MaxHear, string Group, double MinFade = 0);
+/// <summary>An animation sound event: [time, wav, volume, maxHear, group(, minFade, pitch)] of the GSF sound table (the
+/// min fade distance and the pitch only when the toolkit exported them; 0: the view's default - a min fade of the
+/// tables, a pitch of 0.95 .. 1.05 at random).</summary>
+public readonly record struct AnimSoundEvent(double T, string Wav, double Volume, double MaxHear, string Group, double MinFade = 0, double Pitch = 0);
 
 /// <summary>One model of the manifest.</summary>
 public sealed class ModelInfo
@@ -67,7 +69,7 @@ public sealed class ModelInfo
             {
                 var list = new List<AnimSoundEvent>();
                 if (v is JsonArray ea) foreach (var e in ea) list.Add(new AnimSoundEvent(e?[0].Num() ?? 0, e?[1].Str() ?? "", e?[2].Num() ?? 0, e?[3].Num() ?? 0, e?[4].Str() ?? "",
-                    e is JsonArray ja && ja.Count > 5 ? ja[5].Num() : 0));
+                    e is JsonArray ja && ja.Count > 5 ? ja[5].Num() : 0, e is JsonArray jp && jp.Count > 6 ? jp[6].Num() : 0));
                 m.Sounds[k] = list;
             }
         if (n["loops"] is JsonObject lo) foreach (var (k, v) in lo) m.Loops[k] = (v?[0].Num() ?? 0, v?[1].Num() ?? 0);
@@ -156,8 +158,57 @@ public sealed class ModelManifest
     /// <summary>a configuration's extra manifests (overrides/assets/manifest_sequel.json) into this one</summary>
     public ModelManifest WithOverrides(GameConfiguration? cfg)
     {
-        if (cfg != null) AddExtra(Path.Combine(cfg.OverridesDir, "assets", "manifest_sequel.json"), Path.Combine(cfg.OverridesDir, "assets", "models"));
+        if (cfg != null)
+        {
+            AddExtra(Path.Combine(cfg.OverridesDir, "assets", "manifest_sequel.json"), Path.Combine(cfg.OverridesDir, "assets", "models"));
+            AddSelectionBoxes(Json.TryParseFile(Path.Combine(cfg.OverridesDir, "assets", "selboxes.json")));
+        }
         return this;
+    }
+
+    // ---- the original's selection circle (PWClient.exe; docs/VIEW.md "Selection circles")
+    readonly Dictionary<string, double[]> _selBox = new(StringComparer.Ordinal);
+    readonly Dictionary<string, (double R, double X, double Z)?> _ring = new(StringComparer.Ordinal);
+
+    /// <summary>reads selboxes.json (tools/prepare/selection_boxes.py): every model's GSF box - its model info's corner
+    /// and size in the GSF frame (x, y on the ground, z up); returns how many</summary>
+    public int AddSelectionBoxes(JsonNode? boxes)
+    {
+        if (boxes?["models"] is not JsonObject ms) return 0;
+        int n = 0;
+        foreach (var (k, v) in ms)
+            if (v is JsonArray a && a.Count == 6) { _selBox[k.ToLowerInvariant()] = a.Select(x => x.Num()).ToArray(); n++; }
+        _ring.Clear();
+        return n;
+    }
+    public int SelectionBoxCount => _selBox.Count;
+
+    /// <summary>The selection circle the original draws round an object of this model: radius R and the circle's centre
+    /// (X, Z) in the model's own frame (the remake's: the drawn model before its turn), from the model's GSF box. null:
+    /// no box known (data prepared before selboxes.json: the remake's own circle, SelectionRing).
+    /// PWClient.exe: the box is the model info's box (corner + size, model info + 0x34: 0x46b840 / 0x46b900), turned with
+    /// the object (0x46c6f0); the circle stands at the box's middle (0x69a840) with, from the box's ground sides a, b
+    /// (0x6bc100), r = max(0.5 sqrt(a b), 0.33 a, 0.33 b), r = 1 when r &lt;= 1; the circle drawn is max(1.1 r, 1.8)
+    /// (0x6bf430). The box covers the whole model (every part, state and LOD), not what is drawn at the moment.</summary>
+    public (double R, double X, double Z)? OriginalRing(string? name)
+    {
+        if (name == null || _selBox.Count == 0) return null;
+        var n = name.ToLowerInvariant();
+        if (_ring.TryGetValue(n, out var c)) return c;
+        (double R, double X, double Z)? res = null;
+        if (_selBox.TryGetValue(n, out var b))
+        {
+            double a = Math.Abs(b[3]), d = Math.Abs(b[4]);
+            double r = Math.Max(0.5 * Math.Sqrt(a * d), Math.Max(0.33 * a, 0.33 * d));
+            if (r <= 1) r = 1;
+            r = Math.Max(1.1 * r, 1.8);
+            // the box's middle: GSF (x, y, z up) -> the converted model's frame (paraworld_gsf.py's root: x mirrored, turned
+            // -90 degrees round x: (x, y, z) -> (-x, z, -y)), its ground plane x, z
+            double gx = b[0] + b[3] / 2, gy = b[1] + b[4] / 2;
+            res = (r, -gx, -gy);
+        }
+        _ring[n] = res;
+        return res;
     }
 
     /// <summary>Through a configuration's asset source (overrides first).</summary>
@@ -166,7 +217,9 @@ public sealed class ModelManifest
         var man = Json.ParseFile(src.Require("assets/manifest.json"))!;
         var mip = src.Resolve("assets/modelinfo.json");
         var mi = mip != null ? Json.TryParseFile(mip) : null;
-        return new ModelManifest(man, mi, n => src.Resolve("assets/models/" + n + ".glb"));
+        var m = new ModelManifest(man, mi, n => src.Resolve("assets/models/" + n + ".glb"));
+        if (src.Resolve("assets/selboxes.json") is { } sb) m.AddSelectionBoxes(Json.TryParseFile(sb));
+        return m;
     }
 
     public int Count => _models.Count;

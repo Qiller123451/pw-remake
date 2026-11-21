@@ -113,11 +113,11 @@ public static class PointBuyTests
         var c = CampaignTests.LoadCfgPublic("base");
         if (c == null) t.Skip("no configuration base");
         var folder = System.IO.Path.Combine(c!.Config.MissionsDir, "02_single_02");
-        var mj = Json.TryParseFile(System.IO.Path.Combine(folder, "mission.json"));
+        var mj = PwRemake.Sim.Maps.PwMapReader.MissionOf(folder);
         if (mj == null) t.Skip("mission 2 not prepared");
         var offer = PwRemake.Sim.Campaign.CampaignArmy.Of(mj, c.Rules, "", 0)!;
         t.True(offer != null, "mission 2 has an army screen");
-        t.Equal("Hu", offer.Tribe, "the mission's tribe");
+        t.Equal("Hu", offer!.Tribe, "the mission's tribe");
         t.Equal(mj!["min_credits"].Num(), offer.Credits, "the budget: the mission's least credits");
         var army = offer.Defaults();
         t.True(army.Cards.Count >= 3 && army.Fixed.Count == army.Cards.Count, "the level's preset, fixed");
@@ -154,7 +154,7 @@ public static class PointBuyTests
             if (c == null) continue;
             foreach (var dir in System.IO.Directory.GetDirectories(c.Config.MissionsDir).OrderBy(x => x))
             {
-                var mj = Json.TryParseFile(System.IO.Path.Combine(dir, "mission.json"));
+                var mj = PwRemake.Sim.Maps.PwMapReader.MissionOf(dir);
                 if (mj?["players"] is not System.Text.Json.Nodes.JsonArray ps || ps.FirstOrDefault(p => p?["type"].Str() == "human")?["point_buy"] == null) continue;
                 foreach (var tribe in c.Config.PlayableTribes)
                 {
@@ -186,7 +186,7 @@ public static class PointBuyTests
         t.True(mp.All(m => m.Type == "multiplayer") && !mp.Any(m => m.File.StartsWith("single", StringComparison.OrdinalIgnoreCase)), "no campaign maps");
         foreach (var m in mp) { var hh = SkirmishMaps.Header(m.FullPath); t.Log(m.File + ": " + string.Join("; ", hh.Info.Select(kv => kv.Key + "=" + kv.Value)) + " || " + string.Join("; ", hh.Description.Where(kv => kv.Key.StartsWith("Root/Base/")).Select(kv => kv.Key + "=" + kv.Value))); }
         var h = SkirmishMaps.Header(mp[0].FullPath);
-        var full = PwRemake.Sim.Maps.Ula.ParseUlaFile(mp[0].FullPath);
+        var full = PwRemake.Sim.Maps.MapFiles.Read(mp[0].FullPath);
         t.Equal(full.Name, h.Name, "the header's name");
         t.Equal(full.W, h.W, "the header's size");
         t.Equal(full.Setting, h.Setting, "the header's setting");

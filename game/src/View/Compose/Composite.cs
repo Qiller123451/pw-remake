@@ -100,7 +100,7 @@ public sealed class Composite
     public static bool MiscShown(bool wild, string gfx, string className, string? script, IEnumerable<string> partGfx)
     {
         if (wild) return WILD_MISC.IsMatch(gfx);
-        if (className == "hu_mammoth_lumber_upgrade" || script == "CArenaAnimal") return false;
+        if (className == "hu_mammoth_lumber_upgrade" || Array.IndexOf(PwRemake.Sim.World.Compose.WILD_LOOK_CLASSES, script) >= 0) return false;
         if (MISC_HIDDEN.IsMatch(script ?? "")) return partGfx.Any(g => g.Contains("catapult") || g.Contains("gatling"));
         return true;
     }
@@ -291,6 +291,8 @@ public sealed class Composite
             {
                 var r = _host.AttachTo(Seats[i], pax[i].Gfx, pax[i].Party);
                 if (r == null) continue;
+                // (a passenger is its own entity: not infected with the transporter - ModelInstance.SetInfected)
+                r.MarkPassenger();
                 var stand = r.Anim?.Pick("standanim", "idle_0", "stand");
                 var shoot = r.Anim?.Pick("bow_1", "shoot_1", "throw_1", "attack_front", "attack_1");
                 if (stand != null) r.Anim!.Play(stand);

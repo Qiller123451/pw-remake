@@ -75,7 +75,7 @@ public static class AnimAuditTests
                 : w.AddResource("stone", "stone", 26, 6, 2000, new ResOpts { Radius = 2.5, MaxWorkers = 8, Cells = w.Nav.MarkCircle(26, 6, 2) });
             w.Order(u, new Order("gather") { Target = n });
             var walks = new HashSet<string>();
-            var seen = new List<string>(); int serial = u.Anim.Serial;
+            var seen = new List<string>(); int serial = u.Anim!.Serial;
             for (int i = 0; i < (int)(60 / W_.STEP); i++)
             {
                 w.Step();
@@ -128,7 +128,7 @@ public static class AnimAuditTests
         for (int i = 0; i < seen.Count; i++)
         {
             var (clip, ph) = (seen[i].Split('#')[0], seen[i].Split('#')[1]);
-            if (ph != "s" || !u.Anim.Has(clip + "#e")) continue;
+            if (ph != "s" || !u.Anim!.Has(clip + "#e")) continue;
             int j = i + 1;
             while (j < seen.Count && seen[j] == clip + "#l") j++;
             if (j >= seen.Count) break;
@@ -138,7 +138,7 @@ public static class AnimAuditTests
         var b = w.PlaceBuilding("hu_warehouse", p, 30, 0, 0, false);
         if (b == null) return;
         w.Order(u, new Order("build") { Target = b });
-        var seen2 = Starts(w, u, 200, () => b.Built && u.Task.Type == "idle" && u.Anim.CurName != "hammer");
+        var seen2 = Starts(w, u, 200, () => b.Built && u.Task.Type == "idle" && u.Anim!.CurName != "hammer");
         seen2.AddRange(Starts(w, u, 3));
         t.Log(string.Join(" ", seen2));
         int h = seen2.LastIndexOf("hammer#l");
@@ -189,7 +189,7 @@ public static class AnimAuditTests
         var (w, p, e) = Sys2.World(t, Sys2.Base, "Hu");
         var probe = w.SpawnUnit("hu_warrior", p, -40, 0)!;
         if (probe.Anim == null || !probe.Anim.Has("die_simple")) t.Skip("no clips of " + probe.Gfx);
-        if (!probe.Anim.Has("all_snar_trap_catching")) t.Skip("the data has no snare clips (converted before the toolkit kept them; re-run Prepare)");
+        if (!probe.Anim!.Has("all_snar_trap_catching")) t.Skip("the data has no snare clips (converted before the toolkit kept them; re-run Prepare)");
         Unit Caught(double x)
         {
             var trap = w.PlaceBuilding("ninigi_snare_trap", e, x, 0);
@@ -257,9 +257,9 @@ public static class AnimAuditTests
         w.Order(u, new Order("gather") { Target = f });
         var seen = Starts(w, u, 40);
         t.Log(string.Join(" ", seen));
-        t.True(f.GrowStep > 0, "grow steps: " + f.GrowStep);
+        t.True(f!.GrowStep > 0, "grow steps: " + f.GrowStep);
         t.True(f.Anim!.CurName == "grow" && f.Anim.Cur!.Paused, "the grow clip held");
-        t.Near((f.GrowStep - 1) / 25.0, f.Anim.Cur.Time, 1e-9, "on the frame of the step before the last chunk (SetAnim(grow, 0, step))");
+        t.Near((f.GrowStep - 1) / 25.0, f.Anim.Cur!.Time, 1e-9, "on the frame of the step before the last chunk (SetAnim(grow, 0, step))");
         int chunks = seen.Count(x => x == "sowing#s");
         t.True(chunks >= 2 && chunks == seen.Count(x => x == "sowing#e") || chunks - 1 == seen.Count(x => x == "sowing#e"), $"chunks of sowing, each with its start and end part ({chunks})");
     }

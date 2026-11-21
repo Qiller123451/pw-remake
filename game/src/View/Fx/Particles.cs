@@ -121,6 +121,10 @@ public partial class Particles : Node3D
     public IEnumerable<ParticleBatch> Batches { get { foreach (var b in _batches.Values) if (b != null) yield return b; } }
     /// <summary>the scene's linear fog (start, end): particles fade into it and are not drawn beyond (0x705191)</summary>
     public float FogStart = 260, FogEnd = 620;
+    /// <summary>the light of the mixed sprites (smoke, steam, dust - not the additive ones): their colour times it per
+    /// channel, as the original's lit path (0x704f31 - 0x7052d7: colour x the light renderer's sun colour, at least
+    /// 0x0f0f0f) - WorldRenderer.ParticleLight, set by the session each frame; white = unlit</summary>
+    public Color MixLight = Colors.White;
 
     public Particles(TextureCache? textures = null) { Name = "Particles"; _tex = textures; }
     public void SetTextures(TextureCache t) => _tex = t;
@@ -137,6 +141,15 @@ public partial class Particles : Node3D
             if (node == null) continue;
             Add(new Emitter { Node = node, Root = m, Name = m.Template.Name + "/" + node.Name, Q = node.Quaternion }, p);
         }
+    }
+
+    /// <summary>an emitter of another model's template (p: its part with the data) hung on a node of an instance (the
+    /// infected look's flies, ModelInstance.SetInfected): sprays while the node is shown, gone with it</summary>
+    public void TrackNode(Node3D node, PartRef p, ModelInstance root)
+    {
+        if (p.Emitter == null) return;
+        _tex ??= root.Library.Textures;
+        Add(new Emitter { Node = node, Root = root, Name = root.Template.Name + "/" + node.Name, Q = node.Quaternion }, p);
     }
 
     /// <summary>a model whose emitters spray nothing (a placement preview): they are dropped at once</summary>
@@ -262,6 +275,7 @@ public partial class Particles : Node3D
         for (int k = 0; k < gp.Count; k++) _planes[k] = gp[k];
         var planes = _planes;
         var view = camera.GlobalTransform.AffineInverse().Basis;
+        var ml = MixLight;
         // the load of the last frame (0x706b9f): above half the limit the sources hold back
         int last = Drawn, lim = lv.Sprites;
         Load = last >= lim / 2 ? 1 - Math.Clamp((last / (float)lim - 0.75f) * 4, 0, 1) : 1;
@@ -343,6 +357,9 @@ public partial class Particles : Node3D
                 // (a sprite's reach about its point: its height, the cell's width, the pivot's shift)
                 float reach = 1.5f * Math.Max(1, b.Aspect);
                 var P = x.E;
+                // (an infected model's fires and smoke: green - ModelInstance.GreenFire, ParticleBatch; its insects, dust
+                // and water keep their colours - InfectedLook.TurnsGreen)
+                bool green = x.Root != null && GodotObject.IsInstanceValid(x.Root) && x.Root.GreenFire && PwRemake.View.Materials.InfectedLook.TurnsGreen(x.Name);
                 for (int j = 0; j < x.Parts.Length; j++)
                 {
                     ref var p = ref x.Parts[j];
@@ -372,9 +389,11 @@ public partial class Particles : Node3D
                         if ((x.F & GROUND) != 0) rot = (d.X != 0 || d.Z != 0 ? MathF.Atan2(d.X, d.Z) : 0) + P.Rotate;
                         else { d = view * d; rot = SpriteAngle.Screen(d.X, d.Y, P.Rotate) ?? p.Rot; }
                     }
-                    // (the fog's fade: an additive particle's colour, the others' alpha - 0x705191 / 0x705329)
-                    if (b.Additive) b.Push(w, size, p.A, p.Cr * fade, p.Cg * fade, p.Cb * fade, p.Tile, rot, x.Pivot, (x.F & GROUND) != 0);
-                    else b.Push(w, size, p.A * fade, p.Cr, p.Cg, p.Cb, p.Tile, rot, x.Pivot, (x.F & GROUND) != 0);
+                    // (the fog's fade: an additive particle's colour, the others' alpha - 0x705191 / 0x705329; a mixed
+                    // particle's colour lit by the scene's sun - MixLight, 0x70521d: channel x light / 255; the
+                    // additive path 0x705329 takes no light)
+                    if (b.Additive) b.Push(w, size, p.A, p.Cr * fade, p.Cg * fade, p.Cb * fade, p.Tile, rot, x.Pivot, (x.F & GROUND) != 0, green);
+                    else b.Push(w, size, p.A * fade, p.Cr * ml.R, p.Cg * ml.G, p.Cb * ml.B, p.Tile, rot, x.Pivot, (x.F & GROUND) != 0, green);
                 }
             }
         }
@@ -637,10 +656,11 @@ public partial class Particles : Node3D
             // party colour >> 16, white here) - a colour fade goes with the square of the fade (the heal rays are
             // darker while they fade in and out, 0.4 of their life each), a colour of the emitter darkens and deepens
             // (fx_heal_area's dots 200 / 150 / 0 -> 157 / 88 / 0). Its alpha is not used there (alpha 0: the one blend
-            // ONE / INVSRCALPHA adds); the port keeps the emitter's alpha and an alpha-only fade (0x4000) - 173 of the
-            // 1164 additive emitters of the export have an alpha below 255 (some 0: aje_temple, ninigi_teahouse,
-            // domination_flag) and 16 fade only their alpha, which the original would show at full light (not
-            // checked against the game).
+            // ONE / INVSRCALPHA adds); the port keeps the emitter's alpha and an alpha-only fade (0x4000) - 206 of the
+            // 1190 additive emitters of the export have an alpha below 255 (some 0: aje_temple, ninigi_teahouse,
+            // domination_flag) and 3 fade only their alpha (the death pings' spirits), which the original would show
+            // at full light (not checked against the game). (Additive by the sheet's material: EmitterDef.ResolveBlend
+            // - the SEAS buildings' steam, which faded only its alpha, is a mixed sprite.)
             p.Cr *= p.Cr; p.Cg *= p.Cg; p.Cb *= p.Cb;
             p.A = (fl & FADE_ALPHA) != 0 && (fl & FADE_BOTH) == 0 ? al * a : al;
         }

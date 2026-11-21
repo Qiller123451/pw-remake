@@ -16,3 +16,5 @@ __pycache__/
 *.exe
 *.pck
 game/data_*/
+# packages made by Package.bat (they carry converted game data)
+dist/

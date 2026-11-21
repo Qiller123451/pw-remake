@@ -1,7 +1,8 @@
 // Part visibility from the GSF chunk attributes (the engine's "render invisibility mask").
 //
 // Raw attribute bits of a mesh chunk (verified against the original models, see claude/gsf_format_notes.md):
-//   0-8   LOD mask (bit 0 = full detail)            9-13  epoch variants I..V (buildings)
+//   0-4   LOD mask (bit 0 = full detail)            9-13  epoch variants I..V (buildings)
+//   5-8   buildings: build-up flags - 5 rises while built, 6 sinks after its level, 7-8 the group (BuildUp)
 //   18    selection / pick volume                   19    shadow model
 //   17    day-only parts (buildings, ships)         20    night-only lights (the glows and fireflies of lamps)
 //   21-24 construction levels 0..3 (ConstructLevel = progress/25)
@@ -13,6 +14,7 @@
 // Ported from remake/src/engine/parts.js (pw-exporter 98c7703). The functions that walk a model (applyMask,
 // applyState, applyNight) work on the part list of a ModelInstance (ModelInstance.ApplyMask / ApplyState); the bit
 // logic is here, free of Godot types, so it can be tested on its own.
+using System;
 using System.Collections.Generic;
 
 namespace PwRemake.View.Parts;
@@ -152,6 +154,56 @@ public static class PartBits
     /// wore their harness.
     /// </summary>
     public static bool MaskVisible(uint attr, uint hide) => (attr & hide & ~0x1fu) == 0;
+}
+
+/// <summary>
+/// How a building's parts come while it is built - the engine's, not a script's (PWClient 0x46e9b0, 0x7aa060, 0x7a9d30,
+/// 0x46fe90; Building.usl / BuildUpBuilding.usl only set the construction level, progress / 25, and CurProcess):
+///   - The parts of the next level that its current level lacks rise out of the ground while the level is built - when
+///     they carry the model kind's "appear" flag. Each group of them (the "group" bits) rises as one: lowered by the
+///     highest top of the group (its chunks' boxes, GSF z) times 1 - f, f = CurProcess / 100 * 4 - level (0..1), not
+///     drawn at f = 0.
+///   - The parts of the last level that the current one lacks sink into the ground in the half second after the level
+///     changed - when they carry the "disappear" flag (scaffolding): lowered by their group's highest top times the
+///     time / 0.5. The others go at once.
+///   - Parts of neither level are not drawn; a part of the next level without the "appear" flag waits for its level.
+/// The flags, by the model's kind: Bldg appear 0x20, disappear 0x40, group 0x180 (bits 5-8 - beside the LOD bits 0-4);
+/// Wall 0x40000 / 0x80000 / 0x60000000 (bits 18, 19: every wall piece's construction parts carry both); Fiel 0x200 /
+/// 0x400 / 0x1800. The engine does this for buildings and turrets (object class BLDG, TRRT) under construction and in
+/// the half second after they are finished. ModelInstance.BuildUp.cs draws it.
+/// </summary>
+public static class BuildUp
+{
+    public readonly record struct Masks(uint Group, uint Appear, uint Disappear);
+
+    /// <summary>the flags of a model kind; null: its parts do not move (only buildings, walls and fields)</summary>
+    public static Masks? Of(string fourcc) => fourcc switch
+    {
+        "Bldg" => new Masks(0x180, 0x20, 0x40),
+        "Wall" => new Masks(0x60000000, 0x40000, 0x80000),
+        "Fiel" => new Masks(0x1800, 0x200, 0x400),
+        _ => null,
+    };
+
+    /// <summary>the bits that keep parts apart when a model's static parts are merged</summary>
+    public static uint Keep(string fourcc) => Of(fourcc) is { } m ? m.Group | m.Appear | m.Disappear : 0;
+
+    /// <summary>how long the parts of the last level take to sink (s; PWClient 0x46ff21: (now - change) / 0.5)</summary>
+    public const double SINK_TIME = 0.5;
+
+    /// <summary>f: how far the current level is built, 0..1 (the engine reads CurProcess, a whole percent)</summary>
+    public static double StageFraction(double progress, int level) => Math.Clamp(Math.Round(progress * 100) / 100 * 4 - level, 0, 1);
+
+    /// <summary>what a transition from level a to level b does with a part: 0 nothing, 1 rises, -1 sinks, 2 not drawn
+    /// (PWClient 0x7aa060: in a and in b nothing; only in b: rises with the appear flag; only in a: sinks with the
+    /// disappear flag, else not drawn when hideRest; in neither: not drawn)</summary>
+    public static int Transition(bool inA, bool inB, bool appear, bool disappear, bool hideRest)
+    {
+        if (inA && inB) return 0;
+        if (inB) return appear ? 1 : 0;
+        if (inA) return disappear ? -1 : hideRest ? 2 : 0;
+        return 2;
+    }
 }
 
 /// <summary>What an animal or vehicle wears (parts.js animalMask opts).</summary>

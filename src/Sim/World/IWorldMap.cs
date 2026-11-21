@@ -32,6 +32,8 @@ public interface IWorldMap
     string Setting { get; }
     /// <summary>the level's start time of day in seconds (0..86400), null: 12:00</summary>
     double? StartTime { get; }
+    /// <summary>the map's day-night cycle (map.lua day_night: DayNight.cs), null: the original's clock</summary>
+    DayNightSpec? DayNight => null;
     /// <summary>the origin of the 8 m wall grid ([x0, z0], WallMap)</summary>
     double[] WallGrid { get; }
     /// <summary>the map's own walk grid (original maps: the PaFi grid of the .ula, maps/ula.js pathing): where land
@@ -51,6 +53,7 @@ public sealed class FlatMap : IWorldMap
     public double? Water { get; init; }
     public string Setting { get; init; } = "Jungle";
     public double? StartTime { get; init; }
+    public DayNightSpec? DayNight { get; init; }
     public double[] WallGrid { get; init; } = { 4, 4 };
     public double MaxSlope { get; init; } = 32;
     public string Kind { get; init; } = "flat";

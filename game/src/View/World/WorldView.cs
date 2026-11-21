@@ -104,6 +104,8 @@ public partial class WorldView : Node3D
     /// Library.OnInstance); updated in Step. Level: the "Particles" setting.</summary>
     public Particles Particles { get; private set; } = null!;
     public FogOverlay Fog { get; private set; } = null!;
+    /// <summary>the original's fog of war clouds (null: no fog of war drawn this way - the map viewer, no texture)</summary>
+    public FogClouds? Clouds { get; private set; }
     public Node3D Objects { get; private set; } = null!;
     public WorldViewOptions Options { get; private set; } = new();
     public readonly List<TreeView> Trees = new();
@@ -209,11 +211,20 @@ public partial class WorldView : Node3D
         Mark(sw, "water");
         Fog = FogOverlay.Create(S.Size);
         Fog.SetSceneFog(WorldRenderer.Background, WorldRenderer.FogStart, WorldRenderer.FogEnd);
-        Fog.On = Options.Fog;
+        // the fog of war as the original draws it (its default renderer): clouds over what is not seen now, the
+        // ground not darkened (FogClouds; docs/TERRAIN.md "Fog of war: how the original draws it"); without a cloud
+        // texture in the data the old darkening pass
+        if (Options.Fog) Clouds = FogClouds.Create(S, Ground, Assets.Find);
+        if (Clouds != null) AddChild(Clouds);
+        Fog.On = Options.Fog && Clouds == null;
         AddChild(Fog);
         Particles = new Particles(Library.Textures) { FogStart = (float)WorldRenderer.FogStart, FogEnd = (float)WorldRenderer.FogEnd, Level = Options.Render.Particles };
         AddChild(Particles);
         Library.OnInstance = Particles.Track;
+        Library.OnEmitter = Particles.TrackNode;
+        // (the infected look's blight lies on this terrain: Materials/InfectedLook, Fx/InfectionBlight)
+        var ground = Ground;
+        PwRemake.View.Materials.InfectedLook.GroundHeight = (x, z) => (float)ground.At(x, z);
         Props = new PropField { Particles = Particles };
         AddChild(Props);
         Foliage = new FoliageField(64);
@@ -444,11 +455,14 @@ public partial class WorldView : Node3D
     static readonly Regex BushRe = new("^jungle_(bush_|underwood_|mountain_bush)"), FlowerRe = new("^jungle_(flowers|reed|wildrice|beachgrass)");
     static readonly Regex TreeLike = new("tree|palm"), ShadowLike = new("bush|underwood|tree"), NotGround = new("tree|palm|bamboo|deco");
 
+    // the decoration's own random numbers (the bushes' and flowers' leaves; a Park-Miller sequence as the JS)
+    double _brA = 99;
+    double Brnd() { _brA = (_brA * 16807) % 2147483647; return _brA / 2147483647; }
+
     void BuildContent()
     {
         var S = Source;
-        double brA = 99;
-        double Brnd() { brA = (brA * 16807) % 2147483647; return brA / 2147483647; }
+        _brA = 99;
         // fruit bush: the original sprite layers (leaves + fruit) drawn from jng_misc_a
         var miscTex = Library.Textures.Get("jng_misc_a.png");
         List<FoliageHandle> FruitBushSprites(double x, double y, double z, double rot)
@@ -480,74 +494,14 @@ public partial class WorldView : Node3D
             return h != null ? new List<FoliageHandle> { h } : new List<FoliageHandle>();
         }
 
-        foreach (var t in S.Trees)
-        {
-            var tv = new TreeView { Src = t };
-            Trees.Add(tv);
-            if (Library.Template(t.Model, null, true) == null) continue;
-            double y = Ground.At(t.X, t.Z);
-            Kind(t.Model);
-            tv.Prop = Props.Add(t.Model, t.X, y, t.Z, t.Rot, t.Scale);
-            tv.Sprites = AddSprites(t.Model, t.X, y, t.Z, t.Rot, t.Scale);
-        }
+        foreach (var t in S.Trees) AddTree(t);
         // undergrowth: camera-facing leaf sprites (same technique as the tree canopies)
-        var bushTex = Library.Textures.Get("jng_small_a.png");
-        foreach (var d in S.Decor)
-        {
-            double y = d.Y ?? Ground.At(d.X, d.Z);
-            if (BushRe.IsMatch(d.Model))
-            {
-                int n = 6 + (int)Math.Floor(Brnd() * 6);
-                double sc = d.Scale * 1.3;
-                var list = new List<FoliageSprite>();
-                int pal = (int)Math.Floor(Brnd() * 3);    // leaves / ferns / mixed
-                for (int i = 0; i < n; i++)
-                {
-                    double a = Brnd() * 6.283, r = Brnd() * 1.5 * sc, hy = 0.35 + Brnd() * 1.1 * sc;
-                    var cell = pal == 0 ? BUSH_CELLS[3 + (int)Math.Floor(Brnd() * 2)] : pal == 1 ? BUSH_CELLS[(int)Math.Floor(Brnd() * 3)] : BUSH_CELLS[(int)Math.Floor(Brnd() * BUSH_CELLS.Length)];
-                    list.Add(new FoliageSprite
-                    {
-                        X = (float)(d.X + Math.Cos(a) * r), Y = (float)(y + hy), Z = (float)(d.Z + Math.Sin(a) * r), Size = (float)((1.3 + Brnd() * 1.1) * sc),
-                        Uv = cell, Detail = i >= 5, Tint = (float)(Math.Min(1, hy / (1.5 * sc)) * 0.7 + Brnd() * 0.25), Aspect = 1,
-                    });
-                }
-                var dv = new DecorView { X = d.X, Z = d.Z };
-                if (Foliage.Add(bushTex, list) is FoliageHandle h) dv.Sprites.Add(h);
-                Decor.Add(dv);
-                continue;
-            }
-            if (FlowerRe.IsMatch(d.Model))
-            {
-                var list = new List<FoliageSprite>();
-                int kindF = (int)Math.Floor(Brnd() * 3);
-                for (int i = 0; i < 3; i++)
-                {
-                    double a = Brnd() * 6.283, r = Brnd() * 0.9;
-                    list.Add(new FoliageSprite { X = (float)(d.X + Math.Cos(a) * r), Y = (float)(y + 0.45), Z = (float)(d.Z + Math.Sin(a) * r), Size = (float)(1.4 + Brnd() * 0.6), Uv = LEAF[(int)Math.Floor(Brnd() * 2)], Detail = true, Tint = (float)(0.3 + Brnd() * 0.2), Aspect = 1 });
-                }
-                for (int i = 0; i < 5; i++)
-                {
-                    double a = Brnd() * 6.283, r = Brnd() * 1.1;
-                    list.Add(new FoliageSprite { X = (float)(d.X + Math.Cos(a) * r), Y = (float)(y + 0.6 + Brnd() * 0.4), Z = (float)(d.Z + Math.Sin(a) * r), Size = (float)(0.6 + Brnd() * 0.35), Uv = FLOW[kindF * 2 + (int)Math.Floor(Brnd() * 2)], Detail = true, Tint = 0.85f, Aspect = 1 });
-                }
-                var dv = new DecorView { X = d.X, Z = d.Z };
-                if (Foliage.Add(miscTex, list) is FoliageHandle h) dv.Sprites.Add(h);
-                Decor.Add(dv);
-                continue;
-            }
-            if (Library.Template(d.Model, null, true) == null) continue;
-            var dk = Kind(d.Model, d.Block || ShadowLike.IsMatch(d.Model), SettingAt(d.X, d.Z));
-            var prop = Props.Add(dk?.Name ?? d.Model, d.X, y, d.Z, d.Rot, d.Scale, d.Q != null ? Frame.MapQuat(d.Q) : null);
-            var sprites = AddSprites(d.Model, d.X, y, d.Z, d.Rot, d.Scale, !NotGround.IsMatch(d.Model));
-            var glows = prop != null ? AddGlowSprites(d.Model, prop.M) : new List<Node3D>();
-            // the sequel's houses, cars and camps stand where the story put them (not plants)
-            if (!d.Model.StartsWith("sq_")) Decor.Add(new DecorView { X = d.X, Z = d.Z, Prop = prop, Sprites = sprites, Glows = glows });
-        }
+        foreach (var d in S.Decor) AddDecor(d);
         foreach (var s in S.Stones)
         {
             if (s.Model == null || Library.Template(s.Model, null, true) == null) { Stones.Add(null); continue; }
             Kind(s.Model);
-            Stones.Add(Props.Add(s.Model, s.X, Ground.At(s.X, s.Z), s.Z, s.Rot, 1));
+            Stones.Add(Props.Add(s.Model, s.X, Ground.At(s.X, s.Z), s.Z, s.Rot, s.Scale));    // (scale: a map attribute of the remake)
         }
         foreach (var b in S.Bushes)
         {
@@ -564,6 +518,76 @@ public partial class WorldView : Node3D
             Kind(f.Model);
             Fish.Add(Props.Add(f.Model, f.X, S.Water is double w ? w - 0.3 : Ground.At(f.X, f.Z), f.Z, _rnd.NextDouble() * 6.28, 1));
         }
+    }
+
+    /// <summary>a tree of the map: its model and its leaves (BuildContent; the map editor adds trees later too)</summary>
+    TreeView AddTree(MapTree t)
+    {
+        var tv = new TreeView { Src = t };
+        Trees.Add(tv);
+        // (a tree lying felled from the start - map attribute fallen = 1: no standing tree; EntityViews draws its log)
+        if (t.Fallen || Library.Template(t.Model, null, true) == null) return tv;
+        double y = Ground.At(t.X, t.Z);
+        Kind(t.Model);
+        tv.Prop = Props.Add(t.Model, t.X, y, t.Z, t.Rot, t.Scale);
+        tv.Sprites = AddSprites(t.Model, t.X, y, t.Z, t.Rot, t.Scale);
+        return tv;
+    }
+
+    /// <summary>a decoration of the map (plants, scenery): undergrowth as camera-facing leaf sprites, the rest as props
+    /// with their sprites and glows (BuildContent; the map editor adds decoration later too)</summary>
+    void AddDecor(MapDecor d)
+    {
+        var miscTex = Library.Textures.Get("jng_misc_a.png");
+        var bushTex = Library.Textures.Get("jng_small_a.png");
+        double y = d.Y ?? Ground.At(d.X, d.Z);
+        if (BushRe.IsMatch(d.Model))
+        {
+            int n = 6 + (int)Math.Floor(Brnd() * 6);
+            double sc = d.Scale * 1.3;
+            var list = new List<FoliageSprite>();
+            int pal = (int)Math.Floor(Brnd() * 3);    // leaves / ferns / mixed
+            for (int i = 0; i < n; i++)
+            {
+                double a = Brnd() * 6.283, r = Brnd() * 1.5 * sc, hy = 0.35 + Brnd() * 1.1 * sc;
+                var cell = pal == 0 ? BUSH_CELLS[3 + (int)Math.Floor(Brnd() * 2)] : pal == 1 ? BUSH_CELLS[(int)Math.Floor(Brnd() * 3)] : BUSH_CELLS[(int)Math.Floor(Brnd() * BUSH_CELLS.Length)];
+                list.Add(new FoliageSprite
+                {
+                    X = (float)(d.X + Math.Cos(a) * r), Y = (float)(y + hy), Z = (float)(d.Z + Math.Sin(a) * r), Size = (float)((1.3 + Brnd() * 1.1) * sc),
+                    Uv = cell, Detail = i >= 5, Tint = (float)(Math.Min(1, hy / (1.5 * sc)) * 0.7 + Brnd() * 0.25), Aspect = 1,
+                });
+            }
+            var dv = new DecorView { X = d.X, Z = d.Z };
+            if (Foliage.Add(bushTex, list) is FoliageHandle h) dv.Sprites.Add(h);
+            Decor.Add(dv);
+            return;
+        }
+        if (FlowerRe.IsMatch(d.Model))
+        {
+            var list = new List<FoliageSprite>();
+            int kindF = (int)Math.Floor(Brnd() * 3);
+            for (int i = 0; i < 3; i++)
+            {
+                double a = Brnd() * 6.283, r = Brnd() * 0.9;
+                list.Add(new FoliageSprite { X = (float)(d.X + Math.Cos(a) * r), Y = (float)(y + 0.45), Z = (float)(d.Z + Math.Sin(a) * r), Size = (float)(1.4 + Brnd() * 0.6), Uv = LEAF[(int)Math.Floor(Brnd() * 2)], Detail = true, Tint = (float)(0.3 + Brnd() * 0.2), Aspect = 1 });
+            }
+            for (int i = 0; i < 5; i++)
+            {
+                double a = Brnd() * 6.283, r = Brnd() * 1.1;
+                list.Add(new FoliageSprite { X = (float)(d.X + Math.Cos(a) * r), Y = (float)(y + 0.6 + Brnd() * 0.4), Z = (float)(d.Z + Math.Sin(a) * r), Size = (float)(0.6 + Brnd() * 0.35), Uv = FLOW[kindF * 2 + (int)Math.Floor(Brnd() * 2)], Detail = true, Tint = 0.85f, Aspect = 1 });
+            }
+            var dv = new DecorView { X = d.X, Z = d.Z };
+            if (Foliage.Add(miscTex, list) is FoliageHandle h) dv.Sprites.Add(h);
+            Decor.Add(dv);
+            return;
+        }
+        if (Library.Template(d.Model, null, true) == null) return;
+        var dk = Kind(d.Model, d.Block || ShadowLike.IsMatch(d.Model), SettingAt(d.X, d.Z));
+        var prop = Props.Add(dk?.Name ?? d.Model, d.X, y, d.Z, d.Rot, d.Scale, d.Q != null ? Frame.MapQuat(d.Q) : null);
+        var sprites = AddSprites(d.Model, d.X, y, d.Z, d.Rot, d.Scale, !NotGround.IsMatch(d.Model));
+        var glows = prop != null ? AddGlowSprites(d.Model, prop.M) : new List<Node3D>();
+        // the sequel's houses, cars and camps stand where the story put them (not plants)
+        if (!d.Model.StartsWith("sq_")) Decor.Add(new DecorView { X = d.X, Z = d.Z, Prop = prop, Sprites = sprites, Glows = glows });
     }
 
     /// <summary>
@@ -717,11 +741,13 @@ public partial class WorldView : Node3D
         // the emitters last: their nodes are where this frame draws them (particles.js after the render)
         Particles.Update(dt, camera, target);
         P?.Mark("view:particles");
+        Clouds?.Step(dt, camera);
+        P?.Mark("view:fog clouds");
     }
 
     /// <summary>the fog of war of the local player (FogOverlay.SetFog): per cell 1 = visible now / explored; null = all visible</summary>
     public void SetFog(byte[]? visible, byte[]? explored, int w, int h) => Fog.SetFog(visible, explored, w, h);
 
     /// <summary>the fog of war from a FogGrid (the JS FogOfWar)</summary>
-    public void SetFog(PwRemake.Sim.World.FogGrid g) { Fog.RevealAll = g.RevealAll; Fog.SetFogValues(g.TextureBytes(), g.N, g.N); }
+    public void SetFog(PwRemake.Sim.World.FogGrid g) { Fog.RevealAll = g.RevealAll; Fog.SetFogValues(g.TextureBytes(), g.N, g.N); Clouds?.SetFog(g); }
 }

@@ -322,4 +322,35 @@ public interface IMissionHost
     /// <summary>The player's profile variables (Server/settings/ProfileVariables.txt values), or null.</summary>
     IReadOnlyDictionary<string, string>? LoadProfile();
     void SaveProfile(IReadOnlyDictionary<string, string> values);
+
+    // ---------------------------------------------------------------- the remake's own (docs/LUA_MAPS.md "The Game API")
+    /// <summary>where the map's day-night cycle stands (map.lua day_night), null: the map has none</summary>
+    PwRemake.Sim.World.DayNightState? DayNight => null;
+    /// <summary>an object's infected stage 0 .. 3 (drawn by the view: docs/INFECTED_LOOK.md); false: no such object</summary>
+    bool SetInfection(int obj, int stage) => false;
+    int Infection(int obj) => 0;
+    /// <summary>does the configuration's rules know the class (a map made for several configurations picks its classes)</summary>
+    bool ClassExists(string cls) => true;
+    /// <summary>the human side's player slots: the human player, in a co-op game every seat (docs/COOP.md)</summary>
+    IReadOnlyList<int> SeatSlots => new[] { HumanSlot };
+    /// <summary>the cycle's lengths changed (seconds; null: as they are) - a mission's difficulty (Outbreak: shorter
+    /// days on Hard). Meant for the mission's start: a change later moves the phase with the new lengths.</summary>
+    void SetDayNightTimes(double? day, double? night, double? firstDay) { }
+    /// <summary>the player of the slot raised to `epoch` (its epoch upgrades as if researched; no "epoch reached"
+    /// message); returns its epoch</summary>
+    int RaiseEpoch(int slot, int epoch) => 1;
+    /// <summary>a class put down for a player slot in that player's own tribe (seat 1: the chosen tribe's equivalent, a
+    /// co-op seat: its tribe's - the tribe swap), never scaled by the co-op; -1: not made</summary>
+    int SpawnOwn(string cls, int slot, double x, double y, int? level) => -1;
+    /// <summary>a unit drawn this many times its size (a mission's giant: the sequel's scale mark)</summary>
+    void SetDrawScale(int obj, double scale) { }
+    /// <summary>new maximum hit points, healed to them</summary>
+    void SetMaxHp(int obj, double maxHp) { }
+    /// <summary>a unit set on fire: it burns to death in `seconds` (World.Ignite: the fire effect, its hit points run
+    /// down evenly); false: no such unit, or burning already</summary>
+    bool Burn(int obj, double seconds) => false;
+    /// <summary>a worker sent to gather `res` ("food", "wood", "stone") at the nearest source of its owner's reach from
+    /// itself (food: its owner's own field / slaughterhouse with a free place first, then bushes); false: not a worker or
+    /// nothing to gather</summary>
+    bool OrderGather(int obj, string res) => false;
 }

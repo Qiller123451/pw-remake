@@ -115,7 +115,7 @@ version: taking over an ally belongs to mode 2 only.)
 One Lua file per mission and configuration: `game/coop/<config>/<NN>.lua` (NN = the mission id of index.json:
 `00`..`16`, `20`..`23`, `41`..`43`; a `game/coop/common/<NN>.lua` may hold what both configurations share, the
 configuration's file overrides it). It returns a table; coordinates are the original map's map coordinates
-(metres, x east, z = the map's y south, from its north-west corner: the mission's own world.json / trigger
+(metres, x east, z = the map's y south, from its north-west corner: the mission's own world.lua / trigger
 coordinates; after an extension the old map keeps its coordinates and the new land lies at negative or
 beyond-the-old-size coordinates; the map hook turns the seats' starts into game coordinates - docs/COOP.md "Maps").
 What exists only for one seat (its land, its base site, its resources) goes under that seat (`seats[n].extend`,

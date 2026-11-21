@@ -219,6 +219,15 @@ multichannel distance fields, so the text stays sharp at any scale.
   the farm modes) with several objects of that class selected is queued at each of them that offers it, each paying its
   price (`HudGame.UseAction` -> `QueueActionCommand.Also`); a wall piece's upgrade sits in Produce -> Upgrades
   (docs/SIMULATION.md "Wall upgrades and overbuilding").
+  Several buildings selected (Shift+click / Shift+box, docs/GAME_SESSION.md "Selection"): the info window shows the
+  group (a card per building, "N selected"); the command bar has Produce when one of them produces - its menu is the
+  first producing building's (`HudGame.Producer`; CommandBar.usl PreprocessObjects keeps one building of a
+  selection) - and a card (unit, research ...) goes to the **least busy** finished building of that class that offers
+  it: the fewest queue entries, of equal ones the one furthest on with its current entry; Shift's five are spread one
+  by one the same way (`HudGame.LeastBusy`; CmdButton.usl sends the card to `CCommandBar.SortByQueue(selection)`,
+  MIRAGE's server takes the first of it - Mirage.usl `CGPCEmitter.SortByQueue`). Rally point and kill go to all of
+  them. Not yet: the card's queue number shows the first building's queue only. Test:
+  `ShiftSelectTests.SeveralBuildingsProduce`.
 * **Flyout** (Flyout.usl): Build rows Economy / Military / Defence / Special (MIRAGE) / More, Produce rows Modes /
   Upgrades / Extensions / Research / Conversions / Units / More, Special rows Commands / Hero moves / Special moves,
   Stances; cards sorted by `menupos` (fixed places, −1 first free, −2 at the end); the level a unit comes out at
@@ -270,6 +279,41 @@ multichannel distance fields, so the text stays sharp at any scale.
   show the sender's name in its player colour.
 
 ![A group of the Dragon Clan: stances, the minimap of mission 11 with an attack marker and a ping](images/hud_group_minimap.png)
+
+### Info window, command bar and build menu as the original (2026-11-20)
+
+User request: make the bottom HUD match the original (a MIRAGE screenshot): the hit point bar, the square build
+slots "and whatever else is missing". Taken from the scripts:
+
+- **Info window** (Info.usl CInfo, CUnitIcon, CAttribIcon):
+  - The class icon `tt_class_*` sits at 33, 7, with the name beside it at 51, 7 and the owner's (player's) name at
+    33, 19.
+  - The card is 64 x 61 at 33, 38: `info_crdbg_std`, the picture, `info_crdframe_clear`. Its hit point bar is the
+    card's own 64 x 65 layers (see "Hit point bars" below). "hp/max" stands under it at 33, 101.
+  - Six fixed value rows at 117, 34 + 17 i: attack, ranged attack, shield, armour, range ("min - max"), skulls.
+    Each has a 20 x 20 icon with the value 24 px to its right, and "-" for 0. The rows only show when one of them is
+    not 0.
+  - An object without any of those values keeps the remake's extra rows: passengers, gate, a SEAS well's energy, the
+    load. A fighter's load stands under the six rows.
+  - The production queue is at 33, 144, 3 px apart.
+- **Command bar** (CommandBar.usl):
+  - It sits at x 209 on the screen's bottom.
+  - The left spacer comes first. With two or more menu buttons, an empty disabled menu button follows them as the gap
+    before the action buttons. Then come the action buttons and the end piece.
+- **Flyout** (Flyout.usl; MIRAGE the same):
+  - It sits at x 212, right above the bar.
+  - Cards are 37 x 36, 4 px apart, starting 49 px in, a row every 40 px.
+  - Each row's category picture `actmenu_cat_*` is at the left; the special menu has none. The row's name is that
+    picture's tooltip.
+  - The window is as wide as the longest row: cards x 41 + 55.
+  - The frame's centre picture (410 x 40) is a row of empty slot squares, drawn under every row. So shorter rows show
+    the empty squares up to the window's width.
+  - The armed row's digits stand at the card's top right in yellow.
+  - The build menu's MIRAGE row UNIT is on top (MIRAGE: UNIT, ECON, COMB, DEFE).
+
+Not taken: MIRAGE's letter hotkeys (the red / yellow letters on the bar's buttons and the cards: CmdButton
+m_sAssignedKey from MIRAGE's key table). The remake has no letter hotkeys yet; the base game shows the armed row's
+digits only.
 
 ### Selection circles and question marks
 
@@ -337,8 +381,10 @@ markers, as MIRAGE's ClearAll; `game/src/View/Entities/RangeMarkers.cs`, a child
   engine's ground rings add them (debris renderer 0x6be370, the additive copy of Effects/Selection.tga, material
   0x704): a glowing band that keeps the ground's own colour - in Kacper's reference shot a temple's healing ring adds
   about 150 - 175 / 120 - 140 to red / green and keeps the ground's blue. The port mixed the colour at 0.9 (an opaque
-  line); now `blend_add` through `Fx/GammaBlend` (docs/EFFECTS.md "Brightness"). Not ported: the original's ring was
-  drawn over the tower in front of it in that shot (no depth test?) - the port's band is hidden by buildings.
+  line); now `blend_add` through `Fx/GammaBlend` (docs/EFFECTS.md "Brightness"). The original's ring was
+  drawn over the tower in front of it in that shot; the port's was too from 2026-11-20 to 2026-11-21 - Kacper's
+  decision 2026-11-21: rings under buildings (docs/VIEW.md "Rings under buildings"): hidden by a building in front, as
+  by a hill or a unit.
 * **Animation by real time**: the dashes (1.5 m of each colour) run round the rings at 0.03 rad/s and pulse, by the
   shader's TIME - the same for 1 or 100 markers, at any frame rate, on in the pause too (the original advanced it per
   drawn ring: 60 rings ran 60 times faster).
@@ -446,3 +492,49 @@ buttons after the bar; the visible shapes with one top and bottom, edge to edge,
   by the fake host.
 
 **Long buildings' rings and animated buildings** (2026-11-11): a long building's ring is centred on its footprint's middle, not on its place (`SelectionRing.Shape` returns the offset: the SEAS carrier's ring lay beside its hull); a sailing building gets the circle (its boxes are those of its last stop). Clicking a building hits its skinned parts too, by their bounding box (`GameInput.PickHit`: the carrier's animated hull could only be clicked on its few unskinned parts).
+
+### Hit point bars of the unit cards (2026-11-21)
+
+User report: the info window's bar of his full (5000/5000) SEAS garage was red, an enemy building's black; it should
+be green at full and red when low, "as the original draws it".
+
+The original's rule (scripts and engine):
+
+- The bar is blend layers of the card (Info.usl CUnitIcon 890-925; MIRAGE Info.usl 1260-1295; the army controller's
+  cards MIRAGE PyramidCard.usl 391-433). `hp%` = `(iHP * 100) / iMaxHP` (integers).
+- The option **AlternativeColoringACHP** (OptionsMenu "_UI_OptionsM_CheckBox_ACHPAlternativeColoring",
+  `Game/GraphicOptions/AlternativeColoringACHP`, Info.usl 893-905) picks the colouring:
+  - **on**: `layer ovl_hpbar_bg, hslicehp ovl_hpbar hp%` (Info.usl 924, PyramidCard.usl 432). The engine's
+    `hslicehp` (PWClient.exe 0x49bc1a, the blend parser's command strings at 0x846a18..) colours the slice by `p` =
+    hp% clamped to 0..100: **p < 50: (255, 5 p, 0)** (red .. yellow), **p >= 50: ((101 - p) * 5, 255, 0)** (yellow ..
+    green). Full: (5, 255, 0) green, half: yellow, 25 %: orange, 0: red. The same for every owner (own, allied,
+    enemy, neutral). (In the code the two values sit in the red and green slots the other way round, and the call
+    to CColor 0x412690 passes green first - the result is the gradient above.)
+  - **off** (the original's default): info window `layer ovl_hpbar_bg, hslicebar ovl_hpbar 100 0 0 0 256, hslicebar
+    ovl_hpbar hp% r g b 256` (Info.usl 919-922): black under the owner's ACColors.txt **dark** colour
+    (`GetHPColorValue`, mgr/UIStateMgr.usl 196-240): colour id 0..7 of the owner; else resources color11, animals by
+    `anml_aggressive_type` (0 color9 neutral, 1 color10 hostile, else color8). The army controller: the 100 % slice
+    in the player's **counter** colour (`GetHPCounterColorValue`) instead of black; a player colour outside 0..7
+    takes `hslicehp`. (PyramidCard also blends `ovl_hpbar_hploose` at 90 for 0.2 s when the hit points drop - not
+    in the remake yet.)
+- `hslicebar <layer> <p> r g b a` (0x49bf08): the left `w * p / 100` texels of the layer; each texel whose
+  **R > 2 (G + B)** (the mask) is **replaced** by r g b (a = 256: fully), the others are copied. `ovl_hpbar` is only
+  mask texels - two rows at the card's bottom, (255, 64, 0) and (211, 25, 0) - so the bar is a flat colour.
+
+The remake (game/src/UI/Hud/Logic/HpBarRule.cs, the drawing game/src/UI/Hud/HudHpBar.cs):
+
+- Settings `cardHpHealth` (Options > Gameplay, the original's caption key): **on by default** (Kacper's request:
+  green .. red), off the original's default owner colouring. It covers the info window's portrait and the army
+  controller's cards, as the original's option does. (The bars over the units in the world stay
+  `settings.hpBarColors`, the original's separate option AlternativeColoringPFHP.)
+- The cause of the bug: the remake multiplied the red `ovl_hpbar` texels by the owner's ground-ring colour (orange
+  0xef4500 times (255, 64, 0) = red; blue times it = nearly black). Now the mask is made once per atlas region (its
+  mask texels white) and drawn in the colour: the engine's replacement. The slice is `w * p / 100` texels of the
+  layer, scaled to the card.
+- The info window's group view (the remake's own: the original shows one object) colours its small bars with the
+  same `hslicehp` gradient (before: #77cc33 / #ddcc33 / #dd4422 at 0.6 / 0.3, not from the original). The army
+  controller's cards draw the card level's `ovl_hpbar` layers (before: a 4 px bar #6fd34f / #e3c23b / #d8452f at
+  0.5 / 0.25, not from the original).
+- The colours 8..11 and the counter colours are the values of MIRAGE's ReColor ACColors.txt (the base game's file is
+  not in the extracted data); the eight player "dark" colours are Sim/Rules/Colors.cs.
+- Tests: tests/PwRemake.Tests/HpBarRuleTests.cs (the gradient, the slice, the mask, the owner colours).

@@ -6,7 +6,8 @@
 // the Compatibility renderer):
 //   transform origin = the sprite's world position (the basis is the identity)
 //   colour           = rgb (the particle's colour, faded) and alpha
-//   custom           = (height in m, rotation, atlas cell + 256 x ground flag, pivot: x + 32 y, 0..31 each)
+//   custom           = (height in m, rotation, atlas cell + 256 x ground flag + 512 x green, pivot: x + 32 y, 0..31 each)
+//                      (green: an infected model's emitter - fire and light turned green, smoke tinted: InfectedLook)
 //
 // Ported from remake/src/engine/particles.js (Batch, VERT, FRAG) (pw-exporter 98c7703).
 using System;
@@ -69,11 +70,14 @@ uniform vec2 grid = vec2(1.0);
 uniform float aspect = 1.0;
 varying vec2 v_uv;
 varying vec4 v_col;
+varying flat float v_green;
 void vertex() {
     // (the corner offsets in the world: the instance's basis is the identity, so they are the model's - Godot's
     // Compatibility renderer does not keep a view-space VERTEX of skip_vertex_transform for MultiMesh instances)
     float size = INSTANCE_CUSTOM.x, rot = INSTANCE_CUSTOM.y;
-    float ground = floor(INSTANCE_CUSTOM.z / 256.0), tile = INSTANCE_CUSTOM.z - ground * 256.0;
+    float green = floor(INSTANCE_CUSTOM.z / 512.0), cz = INSTANCE_CUSTOM.z - green * 512.0;
+    float ground = floor(cz / 256.0), tile = cz - ground * 256.0;
+    v_green = green;
     float qy = floor(INSTANCE_CUSTOM.w / 32.0), qx = INSTANCE_CUSTOM.w - qy * 32.0;
     vec2 piv = vec2(qx, qy) / 15.5 - 1.0;          // -1 .. 1 from the cell's middle to its edge (y down)
     vec2 corner = vec2(UV.x - 0.5, 0.5 - UV.y);    // -0.5 .. 0.5, y up
@@ -96,7 +100,7 @@ void vertex() {
     v_uv = vec2((tx + corner.x + 0.5) / grid.x, (ty + 0.5 - corner.y) / grid.y);
     v_col = COLOR;
 }
-" + GammaBlend.Glsl + @"
+" + GammaBlend.Glsl + Materials.InfectedLook.GreenGlsl + @"
 void fragment() {
     vec4 t = texture(map, v_uv);
 " + (add
@@ -114,6 +118,9 @@ void fragment() {
     // shows 0.9 (Kacper 2026-11-18: 'less visible').
     vec3 c = t.rgb * v_col.rgb;
 " + (add
+            ? "    if (v_green > 0.5) c = pw_green(c);\n"
+            // (smoke and dust of an infected model: a sickly green-grey)
+            : "    if (v_green > 0.5) c = mix(c, dot(c, vec3(0.3333)) * vec3(0.6, 0.9, 0.4), 0.8);\n") + (add
             // (the alpha scales the light before it is added: blend_add would scale it after the conversion)
             ? @"    ALBEDO = pw_gamma_add(c * a);
     ALPHA = 1.0;
@@ -124,8 +131,9 @@ void fragment() {
 ",
     };
 
-    /// <summary>a sprite: world position, height (m), alpha, colour, atlas cell, rotation, packed pivot</summary>
-    public bool Push(Vector3 w, float size, float a, float r, float g, float b, int tile, float rot, float pivot, bool ground)
+    /// <summary>a sprite: world position, height (m), alpha, colour, atlas cell, rotation, packed pivot, ground flag,
+    /// green (an infected model's: InfectedLook.GreenGlsl)</summary>
+    public bool Push(Vector3 w, float size, float a, float r, float g, float b, int tile, float rot, float pivot, bool ground, bool green = false)
     {
         if (N >= MAX) return false;
         if (N >= _cap)
@@ -139,7 +147,7 @@ void fragment() {
         B[o + 4] = 0; B[o + 5] = 1; B[o + 6] = 0; B[o + 7] = w.Y;
         B[o + 8] = 0; B[o + 9] = 0; B[o + 10] = 1; B[o + 11] = w.Z;
         B[o + 12] = r; B[o + 13] = g; B[o + 14] = b; B[o + 15] = a;
-        B[o + 16] = size; B[o + 17] = rot; B[o + 18] = tile + (ground ? 256 : 0); B[o + 19] = pivot;
+        B[o + 16] = size; B[o + 17] = rot; B[o + 18] = tile + (ground ? 256 : 0) + (green ? 512 : 0); B[o + 19] = pivot;
         if (N == 0) { _min = w; _max = w; }
         else { _min = _min.Min(w); _max = _max.Max(w); }
         N++;

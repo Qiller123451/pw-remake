@@ -22,6 +22,8 @@ public sealed partial class World
             foreach (var r in Rules.Rules.COSTS) h.D(p[r]);
             h.I(p.Tt?.Version ?? 0);
         }
+        // (a colour the human chose for a campaign mission - MissionColors; mixed in only when chosen, so other games hash as before)
+        foreach (var p in Players) if (p.ColorPicked != null) { h.I(p.Id); h.I(p.Color); h.I(p.PartyColor ?? -1); h.I(p.ColorSlot); }
         foreach (var u in Units)
         {
             h.I(u.Id); h.S(u.Name); h.B(u.Alive); h.I(u.Level);
@@ -29,6 +31,12 @@ public sealed partial class World
             h.S(u.Task.Type); h.I(u.Path.Count); h.S(u.Anim?.CurName); h.D(u.Anim?.Cur?.Time ?? 0); h.B(u.BusyAnim);
         }
         foreach (var b in Buildings) { h.I(b.Id); h.S(b.Name); h.B(b.Alive); h.D(b.Hp); h.D(b.Progress); h.B(b.Built); h.S(b.Anim?.CurName); }
+        // (the infected stage a mission sets - Infection.cs; mixed in only when set, so other games hash as before)
+        foreach (var b in Buildings) if (b.Infection != 0) { h.I(b.Id); h.I(b.Infection); }
+        foreach (var u in Units) if (u.Infection != 0) { h.I(u.Id); h.I(u.Infection); }
+        // (a burning unit - Burning.cs - and an indestructible object: mixed in only when set)
+        foreach (var u in Units) if (u.BurnUntil > 0) { h.I(u.Id); h.D(u.BurnUntil); }
+        foreach (var b in Buildings) if (b.Indestructible) { h.I(b.Id); h.B(true); }
         foreach (var r in Resources) { h.I(r.Id); h.B(r.Alive); h.D(r.Amount); }
         foreach (var p in Projectiles) { h.D(p.Pos.X); h.D(p.Pos.Z); h.D(p.T); }
         foreach (var t in Timers) { h.D(t.T); h.S(t.Kind); }
@@ -42,11 +50,11 @@ public sealed partial class World
     {
         var res = new List<(string, ulong)>();
         var h = new Fnv(); h.D(Time); h.L(StepNo); h.I(NextId); foreach (var s in Rng.State) h.U(s); res.Add(("time+random", h.Value));
-        h = new Fnv(); foreach (var p in Players) { h.I(p.Id); h.I(p.Units); h.D(p.MaxUnits); foreach (var r in Rules.Rules.COSTS) h.D(p[r]); h.I(p.Tt?.Version ?? 0); } res.Add(("players", h.Value));
-        h = new Fnv(); foreach (var u in Units) { h.I(u.Id); h.S(u.Name); h.B(u.Alive); h.I(u.Level); h.D(u.Hp); h.D(u.MaxHp); } res.Add(("units", h.Value));
+        h = new Fnv(); foreach (var p in Players) { h.I(p.Id); h.I(p.Units); h.D(p.MaxUnits); foreach (var r in Rules.Rules.COSTS) h.D(p[r]); h.I(p.Tt?.Version ?? 0); if (p.ColorPicked != null) { h.I(p.Color); h.I(p.PartyColor ?? -1); h.I(p.ColorSlot); } } res.Add(("players", h.Value));
+        h = new Fnv(); foreach (var u in Units) { h.I(u.Id); h.S(u.Name); h.B(u.Alive); h.I(u.Level); h.D(u.Hp); h.D(u.MaxHp); if (u.BurnUntil > 0) h.D(u.BurnUntil); } res.Add(("units", h.Value));
         h = new Fnv(); foreach (var u in Units) { h.D(u.Pos.X); h.D(u.Pos.Y); h.D(u.Pos.Z); h.D(u.Heading); h.I(u.Path.Count); } res.Add(("unit positions", h.Value));
         h = new Fnv(); foreach (var u in Units) { h.S(u.Task.Type); h.S(u.Anim?.CurName); h.D(u.Anim?.Cur?.Time ?? 0); h.B(u.BusyAnim); } res.Add(("unit tasks", h.Value));
-        h = new Fnv(); foreach (var b in Buildings) { h.I(b.Id); h.S(b.Name); h.B(b.Alive); h.D(b.Hp); h.D(b.Progress); h.B(b.Built); h.S(b.Anim?.CurName); } res.Add(("buildings", h.Value));
+        h = new Fnv(); foreach (var b in Buildings) { h.I(b.Id); h.S(b.Name); h.B(b.Alive); h.D(b.Hp); h.D(b.Progress); h.B(b.Built); h.S(b.Anim?.CurName); if (b.Indestructible) h.B(true); } res.Add(("buildings", h.Value));
         h = new Fnv(); foreach (var r in Resources) { h.I(r.Id); h.B(r.Alive); h.D(r.Amount); } res.Add(("resources", h.Value));
         h = new Fnv(); foreach (var p in Projectiles) { h.D(p.Pos.X); h.D(p.Pos.Z); h.D(p.T); } res.Add(("projectiles", h.Value));
         h = new Fnv(); foreach (var t in Timers) { h.D(t.T); h.S(t.Kind); } h.I(Effects.Count); h.I(Spirits.Count); h.I(Nav.Version); res.Add(("timers+effects", h.Value));
@@ -60,11 +68,11 @@ public sealed partial class World
         static string R(double v) => v.ToString("R", System.Globalization.CultureInfo.InvariantCulture);
         o.WriteLine($"step {StepNo} time {R(Time)} nextId {NextId} rng {string.Join(",", Rng.State)}");
         foreach (var p in Players)
-            o.WriteLine($"player {p.Id} {p.Tribe} units {p.Units} max {R(p.MaxUnits)} res {string.Join(",", Rules.Rules.COSTS.Select(r => r + "=" + R(p[r])))} tt {p.Tt?.Version ?? 0} techs {p.Techs.Count} kills {p.Kills} lost {p.Lost} defeated {p.Defeated} won {p.Won}");
+            o.WriteLine($"player {p.Id} {p.Tribe} units {p.Units} max {R(p.MaxUnits)} res {string.Join(",", Rules.Rules.COSTS.Select(r => r + "=" + R(p[r])))} tt {p.Tt?.Version ?? 0} techs {p.Techs.Count} kills {p.Kills} lost {p.Lost} defeated {p.Defeated} won {p.Won}" + (p.ColorPicked != null ? $" colour {p.ColorPicked} {p.Color:x6}/{p.PartyColor ?? -1:x6}/{p.ColorSlot}" : ""));
         foreach (var u in Units)
-            o.WriteLine($"unit {u.Id} {u.Name} p{u.Owner?.Id ?? -1} alive {u.Alive} lv {u.Level} pos {R(u.Pos.X)},{R(u.Pos.Y)},{R(u.Pos.Z)} hd {R(u.Heading)} hp {R(u.Hp)}/{R(u.MaxHp)} task {u.Task.Type} path {u.Path.Count} anim {u.Anim?.CurName} {R(u.Anim?.Cur?.Time ?? 0)} busy {u.BusyAnim}");
+            o.WriteLine($"unit {u.Id} {u.Name} p{u.Owner?.Id ?? -1} alive {u.Alive} lv {u.Level} pos {R(u.Pos.X)},{R(u.Pos.Y)},{R(u.Pos.Z)} hd {R(u.Heading)} hp {R(u.Hp)}/{R(u.MaxHp)} task {u.Task.Type} path {u.Path.Count} anim {u.Anim?.CurName} {R(u.Anim?.Cur?.Time ?? 0)} busy {u.BusyAnim}" + (u.BurnUntil > 0 ? $" burn {R(u.BurnUntil)}" : ""));
         foreach (var b in Buildings)
-            o.WriteLine($"building {b.Id} {b.Name} p{b.Owner?.Id ?? -1} alive {b.Alive} hp {R(b.Hp)} progress {R(b.Progress)} built {b.Built} pos {R(b.Pos.X)},{R(b.Pos.Z)} anim {b.Anim?.CurName}");
+            o.WriteLine($"building {b.Id} {b.Name} p{b.Owner?.Id ?? -1} alive {b.Alive} hp {R(b.Hp)} progress {R(b.Progress)} built {b.Built} pos {R(b.Pos.X)},{R(b.Pos.Z)} anim {b.Anim?.CurName}" + (b.Indestructible ? " indestructible" : ""));
         foreach (var r in Resources) o.WriteLine($"resource {r.Id} {r.Name} alive {r.Alive} amount {R(r.Amount)}");
         foreach (var p in Projectiles) o.WriteLine($"projectile {R(p.Pos.X)},{R(p.Pos.Z)} t {R(p.T)}");
         foreach (var t in Timers) o.WriteLine($"timer {t.Kind} {R(t.T)}");

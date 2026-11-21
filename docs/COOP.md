@@ -15,7 +15,7 @@ src/Sim/Coop/                    the co-op core (no Godot types)
   CoopMapHook.cs                 the seam to the map work (extend / resources: src/Sim/Maps/MapExtension.cs, branch port/coopmaps)
   World.Coop.cs                  Player.CoopDamage / CoopHealth / CoopPopBase, World.CoopHeroBlocked
 src/Net/Lobby.cs                 LobbyState.CoopMode ("shared" | "campaign"), CoopLobbyState, LobbyStart (-> GameStart.Coop)
-src/Net/NetHost.cs, NetClient.cs "coop-seat", "coop-tribe" messages
+src/Net/NetHost.cs, NetClient.cs "coop-seat", "coop-tribe", "coop-army", "army-cancel" messages; the lobby state "armies"
 game/coop/<config>/<NN>.lua      the definitions (common/: both configurations)
 game/src/UI/CoopLobby.cs         the lobby (online: Multiplayer; offline: the campaign menu's "Co-op …")
 game/src/UI/Hud/CoopHud.cs       the co-op panel in the game; GameSession.Coop.cs
@@ -40,7 +40,7 @@ and the **mode**:
   2026-11-03 yet ("Co-op campaign: not reworked yet" - Shared mode stays available for them; their definition files
   stay in place, unused, for later).
 
-Joining players take a free human seat ("Take this seat") and pick their own faction; the host sets the AI commanders'
+Joining players take a free human seat ("Take this seat") and pick their own faction and **colour**; the host sets the AI commanders'
 factions and aggression. With MIRAGE the host also sets MIRAGE's game options in *Settings*: **Sixth stage** (on by
 default, MIRAGE's MaxEpoch 6), **No titans**, **Flying units** (FlyingEnabled), **Portal termini** (Portals) and
 **Building limit** (BldgMaxCapacity; the last four off by default) - every player sees them, they go into the mission's
@@ -72,7 +72,8 @@ panel hides while a cutscene shows.
 
 ## The definition (schema v1, final semantics)
 
-One Lua file per mission and configuration, `game/coop/<config>/<NN>.lua` (NN = the mission id of index.json), and
+The remake's own missions (`game/missions/<name>/`, docs/OUTBREAK.md) carry their definition in their folder:
+`coop.lua` (used when `game/coop` has none for the id). One Lua file per mission and configuration, `game/coop/<config>/<NN>.lua` (NN = the mission id of index.json), and
 optionally `game/coop/common/<NN>.lua` for both configurations; the configuration's file is laid over the common one
 (its keys replace the common's, tables merged key by key). The file runs in the maps' sandbox and returns a table; it is
 turned into JSON and **travels inside GameStart** (`GameStart.Coop.Definition`): the other machines, a saved game and a
@@ -81,10 +82,10 @@ replay use that copy, not the files of the machine that loads it.
 | key | meaning (core) |
 |---|---|
 | `version` | 1 (another version: a warning) |
-| `nobuild` | a hero-party mission: no main buildings for the seats, the heroes divided evenly |
+| `nobuild` | a hero-party mission: no main buildings for the seats, the heroes divided evenly; no enemy scaling ("Enemy scaling") |
 | `heroes` | the story heroes split among the humans: classes of the mission (`Stina_s0` also matches her sabre-tooth `special_eusmilus`, the remake's unit for her) |
 | `extend`, `resources` | **the map work's** (plain data, handed to `CoopMapHook`) |
-| `seats[n]` (n = 2, 3) | `start = { x, z, dir }`: the original map's map coordinates in metres (x east, z = the map's y south, from its north-west corner - as the mission's own positions, world.json and the triggers; the map hook turns them into game coordinates of the possibly extended map, "Maps" below), dir a map heading in radians; `army`: `"default"` (seat 1's start army of the mission without its heroes, in the seat's tribe by the tribe swap; in a building mission the tribe's start workers when it has none), `"none"`, or a list of classes (another tribe's class is swapped); `ally = id`: the seat takes that existing ally's slot; `start_resources = { food, wood, stone, iron }` (default: seat 1's of the mission; -1 = the tribe's default stock); `base = false`: no main building (default: one unless `nobuild`); `extend` / `resources` **the map work's**, only for seats in use |
+| `seats[n]` (n = 2, 3) | `start = { x, z, dir }`: the original map's map coordinates in metres (x east, z = the map's y south, from its north-west corner - as the mission's own positions, world.lua and the triggers; the map hook turns them into game coordinates of the possibly extended map, "Maps" below), dir a map heading in radians; `army`: `"default"` (seat 1's start army of the mission without its heroes, in the seat's tribe by the tribe swap; in a building mission the tribe's start workers when it has none), `"none"`, or a list of classes (another tribe's class is swapped); `ally = id`: the seat takes that existing ally's slot; `start_resources = { food, wood, stone, iron }` (default: seat 1's of the mission; -1 = the tribe's default stock); `base = false`: no main building (default: one unless `nobuild`); `extend` / `resources` **the map work's**, only for seats in use |
 | `allies.usable` | the allies a seat may take (a seat's `ally` must be listed) |
 | `scaling` | `count`, `health`, `damage` per extra seat (defaults below), `exclude = { ids }` players left as they are, and `garrisons` / `spawns` / `waves` / `production` = false to switch a kind of "more units" off |
 | `triggers.give_to` | the seat that receives what the original gives "the player" (default 1) - in the base phase; in a hero phase and a no-build mission the gifts are dealt ("Hero phase and gifts") |
@@ -166,7 +167,7 @@ tests/PwRemake.Tests/CoopWorldTests.cs the grown maps' gameplay, the enemy addit
 ### Coordinates
 
 Everything in a definition is in the **original map's map coordinates**: x east, z = the map's y (south), metres from
-its north-west corner - the coordinates of the mission's own world.json, regions and triggers. An extension keeps them:
+its north-west corner - the coordinates of the mission's own world.lua, regions and triggers. An extension keeps them:
 the new land to the north or west lies at negative coordinates, to the south or east beyond the old size
 (`MapData.OffX` / `OffY` are the grids' corner, `MapSource.Origin` the extended map's centre, so `Campaign.ToGame` /
 `ToMap` stay right for every old position and the triggers need nothing). This is also why a definition does not use
@@ -645,8 +646,10 @@ Agreed with the user on 2026-11-03 ("for every step of the mission each player h
     hero phase); in a no-build mission buildings are dealt too (mission 16's turret towers);
   * what is already a seat's stays its seat's when the triggers give it to "the player" again (the tutorial re-occupies
     the player's workers to mark them).
-* **No extra enemies** in a hero phase and in a no-build mission: the enemies' *numbers* are not scaled (no extra
-  garrison copies, spawns, wave units or population); their health and damage are (the co-op difficulty).
+* **No enemy scaling** in a hero phase and in a no-build mission (Kacper 2026-11-20: "no enemy scaling during no-build
+  missions" - the players have no base and control only heroes and units): neither the enemies' numbers (no extra
+  garrison copies, spawns, wave units or population) nor their health and damage are scaled - the mission's enemies are
+  the single player game's (`CoopRuntime.EnemyScaling`). A hero phase's hand-over switches the whole scaling on.
 * Mission 1 (the user's example), 3 seats: Cole → 1, a Norse warrior each → 2, 3; the beach nest sends its two
   Dilophosaurs together (`map_objects`: `spawn_max = 2` - the original has two in all, one after the other); the
   village's 4 warriors → 2, 3, 1, 2; the 4 spearmen → 1 each and the 4th to the seat with the fewest; Stina → 2, Béla
@@ -726,6 +729,9 @@ object queries); the engine's own code changed in three places only (`IMissionHo
 | health | +20 % | ×1.2 | ×1.4 | ×1.8 | the damage the player's objects take ÷ factor (Combat.Damage; the bars show the original numbers) |
 | damage | +10 % | ×1.1 | ×1.2 | ×1.4 | the damage they deal × factor |
 
+**Only while the seats can build**: a no-build mission (`nobuild`: 5, 11, 16, 42 "A Cold Day In Hell" and MIRAGE's SEAS version 21) scales nothing, a hero
+phase nothing until its hand-over ("Hero phase and gifts"); tests `CoopHeroPhase01`, `CoopGiftRules` (mission 5).
+
 Scaled are the players hostile to seat 1 at the start and whoever becomes hostile later (re-checked on every diplomacy
 change; a player that is no longer hostile gets its own values back), not the seats, not `exclude`, not wild animals.
 Fractions of units carry over per player (×1.5 on single spawns: 1, 2, 1, 2 ...). Everything is a function of
@@ -773,13 +779,26 @@ and built the base there; the other tribes kept the wrong start for expansions a
 `CoopGiveCommand`: the giver's own units (not buildings) to another seat; heroes only between humans. Resources: the
 diplomacy window's tribute (`TributeCommand`) to a seat; an AI commander thanks for it.
 
+## Colours (2026-11-21)
+
+Every human seat picks its own colour in the lobby (the seat row's colour cell: the skirmish palette and RGB picker;
+"As in the mission" on seat 1, "Automatic" on seats 2 / 3) - not one of the mission's other players (enemies, allies,
+neutral players: map.lua's players, `MissionSlot.Color`) nor one another human seat chose (`CoopLobbyState.TakenFor`,
+`MissionColors.ForSeat`); those are greyed out ("used by <name>"). Online the choice goes to the host (`coop-color`,
+network protocol 8), which refuses a taken one; taking another seat clears the colour of both seats. It is remembered
+(settings.json `campaignColors` "coop") and offered again once per mission and seat when it is free. **Shared** mode:
+the host's row has the colour of the shared player (`GameStart.Color`). The start carries them (`CoopSeat.Color`,
+`GameStart.Color`); the world checks again (`CoopRuntime.AddPlayers`, after seat 1's in `Campaign.Build`): a seat whose
+colour another player has keeps its own, and the automatic colour of a new seat (the first free palette colour) avoids
+the colours the human seats chose. AI commanders get the automatic one. docs/CAMPAIGN.md "Your colour".
+
 ## Network, saves, replays
 
 Everything is a command (CoopCommand, CoopGiveCommand, TributeCommand ...). `GameStart.Coop` carries the mode's whole
 setup: the seats (kind, faction, slot, aggression), the hero split, the co-op difficulty and the definition. The lobby
 (`LobbyState.CoopMode`, `LobbyState.Coop`: seats, factions, heroes, difficulty, the definition and the mission's players
-- so the dedicated server needs no game data) makes it in `LobbyStart.Make`; the network protocol is version 2 (4 since
-MIRAGE's game options of a mission: `LobbyState.Campaign.Gameplay` -> `GameStart.Gameplay`, test
+- so the dedicated server needs no game data) makes it in `LobbyStart.Make`; the network protocol is version 2 (7 since
+the seats' own armies, "Armies"; 4 since MIRAGE's game options of a mission: `LobbyState.Campaign.Gameplay` -> `GameStart.Gameplay`, test
 `MirageGameOptionsPathsTests.CoopLobby` / `CoopAllyTribeSwap`). In
 `GameStart.Seats` each human is on its seat's slot (the host first). A saved co-op game (host or offline) is GameStart +
 the commands and replays to the same world (test `CoopSaveLoad`); the networked games compare hashes as always.
@@ -824,7 +843,7 @@ the commands and replays to the same world (test `CoopSaveLoad`); the networked 
   start stays at seat 1's landing);
 * lockstep (MultiplayerTests): `CoopCampaignTwoHumansAndAi` (2 clients + an AI commander, a command and a transfer over
   the network, the same world), `CoopCampaignBothCommanders` (1 human + 2 AI commanders: a "both" command over the
-  network as one command that comes back with its seats, both commanders defend), `CoopCampaignTwoSeats` (2 humans, seat 3 empty, the ally's slot), `CoopSharedHostRule`
+  network as one command that comes back with its seats, both commanders defend), `CoopCampaignTwoSeats` (2 humans, seat 3 empty, the ally's slot), `CoopCampaignArmies` (each human's own army: "Armies"), `CoopSharedHostRule`
   (Shared: no ally takeover), `CoopSharedMission`.
 
 ## The test definitions
@@ -846,5 +865,36 @@ with 23 in the base game (MIRAGE's only), as mission 5 has one now.
 
 **Your own start army** (2026-11-11): offline co-op opens the army screen as single player does for a mission with an
 army budget (`CoopLobby.Start` -> `CampaignMenu.StartWithArmy`: seat 1's tribe, the campaign's credits); the bought
-army stands at seat 1's start (`GameStart.Army`), the AI commanders' seats keep their `army`. Online co-op has no army
-screen yet (every seat would need its own bought army). Test: CoopPhaseTests.CoopBoughtArmy.
+army stands at seat 1's start (`GameStart.Army`), the AI commanders' seats keep their `army`. Test:
+CoopPhaseTests.CoopBoughtArmy. Online: "Armies" below.
+
+## Armies (online, a mission with an army budget; 2026-11-20)
+
+In the co-op campaign mode **every human buys the army of its own seat on its own machine**:
+
+* **The budget is the host's**: the mission's `point_buy` makes `CoopLobbyState.ArmyBudget`, the host's campaign
+  credits of the mission `Credits` - every machine opens the same army screen (`CampaignArmy.ForCoopSeat`: the
+  mission's shop and preset, max(credits, min_credits, the preset's cost)). Seat 1's is the mission's own (its story
+  heroes included - the hero split hands them out at the start). **Seats 2 and 3** buy in their faction with the same
+  budget, **without the story heroes** (neither in the preset nor in the shop: they are seat 1's and the lobby's hero
+  split decides who gets them; a copy would be a hero twice). The army screen's debug "Free" is off online.
+* **In the lobby** each human seat's row shows its army ("bought (n)", "the level's", "not chosen", "choosing ...") and,
+  for your own seat, **My army ...** (the army screen; Done sends the army to the host - `coop-army`). A change of the
+  seat's human, its faction or the mission drops the choice (the host keeps the armies: `NetHost.SyncArmies`).
+* **Start**: when every human seat has chosen, the game starts at once. Otherwise the lobby enters the state
+  **`armies`**: every machine shows whom the host waits for and the seconds left (`LobbyState.ArmyWait`), the army
+  screen opens by itself on the machines still choosing (Back there = the level's army), the host's Start button
+  becomes "Back to the lobby" (`army-cancel`). The host starts when every human seat has its army or after
+  **120 s** (`NetProtocol.ArmyTimeout`) - the seats still choosing play the level's army. A player leaving in the
+  meantime brings everybody back to the lobby.
+* **Deterministic**: the armies travel in the GameStart (`CoopSeat.Army`; seat 1's also `GameStart.Army`, which the
+  campaign places as in single player), so every machine - and a save, a replay - places the same units:
+  `CoopRuntime.PlaceStart` puts a seat's bought army round its start (`PointBuy.Place`) instead of the definition's
+  `army`, with the army's resources (skulls: the mission's iron); an Aje army that bought its resource collector card
+  brings the main building itself (no second one). In a hero phase it is placed at the hand-over. AI commanders keep
+  the definition's `army`, and so does a seat on an ally's slot (`seats[n].ally`: it plays on with what the mission
+  gives the ally - no army screen for it, `CoopLobbyState.BuysArmy`). The armies are not checked against the budget by the host (a dedicated server has no game
+  data; the army screen keeps to it - as single player).
+* Offline co-op: unchanged (seat 1's army screen before the start). Shared mode: the level's army.
+
+Network protocol 7. Test: `MultiplayerTests.CoopCampaignArmies` (headless host + two clients).

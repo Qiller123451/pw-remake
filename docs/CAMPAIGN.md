@@ -12,7 +12,7 @@ It is the port of the browser remake's `game/campaign/setup.js`, `registry.js`, 
 
 | file | content | ported from |
 |---|---|---|
-| `MissionData.cs` | `MissionData` (mission.json + world.json + the TriggerDefs of LuaMission = the JS's one pw-campaign/1 document), `MissionEntry` (index.json) | setup.js loadCampaign |
+| `MissionData.cs` | `MissionData` (map.lua's mission + world.lua + the TriggerDefs of LuaMission = the JS's one pw-campaign/1 document), `MissionEntry` (index.json) | setup.js loadCampaign |
 | `Campaign.cs` | `Campaign`: plan, build (players, filters, records, buildings, units, props, groups, question marks, start locations, free mains), per-step update (world events -> registry and engine), the mission-level calls (`Spawn`, `Remove`, `SetOwner`/`Convert`, `Teleport`, `SetAppearance`, `PlayAnim`, `SetQuestionMark`, `PlaceFreeMain`, `Next`) | setup.js |
 | `Registry.cs` | `Rec`, `Group`, `Registry` (lookups, groups, `Query`, `Select` = the query block of triggers.md §2.1, `Matches` §2.2) | registry.js |
 | `Regions.cs` | `Region`, `WorldRegion`, `Regions` | regions.js |
@@ -23,6 +23,7 @@ It is the port of the browser remake's `game/campaign/setup.js`, `registry.js`, 
 | `ICampaignBrain.cs` | `ICampaignBrain`, `IBrainFactory`, `BrainOptions`, `BrainAttack` (for src/Sim/Ai) | TribeAI's public methods, createBrains |
 | `WorldBuilder.cs` | `RulesMapAdapter : IMapRules`, `SourceMap : IWorldMap` (MapSource + HeightField), `Build` (landscape, players, animals, nests), `CreateBrains`, `FindMap`, `MapSourceOf` | main.js buildWorld, mapSource, mapRegions, createBrains |
 | `MissionSession.cs` | `MissionSession`: GameStart + configuration -> everything above, `Step()` | main.js startGame (campaign) |
+| `CustomCampaigns.cs` | the campaign menu's data: `MissionGroups` (original / Booster Pack / mod / other, `NextInGroup`), `MyMapInfo` (a map of My maps, edited copies), `UserCampaign` (campaign.lua, progress, .pwcampaign) - section 10 | the remake's own |
 | `Systems/Scripting.cs` | World: `SetDiplomacy`, `ChangeOpinion`, `Tribute`, `DeclareWar`, `Spawn`, `FreeSpot`, `RemoveEntity`, `SetOwner`, `SetHp`, `SetInvulnerable`, `SetDisarmed`, `SetLevel`, `Teleport`, `SetParked`, `SetResource`, `SetCaps`, `SetFilter`, `HasFilter`, `RevealArea`/`HideArea`/`RevealsFor`; DELAYED `invulnEnd`, `disarmEnd`; the `CampaignUpdate` hook; public wrappers of hooks (`RecomputeCapsOf`, `DepleteNodeOf`, `LeaveTransportOf`, `UnloadAllOf`) | game/scripting.js |
 | `Systems/ScriptingEntities.cs` | fields: `Entity.Rec`, `InvulnUntil`, `Disarmed`, `IsNest`, `StartMain`; `Building.InvulnT`; `Player.Data`, `UnlockAll`, `ScriptFilters`, `FreeMains`, `Cheat`; `UnitTask.Patrol`; `Reveal`; `World.Cheats`, `Highlights`, `Brains`, `Campaign` | loose JS properties |
 | `Game/Cheats.cs` | `Cheats.Apply`, `RaiseEpoch`, `SideOf`, `CheatDamage` | cheats.js |
@@ -41,7 +42,7 @@ s.EndSequence(); s.EndDialog(token);
 
 `Create` follows main.js startGame: `LuaMission.Load(folder)` -> `MissionData` -> `new Campaign(data, cfg).Plan(rules,
 models)` (classify every object: unit / building / prop / resource / nest / landscape / helper / part; the skip list; the
-models the view needs: `Need`, `FullTribes`; the tribe swap) -> `MapSourceOf(.ula, skip)` -> `WorldBuilder.Build` (world
+models the view needs: `Need`, `FullTribes`; the tribe swap) -> `MapSourceOf(the mission folder, skip)` (the folder is the mission's map: docs/MAP_FORMAT.md) -> `WorldBuilder.Build` (world
 on a `SourceMap`, trees / blocking scenery / stones / bushes / fish, `Campaign.Build`, wild animals, nests,
 `WildlifeReady`, weather) -> `Cheats.Apply` -> `CreateBrains` -> `new TriggerEngine(host, lua.Script, lua.Lua)` +
 `lua.Bind(engine)`. The mission folder is `GameStart.MissionFolder` below the configuration's `missions/`, else the
@@ -68,7 +69,7 @@ game coordinates (`Campaign.ToGame` / `ToMap`, `Campaign.Heading` = `Frame.MapHe
 `MissionSession.EndSequence()` at its end), `SequenceEnded(SequencePlay)` (camera to `play.Camera` unless `SnapBack`),
 `PlayDialog(DialogPlay)` -> bool (true: call `EndDialog(token)`), `EndMission(won, text, delay)`, `Camera` (map x, y,
 distance, yaw), `IsSelected(entity)`, `Deselect(entity)`, `LoadProfile()` / `SaveProfile(values)`.
-`SequencePlay` carries the request, world.json's sequence data and the bound `SeqActors` (`PoseAt(actor, t)`,
+`SequencePlay` carries the request, world.lua's sequence data and the bound `SeqActors` (`PoseAt(actor, t)`,
 `Hidden`); the host finishes the actors and removes the `disable_fow` reveal when it ends.
 
 **`ICampaignBrain` / `IBrainFactory`**: `Update(dt)`, `SetBehaviour`, `StartAttack(BrainAttack)`,
@@ -130,18 +131,117 @@ StartLocation.usl MirageInitialized), the co-op
 seats and enemies too (docs/COOP.md). Null (older saves, the base game): MIRAGE's defaults. Unticked "Sixth stage": the
 headquarters' / fireplaces' final_stage is never offered at epoch 5 (docs/SIMULATION.md "MIRAGE: the sixth stage").
 Test `MirageGameOptionsPathsTests.CampaignMission`, `MirageClassesTests.FlyingDisabledByDefault`. MIRAGE's per-mission option table (`CustomMapMirageSettings.txt`, e.g. Single_01 with flying on) is deliberately not applied: flying stays off on every mission unless the menu turns it on (Kacper, 2026-11-13).
-(Open: MIRAGE's master has a table of fixed options per level, Game/misc/CustomMapMirageSettings.txt - e.g. Single_01
-FlyingEnabled 1, MaxEpoch 4 - that its lobby's adjust windows set and lock for those maps; the remake's campaign menu does
-not apply it: the menu's choice holds for every mission.)
+The computer players follow the chosen options as MIRAGE's do (the sixth stage requested with *Sixth stage*, 2 flyers in the village's waves from epoch 3 at Medium / Hard with *Flying units*, no titan / flyer rows of the unit mix when removed / off): docs/AI.md "MIRAGE: the AI follows the game options".
+#### MIRAGE's fixed options per level (`CustomMapMirageSettings.txt`; checked 2026-11-20, master b320f9bb)
+
+**Where MIRAGE applies them.** `Scripts/Game/misc/CustomMapMirageSettings.txt` lists per level (level name, spaces as
+`_`) values of the MIRAGE server settings. They are applied **only in the multiplayer lobby**: choosing such a level
+(`LevelSettingsPage.UpdateCustomMapMirageSettings` -> `CMirageClnMgr.UpdateCustomMapAttribs`: writes
+`Server/GameplayOptions/<name>` - `Server/AllowAlienCommands`, a path fixed in the exe - and `SetAttrib`, after
+backing up the user's values; restored when another level is chosen) and the lobby's adjust windows
+(`Mirage_UI_scripts.usl CAdjustMirage.SetAndLockMirageSetting`: value set, control locked). The single-player campaign
+never reads the file: there the server takes the Options menu's values (`MirageSrvMgr.usl`: `!IsMultiplayer()` ->
+`xConf.GetSet...`). The Single_* entries are for MIRAGE's **multiplayer campaign** (CustomMapSettings.txt
+`MultiplayerCampaign = 1`), the remake's co-op counterpart. The remake applies none of them (Kacper, 2026-11-13: flying
+stays off unless the menu turns it on); the table says what applying them would change.
+
+**MIRAGE's defaults** (`SetDefaultStuff` / the adjust windows, the same in OptionsMenu.usl): every checkbox off except
+AllowThrow, OldDisembark, AuraSharing (on); TransportHealing 60, DwnLvlSwitch 0 (no downleveling), MinEpoch 1,
+MaxEpoch 6, HQTimer 5 min. Only values different from these are listed. Installed MIRAGE (Dec 2024) vs master:
+master sets AllowAlienCommands 1 for Single_05 / 11 / 16 / B42 (installed: 0) and names `Prison_Island` /
+`Living_ruins` without the `_[CUSTOM]` suffix; nothing else differs.
+
+**Every level listed** sets UseFM 1 (finishing moves; MIRAGE's default off - the remake always plays them, no change)
+and HQTimer -1 (no head-quarter timer - the remake has none in a campaign, no change); all but 05 / 11 / 16 / B42 set
+TransportHealing 40 (healers on an open transporter heal at 40 % instead of 60 % - **not in the remake**).
+
+| level (remake mission) | differs from the defaults | applied in the remake |
+|---|---|---|
+| Single_01 (1 Stranded) | FlyingEnabled 1, DivideSkulls 1, DwnLvlSwitch 1, MaxEpoch 4 | flyers buildable; no sixth stage (the level already stops the Norsemen at epoch 3: no other change); **not implemented**: skull sharing, heroes may be levelled down |
+| Single_02 (2 Druid Island) | DwnLvlSwitch 2, MaxEpoch 4 | no sixth stage (level: epoch 3, 4 after the mammoth quest - same); **n.i.**: downleveling |
+| Single_03 (3 Amazon Island) | BldgMaxCapacity 1, FlyingEnabled 1, DwnLvlSwitch 2 | building limits on (menu option "Building limit"); flyers; **n.i.**: downleveling |
+| Single_04 (4 The Dustriders) | BldgMaxCapacity 1, FlyingEnabled 1, DwnLvlSwitch 1, MaxEpoch 3 | building limits; flyers; no sixth stage; Dustriders capped at epoch 3 - but the level's trigger `Ix04` (25 workers) switches the same age_4 / age_5 AntiActions off, which lifts MIRAGE's cap too (inferred); **n.i.**: downleveling |
+| Single_05 (5 The Holy City) | CorpseDamage 1, BonusSkulls 1, DivideSkulls 1, AllowAlienCommands 1, DwnLvlSwitch 2, MaxEpoch 1 | no sixth stage (MaxEpoch 1 adds no AntiAction: StartLocation.usl caps only 2-5); **n.i.**: corpse damage, bonus skulls, skull sharing, allied control, downleveling |
+| Single_06 (6 Pirates and Hostages) | FlyingEnabled 1, HeroPool 1, DwnLvlSwitch 2 | flyers; **n.i.**: hero pool, downleveling |
+| Single_07 (7 The Water Temple) | BldgMaxCapacity 1, FlyingEnabled 1, MaxEpoch 5 | building limits; flyers; no sixth stage (the level already stops at 5) |
+| Single_08 (8 Valley of the Gods) | BldgMaxCapacity 1 | building limits |
+| Single_09 (9 Perilous Path) | FlyingEnabled 1, DwnLvlSwitch 1, MaxEpoch 4 | flyers; no sixth stage (level: epoch 3); **n.i.**: downleveling |
+| Single_10 (10 The Prophet) | FlyingEnabled 1, MaxEpoch 4 | flyers; no sixth stage (level: epoch 4) |
+| Single_11 (11 Arena) | CorpseDamage 1, BonusSkulls 1, TitanSlots 1, UseSupply 1, DivideSkulls 1, AllowAlienCommands 1, DwnLvlSwitch 1, MaxEpoch 1 | no sixth stage; **n.i.**: supply system, titan slots (+2), corpse damage, bonus skulls, skull sharing, allied control, downleveling |
+| Single_12 (12 Sea Battles) | BldgMaxCapacity 1 | building limits |
+| Single_13 (13 The Rush) | FlyingEnabled 1, DwnLvlSwitch 2 | flyers; **n.i.**: downleveling |
+| Single_14 (14 Prisoners) | - | nothing beyond the common rows |
+| Single_15 (15 New World Order) | BldgMaxCapacity 1, FlyingEnabled 1, HeroPool 1 | building limits; flyers; **n.i.**: hero pool |
+| Single_16 (16 Showdown!) | CorpseDamage 1, BonusSkulls 1, DivideSkulls 1, AllowAlienCommands 1, MaxEpoch 1 | no sixth stage; **n.i.**: as Single_05 without downleveling |
+| Single_B41 (41 and its SEAS copy 20: the level name is "Single B41" in both) | FlyingEnabled 1 | flyers |
+| Single_B42 (42 / 21) | CorpseDamage 1, TechtreeSteal 1, BonusSkulls 1, DivideSkulls 1, AllowAlienCommands 1, DwnLvlSwitch 2, MaxEpoch 1 | no sixth stage; **n.i.**: tech tree stealing and the rest as Single_05 |
+| Single_B43 (43 / 22) | TechtreeSteal 1, MultiTribe 1 | **n.i.**: tech tree stealing, other tribes' workers from the start |
+
+Not listed (MIRAGE's lobby values): the tutorial and "Seeking Ada" (single_seas_02). "No sixth stage" = the menu's
+**Sixth stage** unticked (MIRAGE: EpochSix() is MaxEpoch >= 6). MaxEpoch 2-5 also adds AntiActions for
+`age_<N+1>` .. `final_stage` of all four tribes to every player with a start location (StartLocation.usl:811-825),
+enemies included. What the options do (MIRAGE's tooltips, `Locale/*/Texts/mirage.ltf`): DwnLvlSwitch 0 none, 1 heroes
+only, 2 all units (not below captainlevel - 1), 3 no limit (FightingObj.usl `IsLevelAcceptable`, pyramid
+`NewPyramid.usl`; the remake refuses every level down: `World.ChangeLevel` "down"); DivideSkulls: a kill's skulls go to
+every player who damaged the unit (the remake: the last one); BonusSkulls: a unit's kills raise the skulls it is worth;
+CorpseDamage: big corpses hurt enemies they fall on; HeroPool: one player per hero, random hireable heroes;
+TechtreeSteal / MultiTribe: other tribes' tech trees / workers; TitanSlots: titans + 2 transport slots; UseSupply:
+the supply system instead of the 52-unit limit; AllowAlienCommands: control of allied units.
 
 ### The army budget (`GameStart.Army`)
 
-Missions with `point_buy` (mission.json) open the army screen before they load (`CampaignMenu.StartWithArmy`,
+Missions with `point_buy` (map.lua's mission) open the army screen before they load (`CampaignMenu.StartWithArmy`,
 `CampaignArmy.Of`: the level's preset fixed, the budget max(bonus points of the mission before, the least credits), the
 allowed classes, the level's row limits; docs/SKIRMISH.md "Campaign missions with an army budget"). `CampaignConfig.Army`
 is placed at the human's start location instead of the level's start army (campaign/setup.js startLocation, SL:482-623);
-skulls stay the level's. A won mission's bonus points (`Campaign.Boni`) are the next mission's budget (settings.json
+skulls stay the level's. Online co-op: every human seat buys its own (docs/COOP.md "Armies").
+
+The level's start army (and a co-op seat's `"default"` army) spawns the classes it names, each at least at its lowest
+real level (`Rules.MinLevel`). Only a pure rider - a class whose tech tree object has a 1-HP placeholder at every level
+(MIRAGE 7's `aje_velociraptor_handler_char`) - comes as the mount named after it (`Campaign.MountOf`). Fixed
+2026-11-20: `hu_archer` (the chariot's captain, a placeholder only at level 1, below its lowest level 2) came as the
+chariot - missions 14 and 15 and co-op seat armies (tests `StartArmyTests`).
+
+A won mission's bonus points (`Campaign.Boni`) are the next mission's budget (settings.json
 `campaignCredits`).
+
+### Your colour (`GameStart.Color`, `CoopSeat.Color`; 2026-11-21)
+
+Kacper: "Add an option to pick your starting colour in the campaigns, but block the colours used by the enemy." The
+campaign menu's **Your colour** (below the tabs, for both: `CampaignMenu.ShowColor`, `game/src/UI/CampaignColor.cs`)
+offers the skirmish's choice (`PlayerColorCell`: the original's eight party colours, the remake's eight, any RGB colour
+`#rrggbb`) and a first entry **As in the mission** (the mission's own colour, its swatch the human player's colour of
+the map). Every colour another player of the shown mission has - an enemy, an ally, a neutral or computer player of
+map.lua's `mission.players[]` with a palette `color` - is greyed out in the list and in the picker's palette
+("used by <name>"); a colour picked in the square closer than `Colors.NEAR_DISTANCE` to one of them is not taken (the
+choice before stays). Players without a palette colour (drawn grey) block nothing.
+
+* **Where**: the original campaign, the Custom campaigns tab's missions (Booster Pack, the mod's, other folders', the
+  remake's missions like Outbreak), My maps (the map prepared as a mission to read its players), the user campaigns'
+  missions; the co-op lobby (docs/COOP.md "Colours"). Containment and the Scenarios keep their story roles' colours
+  (their players come from the sequel scripts; the box is greyed there).
+* **Remembered per campaign** (settings.json `campaignColors`, `CampaignColor.Key`): `campaign` (the original),
+  `booster`, `mod`, `other:<folder>`, `remake`, `maps`, `user:<campaign>`, `coop` (the lobby's seat). A mission
+  started gets the remembered colour when it is free there (`CampaignColor.For`), else none - the mission's own; the
+  remembered choice stays for the missions where it is free. The end screen's Retry keeps the start's colour, Continue
+  resolves the remembered one for the next mission.
+* **The world** (`Campaign.Build`, `MissionColors`): the human player gets the colour (`MissionColors.Apply`: the dark
+  colour for the minimap, rings, health bars and chat names, the light one for the models' party colour, the SEAS paint
+  and the flags, the palette slot for the minimap's and rings' original colours) only when no other player of the world
+  has it (the same check as the menu's: the same palette slot or a light colour closer than `NEAR_DISTANCE`); otherwise
+  the mission's own (logged as a setup warning). The check is the world's, so a remembered choice, a hand-edited start
+  or another mission version can't give two players one colour, and every machine decides the same.
+* **Saves, replays, lockstep**: the colour is part of the GameStart (`color`; co-op seats `coop.seats[].color`), so a
+  save (a replay of its inputs: docs/SAVES.md), a replay and the other machines of a network game build the same
+  players. A player with a chosen colour (`Player.ColorPicked`) mixes its colour into the state hash (`World.StateHash`,
+  the `players` part, the state dump's `colour`); games without a chosen colour hash as before, so older saves still
+  load and verify.
+* `--mission n --color <id>` starts a mission with a colour (the world refuses a taken one).
+
+Tests: `CampaignColorTests` - the rules (`MissionColors.Used / Blocker / Resolve / ForSeat`, custom colours near a
+taken one, the start's JSON round trip), a mission start with a free colour (the human has it: slot, party colour,
+minimap colour; the hash changes only with it) and with an enemy's colour (refused: the mission's own, the same hash
+as without one), co-op seats (each its own colour; seat 2 can't take seat 1's).
 
 ## 6. Tests (`tests/PwRemake.Tests/CampaignTests.cs`)
 
@@ -190,8 +290,8 @@ The scripted playthroughs (`tests/PwRemake.Tests/Playthrough`, ports of the brow
 `campaign_play_00.js` ... `_16.js`; docs/TESTING.md "Playthroughs") play each mission's main quests to the end with
 each tribe of both configurations, difficulty 1. `game/src/UI/CampaignStatus.cs` follows them: a mission won with
 every tribe of a configuration is **Playable** there, won with some tribes **Partial** (the note names the others),
-else **NotYet** (greyed out). BoosterPack 1's three missions (ids 41-43; the menu shows them after mission 4, as
-Campaigns.txt orders them) and MIRAGE's SEAS missions (ids 20-22: the SEAS versions of 41-43, single_b4N_seas; 23:
+else **NotYet** (greyed out). BoosterPack 1's three missions (ids 41-43; Campaigns.txt orders them after mission 4 - the menu shows them under
+Custom campaigns, section 10) and MIRAGE's SEAS missions (ids 20-22: the SEAS versions of 41-43, single_b4N_seas; 23:
 "Seeking Ada", single_seas_02) have playthroughs written here from their triggers (`PlayB41.cs`, `PlayB42.cs`,
 `PlayB43.cs`, `PlaySeas02.cs`; the JS had none). The SEAS missions exist only in MIRAGE: the prepare tool exports a
 configuration's own folders only (base: Base + BoosterPack1). Every run's step log:
@@ -427,27 +527,45 @@ failures were and what changed (port/missionfix, 2026-11-02):
   building, rocks). Teleports 27 -> 0 (base Norsemen; Dustriders 5 -> 0, Dragon Clan 7 -> 0, MIRAGE Norsemen 4 -> 0,
   SEAS 11 -> 0). No change to the movement for this: the boats' way, the avoidance and the separation were not
   involved (every teleported boat had a way, a fresh search found one, those fighting were in range and shooting).
+  Re-measured on 2026-11-20 (main 964f237, `PW_PLAY_STUCKLOG=1`): 0 teleports in all seven runs (base Norsemen,
+  Dustriders, Dragon Clan; MIRAGE Norsemen, Dustriders, Dragon Clan, SEAS), and no unit without progress for 20 s but
+  a MIRAGE marksman shooting a moving carrier. The "doubling" is history: the base Norsemen's count by the recorded
+  results was 35 (Nov 1), 9, 24, 29, 27, 27, 23 (Nov 5) - the bot's count, none a stuck unit - and the one series run
+  of Nov 11 with 48 never came again; 0 since port/m12 (212a391, merged in 51aec84). Nothing left to bisect. The same
+  check elsewhere: MIRAGE 13 as the Dustriders / Dragon Clan, 84 / 114 in the table of Nov 12, are 7 / 8 on main.
   The telescope tower ruin is invulnerable for 45 s when the player's units reach it: the mission's own Ga07 (Occupy,
   then Invulnerability "Timer: 45", once), as in the original - nothing keeps it longer (MissionHost.SetInvulnerable
   clears the map's flag, the timer ends it).
 * **9 Perilous Path** (bot, 2026-11-12): the same count (the go() above) teleported the army guarding the launch ramp
   45 times a run: `go()` sent it to the ramp's centre, 20 m inside the rocks round it, and it stood at their edge.
   Teleports 55 / 79 / 83 -> 23 (base, the three tribes), MIRAGE Norsemen 54 -> 11, SEAS 52 -> 14.
-  The rest are units that cannot get there on the map: the Dragon Clan village (where the army gathers) lies in a
-  basin at the water's level cut off from the plateaus of the altars (west, 40 m) and of the airplane (north) by cliffs
-  and an 8 m deep channel on the map's own walk grid (terrain alone: no object closes it; `Nav.LabelRegions` gives
-  three regions) - the original's route out of the village is not known (a ship? not a bridge: no bridge of the map
-  joins those regions - the jungle bridge, map (761 .. 873, 847) at 60 m, spans a gorge east of the plateau with both
-  ends on blocked cells and is broken by sc_3025; the river bridges at (589, 386 .. 405) and (401 .. 420, 452) stand
-  over walkable strips in the north; the original's bridges have no walk surface, docs/MAPS.md "Bridges"; the
-  Norsemen's raids there come by transport ship, Adb01a). Open question, not changed. Units sent from there to a goal more
-  than 160 m off wander about the basin: `Nav.Find` replaces a goal in another ground region by the start region's
-  nearest cell only within 80 cells, beyond that the search fails and ends at the cell it reached nearest the goal -
-  another one from each place. Not changed in the engine (searching the whole map for that cell, Found kept false, lost
-  mission 6's playthrough with every tribe tried - the pirates' landings broke the base; not looked into further). The
-  bot: moving 8 m is no progress for a unit with no way (`Unit.NoWay`) - MIRAGE's workers wandered there, their count
-  never ran out and the ramp was not built (MIRAGE as the Norsemen and the SEAS lost at step 9); `Play09` also sends
-  workers more than 60 m from the ramp with `go()`.
+  The rest are the bot's crossings of the sea: the map is an archipelago. **The Dragon Clan village is reachable**
+  (2026-11-20, checked against the original's own data): it lies on the island of the heroes' start, and a way leads
+  from the village to the start and back for every unit size (`UnreachableGoalTests.Mission9VillageReachesTheStart`).
+  The altars and the airplane lie on two other islands - the west one (player 1's settlement; its bunkers
+  `01_bunker01..04` face the channel to the village) and the north one (players 2 and 3, the airplane, the launch
+  ramp) - parted from the village's by an 8 m deep channel and, to the north, a ridge at 50 - 61 m whose every crossing
+  is 38 degrees steep or more. That is the map's own walk grid (the original editor's PaFi, converted exactly, the same
+  in base and MIRAGE; the slope rule gives the same: no land link under 38.5 degrees). No bridge is the link: none of
+  the map's bridges joins two of these regions (the jungle bridge, map (761 .. 873, 847) at 60 m, leads east to the
+  temple island - "the temple island cannot be reached onboard a ship as it is surrounded by dangerous cliffs" - and
+  is broken by sc_3025; the river bridges at (589, 386 .. 405) and (401 .. 420, 452) stand over walkable strips on the
+  north island; the original's bridges have no walk surface, docs/MAPS.md "Bridges"). In the original the player
+  crosses by transport boat (the Dragon Clan's `ninigi_transport_boat`, harbour and boat not filtered in this
+  mission), as the Barbarians' raids come by transport ship (Adb01a, `04_transport_01..04`). Nothing changed in the
+  map. The playthrough does not build boats: its `go()` teleport carries the army and the workers across (most of the
+  teleports of a run). It had also built the tower at the airplane and the launch ramp with workers standing at the
+  village's shore, 465 m off across the water - a builder whose way ended short set to work where it stood; it no
+  longer does (docs/SIMULATION.md "Goals out of reach"), and `Play09` carries the tower's workers across too.
+  Units sent from the village to a goal on another island more than 160 m off wandered about it: `Nav.Find` replaced
+  such a goal by the nearest reachable cell within 160 m only (docs/SIMULATION.md "Goals out of reach"). Fixed on
+  2026-11-20 (the whole map, the straight-line nearest cell; an earlier try on 2026-11-12 lost mission 6's playthrough
+  and was reverted): they walk to the shore nearest the goal and stop. Playthroughs 2, 6, 9, 12, 13 and 15 re-run
+  after it and the builders' rule, both configurations, every tribe: 38 of 38 won (docs/PLAYTHROUGHS.md); mission 9
+  base 39 - 45 teleports a run (the bot now carries a group with no way across together and counts each unit), MIRAGE
+  13 - 20; the ramp can take longer (runs of 26 - 75 game minutes) - only the workers at the ramp build it now. The bot: moving 8 m is no progress for a unit with no way (`Unit.NoWay`) - MIRAGE's workers wandered
+  there, their count never ran out and the ramp was not built (MIRAGE as the Norsemen and the SEAS lost at step 9);
+  `Play09` also sends workers more than 60 m from the ramp with `go()`.
 * **13 The Rush** (base, Norsemen, bot, 2026-11-12): "Hold the Fort" was never accomplished at main eb2fdd7 (70
   minutes, also with the old teleport count): `CBL_Ge02#defeated` waits for the third outpost's team to fall below 3,
   and its eight SEAS units (two suits, a spider, two triceratops, a warrior, two flamethrowers) circled their
@@ -553,3 +671,65 @@ attacked and destroyed from the start, in single player, co-op and with any trib
 tower before the gate, ninigi_small_tower_121, which the original frees only after dialogue 4071) plus a co-op
 definition's `mortal` names (docs/COOP.md). `Campaign.IsMortal`: the map's flags are overridden at placement, and a
 trigger's ObjAppear / Invulnerability cannot lock them again (MissionHost). Test: CoopPhaseTests.MortalTower13.
+
+## 10. Custom campaigns (the campaign menu's second tab)
+
+Kacper's wish (2026-11-19): the campaign menu has two tabs (`game/src/UI/CampaignMenu.cs`, PwTabs as the Options
+window; docs/MENUS.md "Campaign menu"). **Campaign** lists the original campaign only - the tutorial and missions 1 - 16
+of the configuration (`MissionGroups.Original`: keys `tutorial`, `single_NN`). **Custom campaigns**
+(`game/src/UI/CustomCampaignsTab.cs`) lists every other mission, grouped, a header per group:
+
+| group | what | from |
+|---|---|---|
+| **Booster Pack** | 4-1 The Devil's Advocate, 4-2 A Cold Day In Hell, 4-3 Operation Neptune (ids 41-43, keys `single_bNN`) | index.json; base: `BoosterPack1/Maps/...`. In MIRAGE these ids are MIRAGE's own copies, which stay hidden (`CampaignStatus` Hidden, Kacper's wish of 2026-11-11), so the group is not shown there |
+| **MIRAGE** (MIRAGE only) | the SEAS versions of 4-1 .. 4-3 (20-22, `single_bNN_seas`) and "Seeking Ada" (23, `single_seas_02`) - the label adds the tribe where a title is the Booster Pack's | index.json, maps of the mod's own folder (`MIRAGE/Maps/...`) |
+| any other data folder | a mission of another folder of the configuration | index.json, grouped by the folder |
+| **Remake missions** | the remake's own missions in the map format, shipped in `game/missions/<name>/` (Outbreak - StarCraft II's, every seat in epoch 2: docs/OUTBREAK.md) - the same for every configuration, played as campaign missions (the token `remake:<name>` in GameStart.MissionFolder: `RemakeMissions`; co-op through their `coop.lua`) | `src/Sim/Campaign/RemakeMissions.cs`; the UI's `MissionEntry.Load` appends them |
+| **The remake's campaigns** | Containment (1964 - 1966), Scenarios: Start opens their own menus (SequelMenu / ScenarioMenu, Back returns to this tab; Containment is only here - the title screen keeps the Scenarios button) | docs/SEQUEL.md |
+| **My maps** | the user's maps with triggers (the former "Custom maps …" menu; map.lua `requires` respected), an edited copy of a campaign mission shown as "<the original's title> (edited)" | docs/MAP_EDITOR.md "Edited missions and custom campaigns" |
+| **Campaign: <name>** | the user's campaigns and their missions in order | `campaigns/<name>/campaign.lua` in the user folder |
+
+**Which missions belong to a configuration** (`MissionGroups.Belongs`): the toolkit's campaign export fills gaps of the
+mission list from every data folder of the installation (pwexport/campaign.py `campaign_maps`: "folders outside the
+configuration only fill gaps"), so on an installation with MIRAGE the official game's index.json can list the SEAS
+missions 20-23 with their maps in `MIRAGE/Maps/...`. They need MIRAGE's SEAS and are not the official game's: a mission
+whose map's data folder (index.json `map`'s first part, else `map_source`) is not one of the configuration's `folders`
+is left out of both tabs. (The test content's base index does not list them; the test adds them as the toolkit would.)
+
+**Continue** (the end screen) plays the next mission **of the same group** (`MissionGroups.NextInGroup`): mission 4 ->
+5 (the original's own rule, CampaignMgr.usl), 16 -> the end (before: MIRAGE's index went on to 20), 4-1 -> 4-2 -> 4-3 ->
+the end (before: 4-3 -> 5), 20 -> ... -> 23 -> the end; at a group's end the campaign menu opens on the group's tab. The
+army budget of the next mission (`CampaignCredits`, `Campaign.Next`) is unchanged: 4-3's bonus still goes to mission 5.
+Retry and the next mission keep MIRAGE's game options (`GameStart.Gameplay`; they were dropped before).
+
+**User campaigns** (`src/Sim/Campaign/CustomCampaigns.cs` `UserCampaign`): a folder `campaigns/<name>/` in the user
+folder (`UserCampaign.Dir`; `PW_USER_CAMPAIGNS` overrides it) with `campaign.lua` - data only, read with LuaData as
+map.lua (no function, no call):
+
+```lua
+return {
+  format = "pw-campaign", version = 1,
+  name = "Rift Patrol", description = "...", author = "Kacper",
+  missions = { "My Holy City", "single_seas_02", "single_b41_seas" },
+}
+```
+
+A mission name is found (`Resolve`) in the campaign's own `maps/` (an imported campaign's), then in My maps (a folder
+or `<name>.pwmap`), then among the configuration's missions by key. `Problems` names what is wrong (no name, no
+missions, a mission not found, a map that needs another configuration); the menu shows them and does not start a
+missing mission. Missions are played in order: mission *i* is open when *i* missions were won (`IsOpen`, `AfterWin`;
+settings.json `customCampaignWon`: campaign folder -> missions won; the debug options open all). A mission of the
+configuration plays as a campaign mission (its army screen, `CampaignMenu.PlayMission`), a map as a custom map
+(`CustomPlay.Play`: CustomMission.Prepare); `GameStart.CustomCampaign` (campaign, index) marks the game - saved with
+it - so a win opens the next mission and the end screen's Continue plays it (`CustomPlay.Won`, `CustomPlay.Continue`).
+
+**Sharing**: Export writes one `.pwcampaign` (a zip): `campaign.lua` and `maps/<name>.pwmap` of every map it plays (a
+map folder zipped); the configuration's missions are not packed (every installation has them). Import unpacks it into
+a new folder (a free name: "Name (2)" ...): campaign.lua checked (data only), only `maps/*.pwmap` entries taken, a path
+outside the campaign or a damaged map refuses the file and leaves nothing behind.
+
+Tests: `tests/PwRemake.Tests/CustomCampaignTests.cs` (`dotnet run CustomCampaign`): the grouping of both
+configurations' index.json (and the SEAS missions left out of the official game), the next mission in a group,
+campaign.lua read / write / checks (data only), the unlock order, the .pwcampaign round trip (the same map content,
+"(2)", a file outside the campaign and a damaged map refused), an edited copy recognised (folder and .pwmap; a map
+without the original's .ula is not).

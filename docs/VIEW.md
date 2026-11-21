@@ -36,7 +36,8 @@ m.Advance(dt);                                           // per frame (game time
     `BuildingState` (wall arm mask, variant pick, wall part names, gate ends); `SetNight(bool)`;
     `SetAnimalLook(AnimalLook {Owned, Gear, NoSaddle, Misc, Hp})` / `SetHideMask(uint)`; `SetVisFlag(bit, on)`.
     Each applies only when the state changed (cheap to call every frame).
-  * colours: `SetPartyColor(Color?)` (GSF material flag 0x1000), `SetAnimalTint(Color?)` (owned animals' attr bit 5).
+  * colours: `SetPartyColor(Color?)` (GSF material flag 0x1000), `SetAnimalTint(Color?)` (owned animals' attr bit 5),
+    `SetInfected(stage)` (the infected look: docs/INFECTED_LOOK.md).
   * links: `FindLink("Ride")`, `LinkWorld(name)`, `LinkLocal(name)`, `LinkNames`.
   * parts: `Attach(gfx, link, party)` (riders, flags, weapons, tools, cranes), `AttachTo(node, gfx)`, `Detach`.
   * animation: `Anim` (AnimController), `Play(...)`, `SyncAnimation(...)`, `OnAnimEvents(cb)` (GSF sound events), `Advance(dt)`.
@@ -85,17 +86,42 @@ simulation asked three.js for comes from the manifest (`ModelManifest`: speeds, 
 
 | bits | meaning | here |
 |---|---|---|
-| 0-8 | LOD mask (bit 0 = full detail) | LOD0 only (`HelperPart` "lod") |
+| 0-4 | LOD mask (bit 0 = full detail) | LOD0 only (`HelperPart` "lod") |
+| 5-8 (Bldg) | build-up: 5 rises while its level is built, 6 sinks after its level, 7-8 the group (Wall: 18, 19, 29-30; Fiel: 9, 10, 11-12) | `BuildUp`, below |
 | 9-13 | epoch variants I-V | `BuildingState.Epoch` |
 | 17 / 20 | day-only / night lights (Bldg, Ship; 20 also Deko, Fiel, Misc) | `BuildingState.Night`, `SetNight` |
 | 18, 19 | pick volume, shadow model | dropped (pick -> `Template.Pick`); wall archives (`Wall`) keep parts with both (every wall piece's construction parts) but drop a shadow model without the pick bit (the holy city gates' `hcl13_gate` / `hc_gate` mesh 18, a pyramid with the placeholder `test/gates.tga`: a brown slab in the gate in sc_4070, 2026-11-11) |
 | 14 (without 16) | a gate's leaves modelled standing open (editor only) | dropped for gates: the rules' gate classes' models and any wall-archive model with skinned leaves of flag 16 (`hcl13_gate`, a CBuilding; `hc_gate`) - `ModelLibrary` |
 | 21-24, 25 | construction levels 0-3, finished | `BuildingState.Level` (0..4) |
 | 26, 27, 28 | intact, damage 1, damage 2 | `BuildingState.Damage` |
-| animals: 5 party colour, 6 saddle, 7 helmet, 8 armour, 9 standard, 10 armoured saddle, 11 misc, 20-27 wounds | | `AnimalLook` -> `PartBits.AnimalMask` (owned = not wild and not an arena animal, `Compose.WildLook`: mission 10's arena_allosaurus of player 5 keeps the wild look) |
+| animals: 5 party colour, 6 saddle, 7 helmet, 8 armour, 9 standard, 10 armoured saddle, 11 misc, 20-27 wounds | | `AnimalLook` -> `PartBits.AnimalMask` (owned = not wild and not of a class that keeps the wild look, `Compose.WildLook`: the arena animals - mission 10's arena_allosaurus of player 5 -, the kennel's sabre-tooths `hu_kennel_eusmilus`, the Dragon Clan nest's `ninigi_dilophosaurus`, MIRAGE's nest `aje_gallimimus`: their OnInit hides party colour, saddle, helmet, armour, standard, armoured saddle and misc - CKennelEusmilus, CNinigiDilophosaurus, CAjeGallimimus) |
 | characters: 16 activated (medic kit) | | `SetVisFlag(16, on)` / `SetHideMask` |
 
 ![construction](images/view_construction.png)
+
+### Building up (the engine's, 2026-11-21)
+
+Kacper: "in original there was gradual build step and here we just suddenly change to the next build stage". The scripts
+only set the construction level (BuildUpBuilding.usl AddProgress: `CurProcess`, `SetConstructLevel(progress / 25)`); the
+client animates the parts between the levels itself:
+
+- **The construction state.** PWClient 0x46e9b0 runs for objects of class BLDG / TRRT while they are built and when
+  their level changes. With the model's kind (Bldg, Wall, Fiel) it builds two transitions (0x7aa060): last level -> this
+  level, and this level -> the next.
+- **Rising.** The next level's parts that this level lacks rise out of the ground while this level is built, if they
+  carry the appear flag (Bldg 0x20).
+  - Each group (bits 7-8) is lowered by its highest top (the chunks' boxes, GSF z) times 1 - f, where
+    f = CurProcess / 100 * 4 - level. A part is not drawn at f = 0 (0x7a9d30: a z offset per chunk).
+- **Sinking.** The last level's parts that this one lacks sink in the half second after the level changed, if they
+  carry the disappear flag (0x40: scaffolding). They are lowered by their group's top times (now - change) / 0.5
+  (0x46fe90).
+- **Everything else** of the last level goes at once. A next-level part without the appear flag waits for its level.
+
+The remake keeps those parts apart when it merges a model's static meshes (`ModelLibrary.MergeStatic`: the build-up
+bits are in the key). It records each one's top (`PartRef.Top`). A drawn building calls `ModelInstance.StepBuildUp`
+every frame (`EntityViews`) with the game time. The rules are `BuildUp` in Parts.cs.
+
+A building first seen, or seen again after a while, shows its level as it is. A finished building does nothing.
 
 ## Attached parts, turrets, party colours
 
@@ -106,6 +132,10 @@ A turret's clip of the composites table is the one it shoots with (`seas_wehrspi
 clip): it is played on a shot, never as the part's standing loop - neither in the world (`Composite.Build`) nor on an
 actor drawn for a cutscene (`SeqActors.RestClip`: no turret clip, no attack clip; the Black Widows of mission 13's
 scenes fired for the whole scene). A cutscene's bound prop is drawn with the scene's clip (`EntityViews.PropAnimOf`).
+The parts' clips are the simulation's (`AttachedPart.Anim`, `EntityView.SyncParts`): a weapon build-up's top plays
+"attack_front" with each shot also on a unit set up to shoot (the Black Widow, MIRAGE's MG walker), and MIRAGE's
+Scorpion - an empty carrier (`pirate_boss`) with the robot as its build-up - fights with the build-up's clips
+(docs/SIMULATION.md "Attack clips of vehicles and big units").
 Party colour: materials with GSF flag 0x1000 get a tinted copy per colour, shared by all models of that colour:
 texture × colour × 2 (`ModelMaterials.PartyTinted`, `Modulate2X`). The original's material setup (PWClient 0x6ac340)
 draws them with D3D MODULATE2X (texture × lighting × colour × 2), and the textures under them are painted at about half
@@ -188,6 +218,28 @@ big cannon rotator, same design) - its materials are painted only where marked, 
 2026-11-11). Close-up check: `--only=seasclose [--models=a,b]` (seas_close.png: original | blue | red per row).
 Test: `LightingTest.tscn -- --only=seasall --shots=<dir>` (window `--resolution 2400x1400`): every SEAS model, one
 cell each, blue and red copies side by side, original colours above: seas_all.png.
+
+**Snow vs SEAS colour (order).** Snow is never a "white part": it stays white over every player colour.
+* A setting texture with painted snow (MIRAGE's Icewaste `seas_building_a` / `seas_tent`, "Setting textures" below):
+  the paint copy is made from the variant, but its **white key, threshold (`PaintThreshold`) and markings come from
+  the plain texture** (`MaterialTag.Plain`, set by `SettingMaterials.Variant`; shader `paint_plain` / `use_plain`), and
+  the snow the variant adds is kept unpainted: per texel the share of white it adds to the plain one,
+  (variant - plain) / (1 - plain) in sRGB brightness, smoothstep 0.06 .. 0.4 (`seas_snow`, `SEAS_SNOW_FROM` / `_TO`),
+  goes into the mask's keep channel (`seas_unsnowed`: as `Sel.Keep`). Until 2026-11-21 the key read the variant: its
+  white, unsaturated snow was the brightest "white part" - big yellow blotches on a yellow SEAS player's roofs in the
+  Outbreak's Icewaste, a yellow-green tent (Kacper's screenshot). A variant that adds no white (Jungle moss, Ashvalley
+  soot, cave3) is painted where the plain texture is.
+* Shader snow (`SnowCover`, buildings without a setting texture - the base game's SEAS): the snow code runs after the
+  paint in the same shader (`a.rgb = seas_paint(...)`, then `SnowCover.Fragment` mixes the snow texture in), so the snow
+  replaces the coloured texel; party materials (0x1000: colour × 2 in `albedo`) are the same - the snow does not use
+  `albedo`.
+* Order on a model (`ModelInstance.ApplyTints`): setting variant -> party / SEAS paint -> infected look -> "units
+  behind" stencil copy. The infected copy keeps the variant's texture (its painted snow rotted with the rest, no paint,
+  no shader snow); the stencil copies only add passes.
+* Not changed: the tribes' own party materials (0x1000) on their Icewaste atlases are tinted texture × colour × 2 like
+  the original's.
+Check: `LightingTest.tscn -- --only=seasclose --models=seas_barracks,seas_small_tent,seas_big_tent --setting=icewaste
+--colors=yellow,green --data=<data with assets/tex/settings>` (seas_close.png: original | yellow | green, Icewaste).
 
 **A script's decorations (MIRAGE's CMirageDeco).** Some MIRAGE classes link models of their own to a building
 (`LinkAction(building, link, offset)`). All of them are parts of kind "deco" (`CompositeSpec.Kind`), attached by
@@ -295,6 +347,11 @@ Amazon temple has no ruin model: its corpse is the temple itself at destruction 
 
 ## Ship wrecks (EntityViews.Wrecks)
 
+The units' script corpses (docs/SIMULATION.md "Script corpses": MIRAGE's Scorpion, the siege tower, the zeppelins and
+Dragon Clan airships) are drawn here too: their own model without a destruction state, at the height of the moment
+(`Wreck.YAt`: falling, sinking), the simulation's clip followed through `EntityView.SyncAnim` (the Scorpion's held
+frame) and the fire `fire_molotov` attached at the corpse's link.
+
 A sunk ship is drawn as its wreck (`World.ShipWreck`: "<gfx>_dest" at destruction level 2, playing "destroy" once
 from the death - combat.js shipWreck) instead of the ship and its parts, where the player sees the owner or the place
 was ever explored (main.js), and gone with the dead ship after 10 s. (The port had the wreck in the simulation only:
@@ -303,6 +360,22 @@ leaves its parts' wrecks too (`Wreck.Parts`, each with its own times - docs/SIMU
 tail's, rowing deck's and sail's sinking one after the other, the cannon deck and its reduced wreck, then the hull's
 wreck; each model is placed and turned where its part was at the death, coloured as the owner, its clip put on the
 simulation's time (`SyncAnimation` from the death + its start).
+
+**Vehicle wrecks** (2026-11-20): a destroyed vehicle leaves its wreck the same way (`Combat.VehicleWreck`; Vehicle.usl
+CVehicle.CreateCorpse -> CVehicleCorpse: its current model + "_dest" playing "destroy", 10 s; an amphibious one in the
+water "<gfx>_dest_water" playing "destroy_water" - the hovercraft), not when it dies inside a transport. Before, every
+vehicle played its own dying clip and its wreck with the collapse was never shown (22 classes: the steam tank and ram,
+the carts, the mobile suits, the helicopters, the hovercraft, the firecannon, the trike, the harvester, the walker ...).
+A vehicle without such a model keeps its own death. The wagons drawn by animals (the chariot's trailer, the Dragon Clan
+cart and drum wagon) have "_dest" models too, but the original's scripts make no corpse of them (an animal leaves its
+CharacterCorpse): none. Not ported: MIRAGE's collapse of rebuildable SEAS suits into wreckage classes (rebuild
+protocol) and its "unit resources" corpses (stone / wood).
+
+**The audit** (`BuildingRuinTests.BaseUnusedDestructionClips` / `MirageUnusedDestructionClips`): every "<model>_dest"
+with a clip in the data must be left by something - a building class at any of its levels or a part of it, a ship, a
+vehicle, the pirate ship's parts - or is listed as scenery (map props: `hc_*`, the scorpion's huts, the cut Norse
+buildings without stats `hu_marketplace`, `hu_medium_tower`, `hu_big_animal_farm`, the Dustriders' farms and big tent);
+a class's model whose destruction is never played fails it.
 
 ## Rising buildings (MIRAGE custom_buildups.txt)
 
@@ -432,6 +505,18 @@ Godot's normal. Party and animal tints work on both kinds (`ModelMaterials.Albed
 Test: `res://src/View/Tests/LightingTest.tscn` (the check above, plus screenshots of buildings, units and animals in the
 game's world light: `-- --shots=<dir> [--only=buildings|units]`).
 
+## The infected look
+
+`ModelInstance.SetInfected(stage)` (0 healthy .. 3 fully overrun; view only): buildings rot, slime and moss creep up
+from the ground, green veins glow, fires and lights turn green, poison clouds, flies and a blight round them (tuned per
+building family); animals turn pale grey-green with bruises and torn wounds (holes cut in the bind pose with ribs,
+spine or bone in them, blood, green eyes); characters pale with rotting clothes and torn cloth over painted wounds
+(per skeleton), green eyes; vehicles and ships the building look from their bind positions; the undead only glow.
+The look of a model: `InfectionKind` (`InfectedLookData.KindOf`; attached parts `ChildKind`: a mount's rider follows,
+a weapon is an item, a transporter's passengers - `MarkPassenger` - do not). Materials: `Materials/InfectedLook.cs`
+(applied in `ApplyTints` after the party / setting / SEAS tints, before the "units behind" copy), numbers, tunes and
+wound tables: `Materials/InfectedLookData.cs`. docs/INFECTED_LOOK.md.
+
 ## Units behind buildings
 
 "Show units behind buildings" (Options, Graphics; `showUnitsBehind`, default on): a unit covered by a building is
@@ -457,6 +542,36 @@ cylinder of a building drawn in the last frame - its radius and height, widened 
 unit), its fragments nearly all rejected by the stencil test. Measured (llvmpipe, `--perf 120` in the check scene
 below - a worst case: 49 warriors packed around a warehouse): 1376 draws off, 1786 on (1909 with the pass on every
 unit); the main thread's frame unchanged (4.9 ms). Check: `--skirmish --no-fog --spawn hu_warehouse,hu_warrior*49 --spawn-together`.
+
+**At night** (2026-11-20) the silhouettes follow the scene's light (`UnitsBehind.SetSceneLight`, from
+`WorldRenderer.ApplyLight`: the sun and sky light now against the day's, at least 30 %): in full colour they glowed over
+the dark buildings - Outbreak's "the infected headquarters' flag shows as a flat colour block when it is attacked" was
+the dead its night counterattack sends out round the building, behind it on screen, drawn in the infected's full green.
+
+**The terrain clears the mark** where it is the nearest surface (`TerrainShader`): a hill in front of a building
+clears the building's mark - no silhouette through the hill. With the option off (or in a cutscene) nothing writes or
+reads the marks (the rings no longer use them: "Rings under buildings").
+
+## Rings under buildings
+
+**Kacper's decision 2026-11-21: rings under buildings.** The selection, hover, target, highlight, order and rally
+circles (`GroundRings`), the shooting buildings' range rings and the placement ghost's (`RangeRings`), the range markers
+(attack / alarm / sight / healing / aura: `RangeMarkers`) and the hero rings and buff decals (`SelectionOverlay`) lie on
+the ground with the normal depth test: the part of a ring behind a building - the back of a building's own ring behind
+its body, a unit's ring behind a house - is hidden by it, the front part shows; hills and units in front hide them as
+before. (Kacper: "draw the circles around a selected building/unit under the building, meaning the back of the circle
+will be covered by the buildings" - his screenshot: a selected SEAS building with its ring drawn over its roof all the
+way round.)
+
+History: on 2026-11-20 the rings were drawn over the buildings in front of them (`OverBuildings`: a second pass without
+the depth test where the buildings' stencil mark was - after the original's healing ring over the tower in front of it
+in Kacper's reference shot); a building's own ring then ran over its roof. Removed on 2026-11-21 (`Materials/OverBuildings.cs`, `Entities/Logic/OverBuildingsCode.cs`, its test); the
+stencil marks are the units-behind silhouettes' alone again. Check: `--skirmish --no-fog --spawn seas_barracks
+--spawn-together --spawn-select` (the back of the barracks' ring behind it).
+
+The thin horizontal line across a selected building's ring is its **health bar** (2D, `OverlayCanvas`: 2 px, "low
+across the front of the circle" at 0.7 of the radius towards the camera, 1.7 radii long - the ring's width on
+screen; green for the player's own objects at full health) - drawn over everything as every bar, not part of the ring.
 
 ## Setting textures
 
@@ -492,7 +607,8 @@ the fallback.)
   `SettingMaterials.Variant(material, setting)` - **one copy per (material, setting), shared** by every model of that
   kind there (a village of 40 Norse buildings in the Icewaste adds one material per atlas material, not per building;
   the variant textures load once, only for the settings a map has). The party colour, SEAS paint and "units behind"
-  copies are made from the variant as from the plain material. The map's decoration (`PropField`) is a kind per
+  copies are made from the variant as from the plain material - the SEAS paint keyed by the plain texture, the
+  variant's snow kept white ("Snow vs SEAS colour" above). The map's decoration (`PropField`) is a kind per
   (model, setting) for models with such atlases (`hu_ruin_arena@icewaste`), plain kinds as before for the rest.
 * **Option**: "Setting textures on buildings" (Options → Graphics, `settingTextures`, default on; replaces "Snow on
   buildings"): off, every building plain and no shader snow (`SettingMaterials.SetEnabled`, applied at once:

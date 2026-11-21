@@ -193,9 +193,9 @@ public partial class TopStackView : VBoxContainer
     readonly Dictionary<string, (VBoxContainer Box, Label Clock, Label Label)> _timerEls = new();
     /// <summary>the top right corner of the panel on screen (the right end of the top bar's last button, under it);
     /// null: the screen's top right under the top row</summary>
-    public Vector2? Anchor;
+    public new Vector2? Anchor;
     /// <summary>folded away: only the toggle shows</summary>
-    public bool Hidden;
+    public new bool Hidden;
     /// <summary>the toggle was clicked</summary>
     public Action? OnToggle;
 

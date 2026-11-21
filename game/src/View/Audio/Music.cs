@@ -18,7 +18,10 @@
 //              resource collector brings the tribe's theme, as in the original
 //   Trigger / BackgroundLeveled  the trigger action MUSI (CActionMusic: once / looped)
 //   Region, Sequence, GameEnd    never started by the game's scripts (MusicMgr.OnGameEnd has no caller): after the
-//              end of a game its music goes on behind the end screen
+//              end of a game its music goes on behind the end screen (the remake: without the combat music, StopCombat)
+// Leaving a game (UpdateMusicSwitch while !IsGameRunning: every exit - lost, won, quit, load, a loading screen): all
+// the game's switches off with their attacks, home timer and playlist, so the main theme plays (StopGame; the remake
+// calls it when the GameSession leaves the scene tree - GameAudio.Menu).
 // Tracks loop except Opening and Trigger, which turn their switch off when they end.
 //
 // Godot: the tracks are AudioStreamMP3 on the Music bus (GodotAudioOut.cs); the bus has the music and master volumes,
@@ -140,11 +143,17 @@ public sealed class Music
         Update(0);
     }
 
-    /// <summary>Back in the menus: the main theme.</summary>
+    /// <summary>Back in the menus (the game left): the main theme - MusicMgr.usl UpdateMusicSwitch while the game
+    /// does not run: every game switch off (Combat, Trigger, BackgroundLeveled, Sequence ...), the attacks, the
+    /// hometown timer, the Opening / Region tracks and the level's playlist cleared.</summary>
     public void StopGame()
     {
         Running = false;
         foreach (var n in GameSw) S(n).On = false;
+        S("Opening").Track = ""; S("Opening").File = "";
+        S("Region").Track = ""; S("Region").File = "";
+        Attacks = new(); _home = (false, -1e9, 0);
+        _level = null;
         Update(0);
     }
 

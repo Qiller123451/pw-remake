@@ -54,8 +54,15 @@ public sealed class Play09 : CampaignBot
                 var a = army();
                 if (!(a.Count > 0 && hunt(a, e => e.Owner == P4 && inRegion(e, "airplane"), "army"))) goRegion(a, "airplane", "army");
                 var ws = workers().Take(3).ToList();
+                // (the workers cannot walk from the village to the airplane's island: they are carried there with go() -
+                // a build order alone left them at the village's shore, which since 2026-11-20 gives the job up; before,
+                // they built the tower from there, 465 m off across the water)
+                var c = regionC("airplane")!.Value;
+                var farW = ws.Where(w => Hypot(w.Pos.X - c.X, w.Pos.Z - c.Z) > 80).ToList();
+                if (farW.Count > 0) goRegion(farW, "airplane", "workers");
                 var r = build("ninigi_small_tower", tower(), workers: 3, region: "airplane");
                 if (r is not true && !(r is "started")) { TopUp(new() { ["wood"] = 400, ["stone"] = 400 }); goRegion(ws, "airplane", "workers"); }
+                else if (r is true && building("ninigi_small_tower") is { Built: false } site) foreach (var w in ws.Except(farW)) if (w.Task.Type != "build") Order(w, "build", target: site);
             }, () => questState("L09MQ05") == "done", 2400),
             new("the film sc_3033: quest \"A dangerous Path\" accomplished, the launch ramp is the player's", () => { var b = pad(); if (b != null) go(army().Concat(workers()), ToMapR(b.Pos.X, b.Pos.Z), "all"); }, () => questState("L09MQ01") == "done" && pad() != null && pad()!.Owner == me, 300),
             new("the workers build the launch ramp while the army guards it: quest \"Prepare for Start\"", () =>

@@ -18,9 +18,14 @@ namespace PwRemake.Net;
 public static class NetProtocol
 {
     /// <summary>raised with every change of the messages or of their meaning (a client of another version is refused)</summary>
-    public const int Version = 4;          // 2: the co-op campaign mode (LobbyState.CoopMode, Coop; docs/COOP.md)
+    public const int Version = 8;          // 2: the co-op campaign mode (LobbyState.CoopMode, Coop; docs/COOP.md)
                                            // 3: up to 16 players (16 slots, teams 1..16), colours "#rrggbb" (docs/SKIRMISH.md)
                                            // 4: MIRAGE's game options of a mission (GameStart.Gameplay: sixth epoch, no titans, flying units)
+                                           // 5: the map's content hash (SkirmishSetup.MapHash) and "map-check" (a player's copy of the map)
+                                           // 6: the map sent to a player who lacks it: "map-request", "map-data", "map-ack", "map-fail"; LobbyPeer.MapProgress
+                                           // 7: co-op armies per seat: "coop-army", "army-cancel", the lobby state "armies" (ArmyWait),
+                                           //    CoopLobbyState.ArmyBudget / Credits, CoopLobbySeat.Army / ArmyDone, CoopSeat.Army (docs/COOP.md "Armies")
+                                           // 8: the campaign colour: GameStart.Color (Shared: the host's), "coop-color" / CoopLobbySeat.Color / CoopSeat.Color
     /// <summary>the original's default port (_UI_GamLWind_Port_TT: "All other values will be defaulted to 1905")</summary>
     public const int DefaultPort = 1905;
     /// <summary>steps a command waits before it is applied (4 x 50 ms = 200 ms + the network's delay)</summary>
@@ -32,6 +37,9 @@ public static class NetProtocol
     /// <summary>seconds the game waits for a player who lost the connection before the host may drop the player
     /// (the host can drop at once; the game goes on without the player then)</summary>
     public const double ReconnectWait = 60;
+    /// <summary>seconds the host waits for the co-op seats' armies after Start (the lobby state "armies"); a seat that has
+    /// not chosen by then plays the level's army (docs/COOP.md "Armies")</summary>
+    public const int ArmyTimeout = 120;
     /// <summary>the most humans in a game (= the skirmish setup's slots)</summary>
     public const int MaxPlayers = Sim.Game.Skirmish.MAX_SLOTS;
 
@@ -65,6 +73,8 @@ public sealed class LobbyPeer
     [JsonPropertyName("spectator")] public bool Spectator { get; set; }
     /// <summary>co-op campaign mode: the seat (1..3) this human plays, 0 none yet</summary>
     [JsonPropertyName("seat")] public int Seat { get; set; }
+    /// <summary>the host is sending this player the lobby's map: the share received (0 .. 1; null: no transfer)</summary>
+    [JsonPropertyName("mapProgress")] public double? MapProgress { get; set; }
 }
 
 /// <summary>A seat of the co-op campaign lobby.</summary>
@@ -78,6 +88,15 @@ public sealed class CoopLobbySeat
     [JsonPropertyName("tribe")] public string Tribe { get; set; } = "";
     /// <summary>an AI commander's aggression at the start (0 defensive, 1 normal, 2 aggressive)</summary>
     [JsonPropertyName("aggression")] public int Aggression { get; set; } = 1;
+    /// <summary>a mission with an army budget: the army the seat's human bought on its own machine (null: the level's
+    /// army - seat 1 the preset, seats 2 / 3 the definition's `army`). The host's: it keeps them (NetHost) and drops one
+    /// when the seat's human, faction or the mission changes.</summary>
+    [JsonPropertyName("army")] public Army? Army { get; set; }
+    /// <summary>the seat's human has chosen (a bought army, or the level's: Army null)</summary>
+    [JsonPropertyName("armyDone")] public bool ArmyDone { get; set; }
+    /// <summary>the colour the seat's human chose ("coop-color": palette id or "#rrggbb"; null: the game's) - not one of the
+    /// mission's other players or of another human seat (the host refuses those; the world checks again: CoopSeat.Color)</summary>
+    [JsonPropertyName("color")] public string? Color { get; set; }
 }
 
 /// <summary>The co-op campaign lobby (mode 2, docs/COOP.md): seats, factions, heroes, co-op difficulty; the host fills
@@ -93,6 +112,24 @@ public sealed class CoopLobbyState
     [JsonPropertyName("definition")] public System.Text.Json.Nodes.JsonObject? Definition { get; set; }
     /// <summary>the mission's players (mission.json): the seats' slots are resolved from them</summary>
     [JsonPropertyName("missionPlayers")] public List<MissionSlot>? MissionPlayers { get; set; }
+    /// <summary>the mission has an army budget (point_buy): every human seat buys its army on the army screen of its own
+    /// machine (the host fills it from the mission)</summary>
+    [JsonPropertyName("armyBudget")] public bool ArmyBudget { get; set; }
+    /// <summary>the army budget's credits (the host's campaign credits of the mission): the same budget on every machine</summary>
+    [JsonPropertyName("credits")] public double Credits { get; set; }
+    /// <summary>the human seats in use whose army is still being chosen (ArmyBudget only)</summary>
+    public IEnumerable<CoopLobbySeat> ArmiesOpen => ArmyBudget ? InUse.Where(s => BuysArmy(s.Seat) && !s.ArmyDone) : Enumerable.Empty<CoopLobbySeat>();
+    /// <summary>does this seat's human buy an army (an army budget, a human seat, not an ally's slot: an ally plays on with
+    /// what the mission gives it - CoopRuntime.SetupStarts)?</summary>
+    public bool BuysArmy(int seat)
+    {
+        if (!ArmyBudget || Seats.FirstOrDefault(x => x.Seat == seat) is not { Kind: "human" }) return false;
+        if (seat == 1) return true;
+        if (!ReferenceEquals(_defOf, Definition)) { _defOf = Definition; _def = Def(); }
+        return _def == null || !_def.Seats.TryGetValue(seat, out var sd) || sd.Ally == null;
+    }
+    System.Text.Json.Nodes.JsonObject? _defOf;
+    CoopDefinition? _def;
 
     /// <summary>the seats in use (seat 3 "empty": two)</summary>
     public IEnumerable<CoopLobbySeat> InUse => Seats.Where(s => s.Kind != "empty").OrderBy(s => s.Seat);
@@ -101,8 +138,18 @@ public sealed class CoopLobbyState
     public List<CoopSeat> GameSeats(IEnumerable<LobbyPeer> peers) => InUse.Select(s =>
     {
         var p = s.Kind == "human" ? peers.FirstOrDefault(x => x.Seat == s.Seat && !x.Spectator) : null;
-        return new CoopSeat { Seat = s.Seat, Kind = s.Kind == "ai" ? "ai" : "human", Tribe = s.Tribe, Aggression = s.Aggression, Name = p?.Name ?? $"AI commander {s.Seat}", Peer = p?.Id ?? -1 };
+        return new CoopSeat { Seat = s.Seat, Kind = s.Kind == "ai" ? "ai" : "human", Tribe = s.Tribe, Aggression = s.Aggression, Name = p?.Name ?? $"AI commander {s.Seat}", Peer = p?.Id ?? -1,
+            Army = BuysArmy(s.Seat) ? s.Army?.Clone() : null, Color = s.Kind == "human" && p != null ? s.Color : null };
     }).ToList();
+    /// <summary>the colours the human seats with a player on them chose (seat, the player's name, colour id)</summary>
+    public List<(int Seat, string Name, string? Color)> SeatColors(IEnumerable<LobbyPeer> peers) => InUse.Where(s => s.Kind == "human")
+        .Select(s => (s, p: peers.FirstOrDefault(x => x.Seat == s.Seat && !x.Spectator))).Where(x => x.p != null && x.s.Color != null)
+        .Select(x => (x.s.Seat, x.p!.Name, x.s.Color)).ToList();
+    /// <summary>the colours seat `seat`'s human can't take: the mission's other players' and the other human seats'
+    /// (Campaign.MissionColors.ForSeat)</summary>
+    public List<Sim.Campaign.TakenColor> TakenFor(int seat, IEnumerable<LobbyPeer> peers) =>
+        Sim.Campaign.MissionColors.ForSeat(MissionPlayers, Def(), seat, SeatColors(peers));
+
     /// <summary>the hero split the game will have (shown in the lobby)</summary>
     public Dictionary<string, int> HeroSplit(IEnumerable<LobbyPeer> peers) => Def() is { } d ? CoopPlan.FixHeroes(d, GameSeats(peers), Heroes) : new();
 }
@@ -130,8 +177,11 @@ public sealed class LobbyState
     [JsonPropertyName("coopMode")] public string CoopMode { get; set; } = "shared";
     /// <summary>co-op campaign mode: seats, factions, heroes, difficulty, the definition</summary>
     [JsonPropertyName("coop")] public CoopLobbyState? Coop { get; set; }
-    /// <summary>"lobby" | "loading" | "running" | "over"</summary>
+    /// <summary>"lobby" | "armies" (co-op: the host started, the seats' humans choose their armies - ArmyWait) | "loading" |
+    /// "running" | "over"</summary>
     [JsonPropertyName("state")] public string State { get; set; } = "lobby";
+    /// <summary>the state "armies": seconds left before the host starts without the armies still being chosen</summary>
+    [JsonPropertyName("armyWait")] public int? ArmyWait { get; set; }
 
     public LobbyState Clone() => NetProtocol.FromNode<LobbyState>(NetProtocol.ToNode(this))!;
     public LobbyPeer? Peer(int id) => Peers.FirstOrDefault(p => p.Id == id);
@@ -145,6 +195,36 @@ public sealed class CoopChoice
     [JsonPropertyName("tribe")] public string Tribe { get; set; } = "";
     /// <summary>the mission's human player (shared by everyone who picks it)</summary>
     [JsonPropertyName("main")] public bool Main { get; set; }
+}
+
+/// <summary>The map of a skirmish lobby on every machine (docs/MULTIPLAYER.md "Maps"): the host puts the content hash of
+/// its map into the setup (SkirmishSetup.MapHash: MapFiles.ContentHash - every file of the map); each player compares it
+/// with its own copy of the map of that id (the installation's converted maps, the user's maps "User/&lt;name&gt;", a map
+/// received before: downloaded/&lt;hash&gt;.pwmap) and tells the host ("map-check") - a missing or different map is the
+/// player's problem in the lobby, so the host cannot start. A player who lacks the map asks the host for it and gets it
+/// over the lobby's connection (MapTransfer, LobbyMapSync).</summary>
+public static class LobbyMap
+{
+    /// <summary>the content hash of a setup's map on this machine (null: a random map, or no such map here)</summary>
+    public static string? Hash(Sim.Content.GameConfiguration cfg, string map)
+    {
+        if (string.IsNullOrEmpty(map) || Sim.Editor.EditorPlaytest.IsKey(map)) return null;
+        var path = Sim.Maps.MapFiles.Find(cfg, map);
+        if (path == null || !Sim.Maps.PwMapReader.IsMap(path)) return null;
+        try { return Sim.Maps.MapFiles.ContentHash(path); } catch (Exception) { return null; }
+    }
+
+    /// <summary>why this machine cannot play the lobby's map (null: it can, or nothing to compare)</summary>
+    public static string? Problem(Sim.Content.GameConfiguration? cfg, SkirmishSetup? setup)
+    {
+        if (cfg == null || setup == null || string.IsNullOrEmpty(setup.Map) || setup.MapHash == null) return null;
+        var name = setup.MapName ?? setup.Map;
+        var path = Sim.Maps.MapFiles.Find(cfg, setup.Map);
+        var mine = path == null ? null : Hash(cfg, setup.Map);
+        if (mine == setup.MapHash || Sim.Maps.MapFiles.Downloaded(setup.MapHash) != null) return null;      // (its own copy, or the host's received before)
+        if (path == null) return $"does not have the map \"{name}\" ({setup.Map}) - the host sends it";
+        return $"has another version of the map \"{name}\" than the host (a different {(setup.Map.EndsWith(".pwmap", StringComparison.OrdinalIgnoreCase) ? ".pwmap" : "map folder")}) - the host sends its own";
+    }
 }
 
 /// <summary>Turning a lobby into the GameStart of the game.</summary>
@@ -218,7 +298,7 @@ public static class LobbyStart
             start = new GameStart
             {
                 Configuration = s.Configuration, Mode = GameMode.Campaign, Mission = c.Mission, MissionFolder = c.MissionFolder, Tribe = c.Tribe,
-                Difficulty = c.Difficulty, Debug = c.Debug, Seed = c.Seed, Army = c.Army, Gameplay = c.Gameplay?.Clone(),
+                Difficulty = c.Difficulty, Debug = c.Debug, Seed = c.Seed, Army = c.Army, Gameplay = c.Gameplay?.Clone(), Color = c.Color,
                 Profile = profile != null ? new Dictionary<string, string>(profile) : null,
             };
             if (s.CoopMode == "campaign" && s.Coop?.Def() is { } def && s.Coop.MissionPlayers != null)
@@ -228,6 +308,9 @@ public static class LobbyStart
                 CoopPlan.Resolve(cs, def, s.Coop.MissionPlayers);
                 cs.Heroes = CoopPlan.FixHeroes(def, cs.Seats, s.Coop.Heroes);
                 start.Coop = cs;
+                start.Color = null;            // (the seats have their own colours: CoopSeat.Color - not Shared mode's host colour)
+                // seat 1's bought army is the campaign's own (Campaign.PlaceStart: GameStart.Army)
+                if (cs.SeatOf(1) is { Army: { } a1 } && !cs.SeatOf(1)!.Ai) start.Army = a1.Clone();
                 if (cs.SeatOf(1) is { Tribe.Length: > 0 } s1) start.Tribe = s1.Tribe;
                 start.Seats = players.OrderBy(p => p.Seat).Select(p => new Seat { Name = p.Name, Peer = p.Id, Player = cs.SeatOf(p.Seat)!.Slot }).ToList();
                 // (seat 0 of GameStart.Seats is the host's machine's: the host first)

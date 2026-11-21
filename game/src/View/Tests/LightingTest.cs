@@ -16,7 +16,9 @@
 //   --only=seastents: the two tents in the proposal PW_SEAS_TENTS picks (SeasMarkings): seas_tents_<small><big>.png.
 //   --only=seasbldg: the same for the SEAS buildings only, 5 pairs a row, labels above the pairs: seas_buildings.png.
 //   --only=seasclose [--models=a,b] [--gap=1.6]: a few SEAS models close up, a row each: original | blue | red
-//   (seas_close.png; --gap spreads the cells).
+//   (seas_close.png; --gap spreads the cells). --setting=icewaste: the models in a setting's textures (MIRAGE's snowy
+//   seas_building_a / seas_tent, SettingMaterials; --data must hold assets/tex/settings with its index.json, as the
+//   prepare tool writes them); --colors=yellow,green: the two player colours.
 // Exit code 0 = all checks passed.
 using System;
 using System.Collections.Generic;
@@ -257,10 +259,14 @@ public partial class LightingTest : Node3D
         string[] names = { "seas_hq_bunker", "seas_hq_defense_turret_top", "seas_turret_tower", "seas_lumberjack" };
         // (--gap=<factor>: the cells further apart - tall robots and the widow's legs reach into the next row)
         float gap = 1;
+        string? setting = null; string cols = "blue | red";
         foreach (var a in OS.GetCmdlineUserArgs())
         {
             if (a.StartsWith("--models=")) names = a.Substring(9).Split(',');
             if (a.StartsWith("--gap=")) float.TryParse(a.Substring(6), System.Globalization.CultureInfo.InvariantCulture, out gap);
+            if (a.StartsWith("--setting=")) setting = a.Substring(10);
+            if (a.StartsWith("--colors=") && a.Substring(9).Split(',') is { Length: 2 } cs
+                && PartyColors.ById(cs[0]) is { } c0 && PartyColors.ById(cs[1]) is { } c1) { blue = c0.Light; red = c1.Light; cols = cs[0] + " | " + cs[1]; }
         }
         const float CELL = 10f;
         for (int i = 0; i < names.Length; i++)
@@ -272,10 +278,11 @@ public partial class LightingTest : Node3D
                 if (m.Anim != null) { m.Play(m.Anim.Pick("standanim", "idle_0", "stand")); m.Advance(0.5); }
                 m.SetBuildingState(4, 0, 1);
                 FitCell(m, CELL);
+                if (setting != null) m.SetSetting(setting);
                 m.SetPartyColor(k == 0 ? null : k == 1 ? blue : red);
                 if (k == 0)
                 {
-                    var l = new Label3D { Text = names[i].Substring(5) + "   (original | blue | red)", PixelSize = 0.02f, FontSize = 40, OutlineSize = 10, Billboard = BaseMaterial3D.BillboardModeEnum.Enabled, NoDepthTest = true, Position = pos + new Vector3(-CELL * 0.5f, 0.2f, CELL * 0.5f) };
+                    var l = new Label3D { Text = names[i].Substring(5) + $"   (original | {cols}){(setting != null ? "  " + setting : "")}", PixelSize = 0.02f, FontSize = 40, OutlineSize = 10, Billboard = BaseMaterial3D.BillboardModeEnum.Enabled, NoDepthTest = true, Position = pos + new Vector3(-CELL * 0.5f, 0.2f, CELL * 0.5f) };
                     AddChild(l); _temp.Add(l);
                 }
             }

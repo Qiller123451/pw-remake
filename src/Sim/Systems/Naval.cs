@@ -118,7 +118,7 @@ public sealed partial class World
             // net out: the load is filled at once, the boat waits 7 s
             double want = FISH_LOAD - carried;
             double got = Math.Min(want, t.Node.Amount);
-            t.Node.Amount -= got;
+            if (!t.Node.Infinite) t.Node.Amount -= got;
             u.Carry = new Carry { Res = "food", Amount = carried + got };
             if (t.Node.Amount <= 0.5) DepleteNode(t.Node);
             t.Phase = "net"; t.Wait = FISH_STOP;
@@ -260,7 +260,7 @@ public sealed partial class World
         if (n == null) return;
         double got = Math.Min(10, n.Amount);
         double left = Gain(b.Owner, "food", got);
-        n.Amount -= got - left;
+        if (!n.Infinite) n.Amount -= got - left;
         if (n.Amount <= 0.5) DepleteNode(n);
     }
 

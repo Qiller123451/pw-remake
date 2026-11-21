@@ -152,6 +152,25 @@ void sky() { COLOR = (EYEDIR.y >= 0.0 ? sky_color : ground_color) * energy; }
     public void SetDayLight(DayLight? d) { _dayLight = d; ApplyLight(); }
     public DayLight? DayLightNow => _dayLight;
 
+    /// <summary>the darkest light of the mixed particles: the light renderer's 0xff0f0f0f (PWClient 0x7245c1, its
+    /// constructor's colour at +0x34, which 0x723520 takes channel by channel with the sun's)</summary>
+    public const float PARTICLE_LIGHT_MIN = 15 / 255f;
+    Color _sunTint = Colors.White;
+    /// <summary>
+    /// The light of the mixed (alpha-blended) particles - smoke, steam, dust (Particles.MixLight; the additive ones are
+    /// not lit). The original (PWClient 0x704f31 - 0x7052d7, the particle renderer's lit path for the "_pm" sheets)
+    /// multiplies a mixed sprite's colour per channel by (L + 1) / 2 x light / 255, L the model's light value (1.0
+    /// from every caller of the model drawing 0x6eb4c0: the factor 1) and light the light renderer's colour of
+    /// 0x723520: per channel the larger of the sun's colour (the sky table's row 2 at the time of day: 0x727cc0 ->
+    /// +0x55dc, 0x72dacf) and 0x0f0f0f (+0x34) - clamped to 255. Here: the setting's sun colour at noon (SetSunTint)
+    /// times the scene's sun now against the remake's daylight (energy x colour, per channel: a cutscene's time of day
+    /// gives the table's row 2 of that time, the cycle's night and dusk and the biomes darken or tint it), at least
+    /// PARTICLE_LIGHT_MIN, at most 1.
+    /// </summary>
+    public Color ParticleLight { get; private set; } = Colors.White;
+    /// <summary>the sun colour of the map's setting at noon (the sky table's row 2; white without a table)</summary>
+    public void SetSunTint(Color c) { _sunTint = c; ApplyLight(); }
+
     PwRemake.Sim.Maps.BiomeLook? _biome;
     /// <summary>
     /// The biomes around the camera (docs/BIOMES.md): their light, fog and sky as factors of the colours above (the
@@ -213,6 +232,17 @@ void sky() { COLOR = (EYEDIR.y >= 0.0 ? sky_color : ground_color) * energy; }
         _sky.SetShaderParameter("ground_color", new Color(groundC.R, groundC.G, groundC.B));
         env.BackgroundColor = env.FogLightColor = new Color(bg.R, bg.G, bg.B);
         Sun.Basis = Basis.LookingAt(-sunFrom.Normalized(), Vector3.Up);
+        // the light now against the day's (sun + sky light, by brightness): the flat silhouettes of the units behind
+        // buildings follow it (UnitsBehind.SetSceneLight) - at night they glowed in full colour over the dark buildings
+        static float Lum(Color c) => 0.2126f * c.R + 0.7152f * c.G + 0.0722f * c.B;
+        float skyNow = n == null ? b.Sky : b.Sky * n.Value.Hemi;
+        float day = b.Sun * Lum(b.SunColor) + b.Sky * Lum(b.SkyColor), now = Sun.LightEnergy * Lum(sunCol) + skyNow * Lum(skyC);
+        PwRemake.View.Materials.UnitsBehind.SetSceneLight(day > 1e-4f ? now / day : 1);
+        // the mixed particles' light (ParticleLight): the setting's sun colour times the sun now against the day's
+        static float Ch(float tint, float now, float day) =>
+            Math.Clamp(tint * (day > 1e-4f ? now / day : 1), PARTICLE_LIGHT_MIN, 1f);
+        ParticleLight = new Color(Ch(_sunTint.R, Sun.LightEnergy * sunCol.R, b.Sun * b.SunColor.R),
+            Ch(_sunTint.G, Sun.LightEnergy * sunCol.G, b.Sun * b.SunColor.G), Ch(_sunTint.B, Sun.LightEnergy * sunCol.B, b.Sun * b.SunColor.B));
     }
 
     public override void _Ready() => ApplySettings();

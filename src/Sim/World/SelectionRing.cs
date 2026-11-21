@@ -1,9 +1,10 @@
 // The selection circle's radius (the view's ring, hover ring, health bar width).
-// The original draws the circle in the engine, sized by the object's own geometry - there is no per-class value in the
-// tech tree or the class files (Building.usl SetReady of CSeasCarrier: "non visible links corrupt selection circle and
-// health bar rendering", i.e. the engine measures the model with its linked parts). The exact rule is in the engine
-// (not in the scripts), so here the circle goes round the model's drawn extent on the ground (ModelManifest.SelReach),
-// never smaller than the old body / footprint ring.
+// The original's rule (PWClient.exe, 2026-11-20; docs/VIEW.md "Selection circles"): the circle stands at the middle of
+// the model's GSF box, turned with the object, and its size comes from the box's two ground sides a, b:
+// r = max(0.5 sqrt(a b), 0.33 a, 0.33 b), 1 when r <= 1, drawn max(1.1 r, 1.8) - ModelManifest.OriginalRing, from
+// assets/selboxes.json (tools/prepare/selection_boxes.py). Without that file (data prepared before it) the remake's own
+// circle as before: round the model's drawn extent on the ground (ModelManifest.SelReach), never smaller than the old
+// body / footprint ring.
 using System;
 using PwRemake.Sim.Core;
 
@@ -29,7 +30,17 @@ public static class SelectionRing
         return Math.Max(body, model);
     }
 
-    public static double Of(Entity e) => Radius(e is Building, e.Radius, e.SelReach, e is Building b ? b.PickR : 0);
+    public static double Of(Entity e) => Original(e) is { } o ? o.R : Radius(e is Building, e.Radius, e.SelReach, e is Building b ? b.PickR : 0);
+
+    /// <summary>the original's circle of the object's model (ModelManifest.OriginalRing): radius and the circle's middle
+    /// in the world (x, z) relative to the object's place - the box's middle turned as the model is drawn (a building by
+    /// its Rot, everything else by its Heading: EntityViews); null without the GSF boxes</summary>
+    public static (double R, double Cx, double Cz)? Original(Entity e)
+    {
+        if (e.World?.Models.OriginalRing(e.Gfx) is not { } o) return null;
+        double h = e is Building b ? b.Rot : e.Heading, c = SMath.Cos(h), s = SMath.Sin(h);
+        return (o.R, o.X * c + o.Z * s, -o.X * s + o.Z * c);
+    }
 
     /// <summary>a building's footprint at least this many times as long as wide has its circle round its footprint's middle (Shape)</summary>
     public const double LONG = 1.5;
@@ -48,6 +59,8 @@ public static class SelectionRing
     /// </summary>
     public static (double R, double Ax, double Az, double Cx, double Cz) Shape(Entity e)
     {
+        // the original's circle (the box's middle, turned with the object) wherever the GSF boxes are known
+        if (Original(e) is { } o) return (o.R, 0, 0, o.Cx, o.Cz);
         if (e is not Building b || b.Boxes.Length == 0 || b.PickR > 0 || b.Sail != null) return (Of(e), 0, 0, 0, 0);
         double c = SMath.Cos(b.Rot), s = SMath.Sin(b.Rot);
         // the footprint in the building's own frame round its middle (Footprint.Place's turn, inverted)

@@ -15,7 +15,10 @@ A configuration lives in `content/configs/<id>/`:
 ```
 content/configs/mirage/
 ├─ config.json        what the configuration is (below)
-├─ missions/          the campaign: index.json + one Lua mission folder per mission (docs/LUA_MAPS.md)
+├─ maps/              the installation's maps (and the remake's own) in the remake's map format, converted by Prepare
+│                     (docs/MAP_FORMAT.md): maps/Base/Maps/Multiplayer/multi_2_jun_001/, maps/Remake/frost_to_jungle/ ...
+├─ missions/          the campaign: index.json + one mission folder per mission - a map of the map format with the
+│                     mission's Lua (docs/LUA_MAPS.md)
 └─ overrides/         files that replace or add to the converted ones - own assets, and what the prepare tool
                       converts beyond the toolkit (films, effect models, sky tables, assets/tex/settings/ ...)
 ```
@@ -42,8 +45,8 @@ content/configs/mirage/
   `sounds.json`, `video/`). Today the ParaWorld Toolkit's pipeline makes this folder from the installation
   (`remake/pipeline`, its docs/DATA_PIPELINE.md); the remake reads it as it is, so both remakes share one
   conversion (2 GB per configuration, made once).
-* `install` - the ParaWorld folder (sounds `Data/<folder>/Audio/Sound`, music `Audio/Music`, original maps; read at
-  run time, not prepared: the string tables `Data/locale/<lang>/Texts` and the add-ons' `Locale/<lang>/Texts`
+* `install` - the ParaWorld folder (sounds `Data/<folder>/Audio/Sound`, music `Audio/Music`; the original maps are
+  converted by Prepare into `maps/` and `missions/` and not read at run time; read at run time, not prepared: the string tables `Data/locale/<lang>/Texts` and the add-ons' `Locale/<lang>/Texts`
   (GameTexts), the mission speech and the journal entries' voices `Audio/SeqSounds` (and `Data/locale/<lang>/Audio`),
   the loading screens' table `Scripts/Game/misc/LoadingScreens.txt` and the speech's sound events
   `Scripts/Server/init/dialogsounds.txt` - docs/GAME_SESSION.md "The journal entry").
@@ -81,7 +84,16 @@ animations, walk speeds, footprint, links; docs/VIEW.md).
    base game **and the add-ons** (`tools/prepare/pack_texts.py`): the toolkit's text table reads only the base one,
    so the BoosterPack 1 missions (4-1 … 4-3, the SEAS missions) and MIRAGE's *Seeking Ada* got the master files'
    placeholder "!boosterpack1.ltf load failed!" as title and quest texts;
-3. converts them to Lua mission folders (`tools/prepare/campaign_to_lua.py`) in `content/configs/<config>/missions/`;
+3. converts them to Lua mission folders of an intermediate layout (`tools/prepare/campaign_to_lua.py`: mission.json,
+   world.json, triggers.lua, texts) in `content/cache/missions/<config>/<lang>/`;
+3a. **converts the maps** to the remake's map format (`tools/mapconvert`, C#; needs the .NET SDK, as the game):
+   every original map of the configuration's Data folders (`Data/<folder>/Maps/**/*.ula`, campaign maps too) into
+   `content/configs/<config>/maps/`, the remake's own maps (`game/maps/*.pwmap.json`) into `maps/Remake/`, and every
+   mission (its original map + its folder of step 3) into `content/configs/<config>/missions/<NN>_<key>/` (map.lua,
+   terrain pictures, world.lua, triggers.lua, texts/*.lua; a `custom.lua` there is kept). **Incremental**: a map is
+   converted again only when its source files or the converter changed (`content/cache/maps/<config>.json`),
+   `--force` converts all. The game reads only these converted maps: **run Prepare again after the update that brought
+   the map format** (the title screen's Game data says so until then). Details: docs/MAP_FORMAT.md "Converting";
 4. converts the story films and the start films (the logos and the intro the client plays at start-up: docs/MENUS.md
    "The start films") to Ogg Theora, the format Godot plays (`tools/prepare/films.py`, needs ffmpeg; once, into
    `content/cache/films/` and the configuration's `overrides/assets/video/`; `--no-films` skips it);
@@ -95,7 +107,10 @@ animations, walk speeds, footprint, links; docs/VIEW.md).
 6. converts the landscape settings' day-time light tables (`Texture/Scape/<Setting>/skygradient_day.tga`, else
    `skygradient.tga`, the last Data folder of the configuration that has one: `tools/prepare/sky.py`) into the
    configuration's `overrides/assets/terrain/<Setting>/sky.json` - a cutscene's time of day lights the scene by them
-   (docs/GAME_SESSION.md "Cutscenes");
+   (docs/GAME_SESSION.md "Cutscenes"), and their row 8 colours the fog of war clouds (docs/TERRAIN.md "Fog of war");
+   and the fog of war's cloud atlases (`Texture/Scape/<Setting>/fog_(0256).dds`, the fallback
+   `Texture/Effects/fogofwar.tga`: `tools/prepare/fog_textures.py`) into `overrides/assets/terrain/<Setting>/fog.png`
+   and `fogofwar.png` (without them the game uses the original's `particle_06` clouds and says so in the log);
 7. converts the buildings' **setting textures** (`tools/prepare/setting_textures.py`): the original's texture atlases
    repainted per landscape setting - `Texture/Buildings/settings/<ashvalley|icewaste|jungle|northland|savanna>/`
    (`<Aje|Hu|Ninigi>_Lvl_<n>_a`, `Hu_Misc_a`; MIRAGE adds `cave3`, `Seas_Building_a`, `Seas_Tent`) and MIRAGE's
@@ -126,3 +141,35 @@ repository root from its own folder upwards (the folder with `tools\prepare\prep
 editor, so `Prepare.bat` runs once for both. An executable copied elsewhere uses its own folder (`content\`, `lua\`,
 `campaigns\` beside it), or the content folder of settings.json `contentRoot` / `PW_CONTENT`. The biomes and the
 remake's own maps are `game\maps` (`maps\` beside such an executable; docs/BIOMES.md).
+
+## Sending the game to a tester (`Package.bat`)
+
+`Package.bat` / `python tools/package/package.py` builds a package that plays without Python, the toolkit or
+Prepare, and zips it into `dist/ParaWorldRemake-<date>.zip`:
+
+```
+ParaWorldRemake/
+├─ game/        the exported executable, its .pck and data_ParaWorldRemake_windows_x86_64/, project.godot (the marker
+│               AppPaths.RootDir finds the root by), lua/, maps/, campaigns/, coop/, missions/
+├─ content/     configs/<id>/ (as Prepare made them; config.json rewritten, below), hd/
+├─ data/<id>/   the converted game data of each configuration (~2 GB each)
+├─ Set ParaWorld folder.bat   (+ set_paraworld_folder.ps1) writes the tester's ParaWorld folder into the configurations
+└─ README.txt
+```
+
+- **Export first.** Export the game from Godot (Project > Export > Windows Desktop, into `game\`). Alternatively,
+  `--godot <Godot exe>` exports headless with that preset. The script warns when the sources are newer than the export.
+- **The package's `config.json`.** `data` is `../../../data/<id>`: `data` and `install` may be relative to the
+  configuration's folder (`GameConfiguration.Resolve`). `install` is empty until the tester runs `Set ParaWorld
+  folder.bat`, which checks that the chosen folder contains `Data\Base`.
+- **The tester's own installation.** The game reads sounds, music, texts and voices from the tester's ParaWorld at run
+  time. For MIRAGE it also needs the MIRAGE and BoosterPack3 folders. The converted data comes from the game itself:
+  send it only to people who own ParaWorld.
+- **Options.**
+  - `--configs base,mirage` picks the configurations (default: all).
+  - `--no-data` leaves the converted data out, for a tester who already has it.
+  - `--folder` also writes the package as a folder.
+  - `--out <folder>` puts the zip somewhere else.
+- **Left out.** Sources, `.godot`, `content/cache` (Prepare's working files), tools, tests and docs.
+- **The zip.** It is written straight from the files, with no copy of the data first. Pictures, films, sounds and
+  models are stored, the rest deflated. It is a ZIP64 archive past 4 GB; Windows 10 and later unpack it.

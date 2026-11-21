@@ -17,6 +17,7 @@ game/src/App/GameSession.Feedback.cs     ui/feedback.js, the sound part: world e
 game/src/App/GameSession.Models.cs       main.js loadModels / mapModels: the models loaded while the loading screen shows
 game/src/App/GameSession.Autoplay.cs     test runs: --autoplay, --shots, --menu-at, --spawn, --cine (+ PlacementCheck: --test-placement)
 game/src/App/GameSession.Settings.cs     the Options window's settings applied to the game (at its start and on every change)
+game/src/App/GameSession.Editor.cs       the map editor's Test map: a skirmish on the edited map from memory, its end back to the editor
 game/src/App/GameSession.Saves.cs        saved games: recording, save / quick save / autosave, loading (replay), the view after loading (docs/SAVES.md)
 game/src/UI/Loading/                     the loading screen (LoadingScreen, LoadingBar; Logic/LoadingInfo: picture, texts, hints;
                                          Logic/Journal: the campaign's journal entries, the ready button)
@@ -33,6 +34,10 @@ game/src/UI/Game/                        PauseMenu (Options: game/src/UI/Options
 A skirmish runs through the same session (`GameStart.Mode = Skirmish`, docs/SKIRMISH.md): `s.Sim` is what is played
 (`IGameSim`: a `MissionSession` or a `SkirmishSession`), `s.Mission` is null in a skirmish and `s.Skirmish` null in a
 mission; `GameSession.Skirmish.cs` has the skirmish's creation, its end (main.js checkEnd) and the end screen's buttons.
+The map editor's **Test map** (docs/MAP_EDITOR.md) is such a skirmish whose setup's map is a key of the editor
+(`editor:<n>`, `EditorPlaytest`): the map source comes from the editor's snapshot instead of a file
+(`GameSession.Editor.cs`), and "Back to Main menu" / the pause menu's "Quit to the map editor" return to the editor
+(`s.EditorTest`).
 
 ## The API (for the HUD and other UI)
 
@@ -80,8 +85,18 @@ HUD's, sounds the session's.
 
 `Items` (in order), `Count`, `Contains`, `Own`, `OwnUnits`, `First`; `Set(list)` (G.select: the own entities of the
 list, else its first one), `Replace(list, silent)` (as given: the HUD), `Add`, `AddRange`, `Remove`, `Toggle`,
-`Clear`; event `Changed(sel, silent)`. The dead, removed and parked leave it by themselves (each frame). A selection
-by the player plays the selection's speech.
+`Clear`, `Modify(hovered, shift, ctrl)`; event `Changed(sel, silent)`. The dead, removed and parked leave it by
+themselves (each frame). A selection by the player plays the selection's speech.
+
+Shift / Ctrl clicks and boxes (`Selection.Combine`, GameInputController.usl MT_MouseLBtnUp, base and MIRAGE alike):
+one object clicked (or boxed) - **Shift adds it** (one already selected stays: Shift never takes out), **Ctrl adds it
+or takes it out**; a box of several - Shift: the boxed ones, then the selection; Ctrl: each boxed one in or out. The
+result is then sorted out: with any of the player's own in it only his own stay; with any unit (character, animal,
+vehicle, ship, the Aje floating harbour, MIRAGE's SEAS carrier) only the units, else with any building only the
+buildings, else everything. So Shift+click (or Shift+box) gathers several buildings, of one class or of several; a
+building Shift+clicked to selected units is left out; a unit Shift+clicked to selected buildings replaces them (units
+win). A Shift / Ctrl click on the ground keeps the selection. A plain box takes the own units in it, without any the
+own buildings (no wall pieces). Test: `ShiftSelectTests`.
 
 ### The game API
 
@@ -113,7 +128,7 @@ ms per part, units drawn), F10 log, F12 screenshot.
 
 Mouse: left click / drag box (units first by their pick volume along the ray, then the nearest small figure, then
 buildings by their visible surfaces, resources by their standing cylinders; double-click: the same class on screen,
-Ctrl the same type, Shift all; Shift+click adds / removes), right click the order by the cursor's logic (cursorFor:
+Ctrl the same type, Shift all; Shift+click / Shift+box adds - buildings too -, Ctrl+click / Ctrl+box adds or removes: see Selection above), right click the order by the cursor's logic (cursorFor:
 harvest_food / wood / stone, attack, attack_walk, attack_harvest, attack_area_weapon_invalid, build, load, trade,
 healing -> special, no at the map's edge) with the original cursors (assets/ui/cur), right drag the formation arrow,
 Shift queues waypoints, Ctrl patrols; the modes' clicks (move, attack, attack-move, rally, place, target, lay,
@@ -172,6 +187,9 @@ n / m"), the terrain 90-97 %, the objects (mission 1 on a fast PC: ~2 s, ~10 s, 
    with the placement dots, drawn in the first three frames behind the camera with a cull margin that keeps them from
    being culled (the draw calls compile the shaders and pipelines; no pixel shows), then removed; the card sheets of
    the build menus read and their locked (grey) cards made. The first placement of a building is then as quick as the next (`--ghost-rounds`).
+   A mission with infected objects (the Outbreak) prepares their look out of sight in its first seconds and draws each
+   look once behind the camera the same way (docs/INFECTED_LOOK.md "Performance"); the models of the classes a Lua
+   mission's custom.lua names and of the animals breeding buildings breed are loaded with the mission (step 2).
 
 ### The loading screen
 
@@ -374,8 +392,28 @@ Films play when the prepare tool converted them to Theora (tools/prepare/films.p
 
 Check: `--mission 1 --reveal --cine sc_1040` logs `CINE` lines once a second: the scene time, the day time, how many
 objects are hidden and each speaker's jaw weight and pose (Cole 0.21 after "Stina? You okay?", Stina up to 1.0; sc_1050:
-19:00, night ambience). `--reveal`: a scene played this way has no trigger revealing its area, so without it the
-unexplored ground is drawn black.
+19:00, night ambience). (`--reveal` is no longer needed for the picture: a cutscene draws no fog of war, below.)
+* **No fog of war in a cutscene** (2026-11-21, Kacper on mission 16's sc_7050: "in the original's cutscenes the scene
+  is fully visible"): while an in-engine cutscene plays (its timeline camera: `SessionSequenceStage.NoFog`, from
+  `Begin` to `End`) the fog of war pass is off (`FogOverlay.Suspended`, set every frame by GameSession) and the
+  entity views, wrecks, props, effects and particles treat every place as seen (`EntityViews.NoFog`,
+  `WorldFx.Visible / Explored`, `Particles.Seen`) - terrain, objects and the far scene drawn normally. At its end the
+  fog is drawn again as the world has it (gameplay unchanged; the world's fog grid is not touched, so saves and
+  replays are the same). Line scenes (dialogues whose camera eases over the game's view) keep the fog. The scene's
+  `disable_fow` circle (next point) still reveals that area in the world's fog, as in the original. In the original's
+  client the sequence start (0x501670 ff.) keeps `GetFOWEnabled()` (0x5017ac -> 0x8df360) and switches the occlusion
+  renderer off (app+0x2d670, restored at the end), and the server keeps the FOW map at the start and puts it back at
+  the end (PWServer 0x465890 / 0x465960); a plain "fog of war off" switch was not found - the rule follows Kacper's
+  observation of the original. Before: mission 16's opening showed the crater rim beyond the 250 m its trigger reveals
+  black (for a while blue-grey, with a gameplay mist that was taken out again - the heroes faint silhouettes in it: they
+  are actors and are drawn, so it looked like distance fog; it was not - the scene fog starts at 260 m and was never
+  black). The gameplay fog of war is now drawn as the original's: clouds over what is not seen now (docs/TERRAIN.md
+  "Fog of war: how the original draws it").
+* **The area a scene shows** (`disable_fow`, `fow_pos`, `fow_radius` of its SQNZ): seen while it plays, for the human
+  (and every human seat of a co-op game), gone at its end (`MissionHost.PlaySequence` / `SequenceFinished`). Whatever
+  the position - the original's client stamps the circle whenever the flag is set (PWClient 0x44eb81), so mission 12's
+  sc_4030 and sc_4038 (`0.0, 0.0, 0.0`, radius 1000, every camera inside) show their island (this port skipped a zero
+  position until 2026-11-21). Test `CutsceneFogTests.SequenceRevealsItsArea`.
 
 ## Pause menu and debug tools
 

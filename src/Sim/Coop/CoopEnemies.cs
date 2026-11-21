@@ -337,7 +337,7 @@ public sealed class CoopRuntimeEnemies
                 var cls = c.RuleClass(cl) ?? cl;
                 if (!c.D.Exists(cls)) { c.Warn($"co-op {d}: unknown class {cl}"); continue; }
                 bool worker = c.D.Def(cls, null) is { } ud && (ud.CanHarvest != 0 || ud.CanBuild != 0);
-                int copies = worker || !R.IsScaled(p.Id) || !R.Def.Scaling.Garrisons ? 1 : R.Scaling.Units(p.Id, 1);
+                int copies = worker || !R.IsScaled(p.Id) || !R.Def.Scaling.Garrisons || !R.EnemyScaling ? 1 : R.Scaling.Units(p.Id, 1);
                 for (int k = 0; k < copies; k++)
                 {
                     double ang = idx * 2.399, rr = 8 + (idx % 4) * 3;

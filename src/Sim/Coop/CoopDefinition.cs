@@ -197,6 +197,8 @@ public sealed class CoopDefinition
             var f = Path.Combine(root, dir, nn + ".lua");
             if (File.Exists(f)) res.Add(f);
         }
+        // the remake's own missions (game/missions/<name>/coop.lua: Campaign.RemakeMissions) carry their definition
+        if (res.Count == 0 && Campaign.RemakeMissions.ById(missionId)?.CoopFile is { } own) res.Add(own);
         return res;
     }
 

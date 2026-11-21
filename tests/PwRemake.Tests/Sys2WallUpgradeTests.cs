@@ -80,7 +80,7 @@ public static class Sys2WallUpgradeTests
         t.True(made.All(b => WM.ClassOfObj(WM.At(b.Tile!.Value.I, b.Tile.Value.J)!.Wall) == 3), "the wall map: class 3 on the tiles");
         var newWing = WallAt(w, -4, -20)!;
         t.True(gate.Alive && newWing.ParentGate == gate && gate.Wings!.Contains(newWing) && gate.Wings.All(x => x.Alive), "the gate keeps its wings (the new piece one)");
-        t.Equal(2, gate.Wings.Count, "two wings");
+        t.Equal(2, gate.Wings!.Count, "two wings");
         t.True(tower != null, "a tower on the second piece");
         if (tower != null) t.True(tower.Alive && WM.HasOwn(tower.Tile!.Value.I, tower.Tile.Value.J, WM.OwnerId(p), 3, WallMap.WT.TOWER), "the tower on the replaced piece stays");
         // the pieces connect across the classes: the new end piece and the old fence beyond the gate keep their arms

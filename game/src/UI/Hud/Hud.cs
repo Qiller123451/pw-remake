@@ -227,7 +227,7 @@ public partial class Hud : CanvasLayer, PwRemake.UI.PlayerInput.IGameHud
         _pyramid.Scale = new Vector2(ps, ps); _pyramid.Position = new Vector2(0, 74);
         // the bottom left: the info window, the command bar right of it (4 px in, 4 px up)
         _info.Scale = sv; _info.Position = new Vector2(0, vp.Y - HudInfo.H * s);
-        _cmd.Scale = sv; _cmd.Position = new Vector2((HudInfo.W + 4) * s, vp.Y - (59 + 4) * s);
+        _cmd.Scale = sv; _cmd.Position = new Vector2(HudInfo.W * s, vp.Y - 59 * s);      // (CommandBar.usl POS_X 209, the screen's bottom - 59)
         _minimap.Scale = sv; _minimap.Position = new Vector2(vp.X - (HudMinimap.W + 1) * s, vp.Y - (HudMinimap.H + 1) * s);
         _flyout.Scale = sv;
         _msgs.Scale = sv; _msgs.Position = new Vector2(vp.X / 2, 44 * s);
@@ -257,8 +257,8 @@ public partial class Hud : CanvasLayer, PwRemake.UI.PlayerInput.IGameHud
 
     void PlaceFlyout()
     {
-        // above the command bar: its left edge, 4 px above
-        _flyout.Position = new Vector2(_cmd.Position.X, _cmd.Position.Y - 4 * S - _flyout.Size.Y * S);
+        // right above the command bar, 3 px right of its left edge (Flyout.usl: x 212, the screen's bottom - (59 + height))
+        _flyout.Position = new Vector2(_cmd.Position.X + 3 * S, _cmd.Position.Y - _flyout.Size.Y * S);
     }
 
     // ------------------------------------------------------------------ per frame

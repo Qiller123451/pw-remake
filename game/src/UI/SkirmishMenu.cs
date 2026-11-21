@@ -115,6 +115,7 @@ public partial class SkirmishMenu : MenuScreen
             _setup.Debug = s.UseDebug ? s.Debug.ForGame() : null;
             var l = lobby.Clone();
             l.Skirmish = _setup.Clone();
+            l.Skirmish.MapHash = LobbyMap.Hash(GameApp.Config!, _setup.Map);        // (the players compare their copy: LobbyMap)
             var json = NetProtocol.ToNode(l.Skirmish)!.ToJsonString();
             if (json == _sent) return;
             _sent = json;
@@ -353,7 +354,17 @@ public partial class SkirmishMenu : MenuScreen
                          $" (now {n} players: {MapGen.SIZES[k]:0} × {MapGen.SIZES[k]:0} m).";
             return;
         }
-        var path = SkirmishMaps.Resolve(GameApp.Config!, _setup.Map);
+        // (a networked lobby: the copy of the host's content - a map received from the host: MapFiles.FindFor)
+        var path = SkirmishMaps.Resolve(GameApp.Config!, _setup.Map, _net ? _setup.MapHash : null);
+        if (path == null && _net && !IsHost && N?.Client is { } nc)
+        {
+            // (a player without the host's map: the host sends it - MapTransfer; the lobby shows the progress)
+            _mapError = nc.MapReceiving != null ? $"Receiving the host's map \"{_setup.MapName ?? _setup.Map}\": {nc.MapProgress * 100:0} %"
+                : nc.MapError != null ? "The host's map could not be received: " + nc.MapError : $"This machine does not have the map \"{_setup.MapName ?? _setup.Map}\" - the host sends it.";
+            _desc.Text = _mapError;
+            _preview.Show(null);
+            return;
+        }
         try
         {
             if (path == null) throw new System.IO.FileNotFoundException("not in the installation");

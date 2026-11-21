@@ -30,8 +30,16 @@ public sealed class CoopSeat
     [JsonPropertyName("peer")] public int Peer { get; set; } = -1;
     /// <summary>an AI commander's aggression at the start: 0 defensive, 1 normal, 2 aggressive</summary>
     [JsonPropertyName("aggression")] public int Aggression { get; set; } = 1;
+    /// <summary>a mission with an army budget: the army this seat's human bought on the army screen (online: on the
+    /// human's own machine, sent to the host - docs/COOP.md "Armies"). Null: the seat's `army` of the definition (seat 1:
+    /// the level's preset). Seat 1's is GameStart.Army as well (the campaign places it).</summary>
+    [JsonPropertyName("army")] public Game.Army? Army { get; set; }
+    /// <summary>a human seat's colour (palette id or "#rrggbb", each human's own choice in the lobby; null: the game's -
+    /// seat 1 the mission's, the others the first free palette colour). A colour of a mission player or of another seat
+    /// before it gives the default instead (CoopRuntime.AddPlayers, Campaign.MissionColors).</summary>
+    [JsonPropertyName("color")] public string? Color { get; set; }
     [JsonIgnore] public bool Ai => Kind == "ai";
-    public override string ToString() => $"seat {Seat} {Kind} {Name} {Tribe} slot {Slot}";
+    public override string ToString() => $"seat {Seat} {Kind} {Name} {Tribe} slot {Slot}" + (Color != null ? " color " + Color : "");
 }
 
 public sealed class CoopStart
@@ -53,8 +61,9 @@ public sealed class CoopStart
     public override string ToString() => $"co-op {Seats.Count} seats [{string.Join(", ", Seats)}] difficulty {CoopScaling.DifficultyNames[Math.Clamp(Difficulty, 0, 2)]}";
 }
 
-/// <summary>A mission player as the planning sees it (mission.json players[]).</summary>
-public sealed record MissionSlot(int Id, string Tribe, bool Human, int Team, int[]? Diplomacy);
+/// <summary>A mission player as the planning sees it (mission.json players[]); Color: its palette index (-1 none), Name
+/// its name - the co-op lobby's "Your colour" greys those out (MissionColors.ForSeat)</summary>
+public sealed record MissionSlot(int Id, string Tribe, bool Human, int Team, int[]? Diplomacy, int Color = -1, string Name = "");
 
 /// <summary>Planning a co-op game without a world.</summary>
 public static class CoopPlan
@@ -63,15 +72,16 @@ public static class CoopPlan
     /// 8 and up</summary>
     public const int MaxSlots = 12;
 
-    /// <summary>the present players of a mission folder (mission.json)</summary>
+    /// <summary>the present players of a mission folder (map.lua's mission table)</summary>
     public static List<MissionSlot> MissionSlots(string missionFolder)
     {
         var res = new List<MissionSlot>();
-        var j = Json.TryParseFile(Path.Combine(missionFolder, "mission.json"));
+        var j = Maps.PwMapReader.MissionOf(missionFolder);
         foreach (var p in j?["players"]?.AsArray() ?? new JsonArray())
         {
             if (p == null || !p["present"].Bool()) continue;
-            res.Add(new MissionSlot(p["id"].Int(), p["tribe"].Str(), p["type"].Str() == "human", p["team"].Int(), p["diplomacy"] is JsonArray d ? d.Select(x => x.Int(1)).ToArray() : null));
+            res.Add(new MissionSlot(p["id"].Int(), p["tribe"].Str(), p["type"].Str() == "human", p["team"].Int(), p["diplomacy"] is JsonArray d ? d.Select(x => x.Int(1)).ToArray() : null,
+                p["color"] is JsonValue ? p["color"].Int(-1) : -1, p["name"].Str()));
         }
         return res;
     }

@@ -147,7 +147,7 @@ public static class BiomeTests
         t.Equal("Frost and Jungle", e!.Name, "its name");
         t.True(e.Players >= 2 && e.SetupModes.Contains("deathmatch"), $"{e.Players} players, deathmatch");
         var path = SkirmishMaps.Resolve(c.Config, DEMO);
-        t.True(path != null && path.EndsWith(".pwmap.json"), "resolved");
+        t.True(path != null && PwRemake.Sim.Maps.PwMapReader.IsMap(path), "resolved to the converted map (docs/MAP_FORMAT.md)");
         var S = WorldBuilder.MapSourceOf(path!, c.Rules, c.Models, null, c.Forest);
         t.True(S.BiomeLayer != null && S.BiomeLayer.Biomes.SequenceEqual(new[] { "Frost", "Rainforest" }), "its biomes");
         double h = S.Size / 2 - 40;

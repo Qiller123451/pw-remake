@@ -71,7 +71,7 @@ public partial class PauseMenu : CanvasLayer
         b.AddChild(PwTheme.Btn("Help", () => Help(null, Main)));
         b.AddChild(PwTheme.Btn("Controls", () => { var w = Open("Controls", 760); PwRemake.UI.Help.ControlsList.Fill(w.Body); w.Body.AddChild(PwTheme.Btn("Back", Main)); }));
         if (!net) b.AddChild(PwTheme.Btn(sk ? "Restart skirmish" : "Restart mission", () => Confirm(sk ? "Restart the skirmish?" : "Restart the mission?", () => S.EndAction("retry"))));
-        var to = net ? "the multiplayer menu (leave the game)" : sk ? "the skirmish menu" : "the campaign menu";
+        var to = net ? "the multiplayer menu (leave the game)" : S.EditorTest ? "the map editor" : sk ? "the skirmish menu" : "the campaign menu";
         b.AddChild(PwTheme.Btn("Quit to " + to, () => Confirm($"Quit to {to}?", () => S.EndAction("menu"))));
         b.AddChild(PwTheme.Btn("Exit game", () => Confirm("Exit the game?", () => S.EndAction("exit"))));
         var v = PwTheme.Para($"ParaWorld Remake {GameApp.Version} · {GameApp.Config?.Title} · {(sk ? $"skirmish · {S.World.Opts.Mode}" : $"mission {S.Mission!.Data.Id} · difficulty {new[] { "easy", "medium", "hard", "nightmare" }[Math.Clamp(S.Start.Difficulty, 0, 3)]}")}", 11);

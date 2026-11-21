@@ -2,7 +2,7 @@
 // MIRAGE (adds the SEAS as a playable tribe and the mod's rules). The choice is remembered (settings.json
 // "configuration") and changes the menu art, the rules, the missions and the tribes offered after it.
 // Then the main menu (menu.js title; captions and tooltips: MainMenu.srf's texts): Campaign, Skirmish, Load Game,
-// Multiplayer (host / join: MultiplayerMenu, docs/MULTIPLAYER.md), Options (OptionsPanel), Help, Controls, Game data,
+// Multiplayer (host / join: MultiplayerMenu, docs/MULTIPLAYER.md), Map Editor (docs/MAP_EDITOR.md), Options (OptionsPanel), Help, Controls, Game data,
 // Quit (docs/MENUS.md).
 using System;
 using System.Linq;
@@ -79,17 +79,20 @@ public partial class TitleScreen : MenuScreen
         _note.CustomMinimumSize = new Vector2(440, 0);
         _note.Visible = false;
         btns.AddChild(_note);
-        // the remake's own campaigns (docs/SEQUEL.md): Containment is played with MIRAGE (its menu offers the switch)
-        btns.AddChild(Center(PwTheme.Btn("Containment (1964)", () => Boot.Instance.Show(new Sequel.SequelMenu()))));
+        // the remake's own campaigns (docs/SEQUEL.md): Containment is in the campaign menu's Custom campaigns tab
+        // ("The remake's campaigns"; played with MIRAGE, its menu offers the switch); the scenarios stay here
         btns.AddChild(Center(PwTheme.Btn("Scenarios", () => Boot.Instance.Show(new Sequel.ScenarioMenu()))));
         Add("Skirmish", "Skirmish", "Skirmish", () => Boot.Instance.Show(new SkirmishMenu()), ok);
         Add("Multiplayer", "Multiplayer", "Multiplayer", () => Boot.Instance.Show(new MultiplayerMenu()), ok);   // (docs/MULTIPLAYER.md)
+        var ed = PwTheme.Btn("Map Editor", () => Boot.Instance.Show(new PwRemake.Editor.MapEditor()));       // (docs/MAP_EDITOR.md)
+        ed.Disabled = !ok; ed.TooltipText = "Make and change maps: terrain, objects, players - and test them at once.";
+        btns.AddChild(Center(ed));
         Add("LoadGame", "Load game", "LoadGame", () => Boot.Instance.Show(new LoadGameScreen()));      // (SavesPanel.cs; docs/SAVES.md)
         Add("Options", "Options", "Options", () => Boot.Instance.Show(new OptionsScreen()));           // (OptionsPanel.cs)
         btns.AddChild(Center(PwTheme.Btn("Help", () => { Help.HelpWindow? h = null; h = new Help.HelpWindow(null, () => h!.QueueFree()); AddChild(h); })));   // the game's help book (game/src/UI/Help)
         btns.AddChild(Center(PwTheme.Btn("Controls", () => Boot.Instance.Show(new ControlsScreen()))));  // (the keys: Help/ControlsList.cs)
         btns.AddChild(Center(PwTheme.Btn("Game data …", () => Boot.Instance.Show(new SetupScreen()))));
-        Add("Quit", "Exit game", "Quit", () => Boot.Instance.Quit());
+        Add("Quit", "Exit game", "Quit", () => Boot.Instance.RequestQuit());
     }
 
     static CenterContainer Center(Control c) { var cc = new CenterContainer(); cc.AddChild(c); return cc; }

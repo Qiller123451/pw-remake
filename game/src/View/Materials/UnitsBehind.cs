@@ -60,6 +60,13 @@ public static class UnitsBehind
     public static Material Apply(Material m, BehindRole role, Color col)
     {
         if (role == BehindRole.None || !Enabled) return m;
+        long t0 = PwRemake.View.PerfProbe.P != null ? System.Diagnostics.Stopwatch.GetTimestamp() : 0;
+        try { return ApplyRole(m, role, col); }
+        finally { PwRemake.View.PerfProbe.P?.Add("behind:apply", System.Diagnostics.Stopwatch.GetTimestamp() - t0); }
+    }
+
+    static Material ApplyRole(Material m, BehindRole role, Color col)
+    {
         if (!Solid(m, role == BehindRole.Building, out bool cut, out bool twoSided)) return m;
         if (role != BehindRole.UnitCovered)
         {
@@ -89,14 +96,25 @@ public static class UnitsBehind
             case ShaderMaterial sh when sh.Shader != null && sh.NextPass == null:
             {
                 // (the Lambert shaders of ModelMaterials: "ALPHA = " only when blended or cut out)
-                var code = sh.Shader.Code;
-                if (code.Contains("blend_add") || code.Contains("stencil_mode")) return false;
-                cut = code.Contains("ALPHA_SCISSOR_THRESHOLD");
-                twoSided = code.Contains("cull_disabled");
-                return cut || blended || !code.Contains("ALPHA =");
+                // (read once per shader: its code is marshalled from the engine on every read - tens of KB for the
+                // infected looks, for every surface of every model whose tints change)
+                var f = ShaderFacts(sh.Shader);
+                if (f.Skip) return false;
+                cut = f.Cut; twoSided = f.TwoSided;
+                return cut || blended || !f.Blended;
             }
             default: return false;
         }
+    }
+
+    static readonly Dictionary<Shader, (bool Skip, bool Cut, bool TwoSided, bool Blended)> s_facts = new();
+    static (bool Skip, bool Cut, bool TwoSided, bool Blended) ShaderFacts(Shader s)
+    {
+        if (s_facts.TryGetValue(s, out var f)) return f;
+        var code = s.Code;
+        f = (code.Contains("blend_add") || code.Contains("stencil_mode"), code.Contains("ALPHA_SCISSOR_THRESHOLD"), code.Contains("cull_disabled"), code.Contains("ALPHA ="));
+        s_facts[s] = f;
+        return f;
     }
 
     /// <summary>a copy of m that writes the stencil value v where it passes the depth test</summary>
@@ -155,7 +173,34 @@ public static class UnitsBehind
         return t;
     }
 
-    static Shader Make(bool cut, bool twoSided) => new()
+    /// <summary>the scene's light against the day's (WorldRenderer.ApplyLight): the silhouettes' colour is scaled by it,
+    /// never below NIGHT_FLOOR (2026-11-20, Outbreak at night: "the infected headquarters' flag shows as a flat colour
+    /// block when it is attacked" - the dead its counterattack sends out round it, behind it on screen, drawn in the
+    /// infected's full green over the dark building)</summary>
+    public static float SceneLight { get; private set; } = 1;
+    /// <summary>the least share of the colour a silhouette keeps in the darkest night (it stays readable)</summary>
+    public const float NIGHT_FLOOR = 0.3f;
+    public static void SetSceneLight(float k)
+    {
+        EnsureGlobals();
+        SceneLight = Math.Clamp(k, NIGHT_FLOOR, 1f);
+        RenderingServer.GlobalShaderParameterSet("pw_scene_light", SceneLight);
+    }
+    static bool s_globals;
+    static void EnsureGlobals()
+    {
+        if (s_globals) return;
+        s_globals = true;
+        // (once per process; a global uniform must exist before a shader that reads it is compiled)
+        RenderingServer.GlobalShaderParameterAdd("pw_scene_light", RenderingServer.GlobalShaderParameterType.Float, 1f);
+    }
+
+    static Shader Make(bool cut, bool twoSided)
+    {
+        EnsureGlobals();
+        return MakeShader(cut, twoSided);
+    }
+    static Shader MakeShader(bool cut, bool twoSided) => new()
     {
         Code = @"
 shader_type spatial;
@@ -163,9 +208,10 @@ shader_type spatial;
 render_mode unshaded, blend_mix, depth_draw_never, depth_test_disabled, " + (twoSided ? "cull_disabled" : "cull_back") + @", fog_disabled, shadows_disabled;
 stencil_mode read, compare_equal, " + STENCIL_BUILDING + @";
 uniform vec3 col : source_color = vec3(1.0);
+global uniform float pw_scene_light; // the scene's light against the day's (UnitsBehind.SetSceneLight)
 " + (cut ? "uniform sampler2D tex : source_color, hint_default_white, filter_linear_mipmap, repeat_enable;\n" : "") + @"
 void fragment() {
-" + (cut ? "\tif (texture(tex, UV).a < 0.5) discard;\n" : "") + @"	ALBEDO = col;
+" + (cut ? "\tif (texture(tex, UV).a < 0.5) discard;\n" : "") + @"	ALBEDO = col * pw_scene_light;
 	ALPHA = 1.0;
 }
 ",

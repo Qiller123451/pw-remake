@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Converts the toolkit's campaign missions (pw-campaign/1 JSON, docs/CAMPAIGN_FORMAT.md of the ParaWorld Toolkit) into
-the remake's mission folders (docs/LUA_MAPS.md):
+mission folders of the intermediate layout below. Prepare writes them to content/cache/missions/<config>/<lang>/; the
+map converter (tools/mapconvert, docs/MAP_FORMAT.md) then makes the game's mission folders from them and the missions'
+original maps (map.lua, terrain/, world.lua, triggers.lua, texts/<lang>.lua) - the game reads only those.
 
     <missions_dir>/<NN>_<key>/
         mission.json      what the menu shows and the setup needs: id, key, folder, title, description, tribe,

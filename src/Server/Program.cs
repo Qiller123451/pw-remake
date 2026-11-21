@@ -5,6 +5,8 @@
 // when the game ends or the server is stopped.
 //
 //   dotnet run --project src/Server -- --setup lobby.json [--port 1905] [--players 2] [--replay game.pwsave] [--build <version>]
+//          [--map <map folder or .pwmap>]   (the setup's map, sent to a player who lacks it: its content hash is the
+//                                            setup's mapHash - set from the file when the setup has none)
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -26,7 +28,7 @@ public static class Program
             if (argv[i].StartsWith("--")) a[argv[i][2..]] = i + 1 < argv.Length && !argv[i + 1].StartsWith("--") ? argv[++i] : "";
         if (!a.TryGetValue("setup", out var setupFile) || !File.Exists(setupFile))
         {
-            Console.Error.WriteLine("usage: PwRemake.Server --setup lobby.json [--port 1905] [--players 2] [--replay game.pwsave] [--build version]");
+            Console.Error.WriteLine("usage: PwRemake.Server --setup lobby.json [--port 1905] [--players 2] [--replay game.pwsave] [--build version] [--map map.pwmap]");
             return 2;
         }
         var lobby = NetProtocol.FromNode<LobbyState>(System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(setupFile)));
@@ -36,6 +38,16 @@ public static class Program
         var replay = a.GetValueOrDefault("replay", "replay.pwsave");
         using var host = new NetHost(port) { Dedicated = true, Autostart = players, Build = a.GetValueOrDefault("build", ""), DumpDir = Directory.GetCurrentDirectory() };
         host.Info += s => Console.WriteLine(s);
+        // the setup's map from a file: sent to players who lack it (MapTransfer); its hash is the setup's
+        if (a.TryGetValue("map", out var mapFile) && mapFile.Length > 0 && lobby.Skirmish != null)
+        {
+            var hash = PwRemake.Sim.Maps.MapFiles.ContentHash(mapFile);
+            if (lobby.Skirmish.MapHash == null) lobby.Skirmish.MapHash = hash;
+            else if (lobby.Skirmish.MapHash != hash) { Console.Error.WriteLine($"{mapFile}: its content hash {hash} is not the setup's mapHash {lobby.Skirmish.MapHash}"); return 2; }
+            var bytes = MapTransfer.Pack(mapFile);
+            host.MapFile = (id, h) => h == hash ? (bytes, null) : (null, "the server has another map");
+            Console.WriteLine($"serving the map {mapFile} ({bytes.Length} bytes, hash {hash})");
+        }
         host.SetLobby(lobby);
         Console.WriteLine($"ParaWorld Remake server on port {host.Port}: {lobby.Mode} \"{lobby.Name}\" ({lobby.Configuration}), starting with {players} players");
         bool stop = false;

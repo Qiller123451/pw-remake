@@ -21,6 +21,7 @@ it; `src/Sim` stays engine-free.
 | main.js (G.fx / G.mfx / G.particles, the 'effects' draw step) | game/src/App/GameSession.Effects.cs | the session's part |
 | game/animfx.js ANIM_FX, entities.js (the merge into the clips' events) | src/Sim/World/AnimFx.cs; WorldFx.AnimEffect | the clips' effect events: camera shakes |
 | (none: the toolkit's export leaves these models out) | tools/prepare/effect_models.py; View/Models/ModelManifest.cs (manifest_fx.json) | the original effect models the port needs beyond the export |
+| (none: the remake's own) | InfectionBlight.cs; Materials/InfectedLook.cs | the infected look's blight, green fires, clouds and flies (docs/INFECTED_LOOK.md) |
 
 ![the emitters of a campfire and the Norse fireplace](images/fx_emitters_fire.png)
 
@@ -83,6 +84,36 @@ the fires of a damage stage, the chimney smoke of an epoch, the night's fireflie
   applied on the CPU: in Godot's Compatibility renderer `PROJECTION_MATRIX[1][1]` read 0 in this MultiMesh vertex
   shader, and the sprites came out huge), hangs it at its
   cell's pivot and picks its cell. Additive sheets ignore the texture's alpha (the flames of gore.tga have alpha 0).
+* **Blending: the original's material rule** (2026-11-21, Kacper: "smoke is wrong, it's just a bunch of squares" -
+  MIRAGE, Outbreak, Icewaste: bright white hard-edged quads over the SEAS buildings' chimneys, glowing at night).
+  Whether a sheet is added or mixed comes from the emitter's GSF material. PWClient.exe 0x6c767f makes the particle
+  material of a GSF material by its alpha bits: attr1 & 0x3 (alpha test 0x1, alpha blend 0x2) -> "<texture>_pm"
+  (premultiplied, mixed by the sheet's alpha: the renderer's path that multiplies the colour by the alpha), none ->
+  "<texture>_add" (handle | 0x80000000: the additive path 0x705329, the alpha unused). The bit 0x4 ("additive / self
+  illuminated" of the meshes) is not looked at. The converter (pwexport gsf.py `T['additive'] = attr1 & 0x4`) writes
+  the tile's "additive" from 0x4 and drops the material's index, so the materials 0x106 and 0x105 came out additive:
+  * the SEAS buildings' steam - `seas_greenhouse`, `seas_steelwork`, `seas_barracks`, `seas_garage`,
+    `seas_headquarters` (`particles_steam*`, `particles_EP_02_steam*`; 13 emitters): particle_01.tga cells 16 - 21,
+    white, alpha 50, GSF 0x106. The cells are grey (about 128) to their border, the puff is only in the alpha; added
+    with the alpha unused, every sprite was a bright grey-white square, more so on dark ground at night. MIRAGE's
+    SEAS uses the same base models (its data changes none of them);
+  * the Norse lamps' night flies (`hu_fireplace`, `hu_weapons_smith` `particles_*lamp_nightflies*`; 7 emitters):
+    cell 63, GSF 0x105 - small, mixed now as in the original.
+  `EmitterDef.ResolveBlend` (called by ModelLibrary for every emitter) finds the emitter's material in the .glb - the
+  one with the emitter's sheet and the bit 0x4 as the converter wrote it (in the whole export exactly one such
+  material per emitter, or several that agree) - and sets `Additive = (attr1 & 0x3) == 0`, `GsfFlags` = its flags;
+  without one (an export without gsf_flags) the converter's flag stays, materials that disagree keep it and warn.
+  In this data (Base + MIRAGE, 3037 emitters of 366 models): mixed 0x102 1717, 0x101 107, 0x106 13, 0x105 7, 0x4302
+  3; additive 0x104 1184, 0x1104 6 - exactly the 20 above changed. The converter could write the rule itself
+  (`T['additive'] = (attr1 & 3) == 0`); the port no longer depends on it. Every sheet the emitters name is in the
+  converted data (19 sheets, none missing; all keep their alpha). The mixed sprites are lit by the scene's sun (next
+  point).
+  Tests: `EmitterSheetsTests` (PwRemake.Tests: the rule; every emitter of PW_DATA / PW_DATA_MIRAGE - its sheet
+  found, its blending from its material, no cell drawn with a visible square edge: a mixed cell transparent at its
+  border, an additive one dark there; it lists the emitters whose blending differs from the converter's flag and
+  every problem), FxTest `SeasSteam` (`fx_seas_steam.png`).
+
+![the SEAS buildings' steam, before (added: squares) and after (mixed by the sheet's alpha)](images/fx_seas_steam.png)
 * **Brightness: the original's colours and blending** (2026-11-18, Kacper: "this is how healing area effect looks in
   original game, I feel like in the remake it is less visible"). The original (PWClient.exe renderer 0x704d40,
   Direct3D 9, no sRGB conversion anywhere) draws a sprite as texel x vertex colour in the screen's sRGB values and adds
@@ -104,10 +135,10 @@ the fires of a damage stage, the chimney smoke of an epoch, the night's fireflie
   * **The additive colour is squared** (0x705329: c x c x the party colour >> 16): a colour fade goes with the square
     of the fade, an emitter's colour deepens (fx_heal_area's dots 200 / 150 / 0 -> 157 / 88 / 0). The fog's fade
     scales an additive sprite's colour (the others' alpha). The original does not use an additive particle's alpha at
-    all; the port keeps the emitter's alpha and an alpha-only fade (0x4000): 173 of the 1164 additive emitters of the
+    all; the port keeps the emitter's alpha and an alpha-only fade (0x4000): 206 of the 1190 additive emitters of the
     export have an alpha below 255 (some 0: aje_temple, ninigi_teahouse, domination_flag - invisible here, perhaps
-    shown in the original) and 16 fade only their alpha (the death pings' vanish, SEAS buildings) - not checked
-    against the game.
+    shown in the original) and 3 fade only their alpha (the death pings' vanish; the SEAS buildings' steam, 13
+    more until 2026-11-21, is mixed: "Blending" above) - not checked against the game.
   On the heal rays (fx_heal_area: 50 sprites of rays.png cell 1 - brightest texel 156 / 125 / 66, mean 49 / 41 / 17 -
   colour white, size 50 - 100, 3 s, fade in and out 0.4 each, on a disk of 23.7 m) the brightest texel over ground of
   0.3 now adds 0.6 as in the original (before: 0.13 in Forward+, 0.32 in Compatibility); the faint body of a ray
@@ -119,6 +150,32 @@ the fires of a damage stage, the chimney smoke of an epoch, the night's fireflie
   sprites' size (the original's half extent is W / 8 x size / w pixels - a quarter of "size" high at 4 : 3 with the
   game camera's 38 - 40 degrees; on a 16 : 9 screen the original's sprites are about a fifth taller), the drawn
   fallback sprites (DrawnFx: the browser remake's own).
+* **The light of the mixed sprites** (2026-11-21: white steam and smoke no longer bright at night). The original
+  lights its "_pm" sprites, the additive ones not. PWClient.exe:
+  * the particle renderer 0x704d40 (arguments: 7 the model's light value L, 10 the light colour, 12 the party colour):
+    for a mixed sheet (0x704f31 - 0x704fe9, 0x705209 - 0x7052d7) each channel is colour x (L + 1) / 2 x light / 255,
+    clamped to 255, then multiplied by the alpha (premultiplied) - the additive path 0x705329 takes no light (c x c x
+    the party colour, alpha 0); an additive sheet passes L = -1 (0x72560a), which picks that path;
+  * L is the model drawing's argument 7 (0x6eb4c0, through the particle queue 0x725210 at +4 of its entry): 1.0 from
+    every caller (0x45c6c3, 0x471259, 0x4718a6, 0x472123 ...), so the factor (L + 1) / 2 is 1;
+  * the light colour (0x7253f0 -> 0x723520 of the light renderer, 0x88d0e0): per channel the larger of +0x55dc - the
+    sun's colour, the sky table's row 2 at the time of day (0x727cc0, written each frame at 0x72dacf; the "_day"
+    tables hold the same colour all day: Northland 255 / 245 / 196 at noon, Icewaste 249 / 234 / 234, Savanna 251 /
+    236 / 187) - and +0x34, 0xff0f0f0f from the constructor (0x7245c1; nothing else writes it): the light never drops
+    below 15 / 255. Without the light renderer the colour is white (0x725431).
+  The port: `WorldRenderer.ParticleLight` = the setting's sun colour at noon (`SetSunTint`: GameSession.LoadSkyTable,
+  the sky table's row 2; white without assets/terrain/<Setting>/sky.json) x the scene's sun now against the remake's
+  daylight (energy x colour per channel: a cutscene's time of day gives the table's row 2 of that time, as the
+  original; the day-night cycle's night and dusk - Outbreak - the sequel's night and the biomes' sun factor darken or
+  tint it the same way), each channel at least `PARTICLE_LIGHT_MIN` (15 / 255) and at most 1. The session hands it to
+  `Particles.MixLight` every frame; a mixed sprite's colour is multiplied by it (the additive ones unchanged). At the
+  remake's night (sun 0.22, 0x8aa8ff) that is about 0.12 / 0.15 / 0.26 - the SEAS steam and the chimneys' smoke a dim
+  blue-grey instead of white; by day only the table's tint (a slightly warm white). Other views (map viewer, tools)
+  keep white. FxTest `NightSmoke` (`fx_night_smoke_unlit.png` / `fx_night_smoke.png`: the mixed sprites' colour 0.77
+  -> 0.20 at night, the campfire's additive flames unchanged).
+
+![night: the mixed sprites unlit (before) and lit by the night's sun (after)](images/fx_night_smoke.png)
+
 * **The "Particles" setting** (`AppSettings.Particles`, the in-game Options' "Particle effects"): off (nothing, no
   drawn effects either), low (800 sprites, 3 screens of fill), on (3000, 8 screens), high (6000, 16 screens) - the
   JS's levels; the fill budget stops sprites close to the camera from covering the screen many times.
@@ -256,6 +313,19 @@ have no model either). The synthesized sounds of fx.js are not ported (the game'
 ![world events: a cannonball on the ground, an arrow on a warrior, a cannonball on a warehouse, level-up, heal, a blast, the tornado, fireworks](images/fx_events.png)
 ![a mission's effects, question marks (the game's models) and a cutscene's effect item](images/fx_mission.png)
 
+## The infected look
+
+`ModelInstance.SetInfected(stage)` (docs/INFECTED_LOOK.md) draws a building, unit or animal infected: besides its
+materials it hangs the game's `fx_poison` / `fx_poison_big` clouds and the lumberjack cottage's meat flies on the model
+(`Particles.TrackNode`: an emitter of another template on a node, through `ModelLibrary.OnEmitter`; how many by the
+look and the building's tune: `InfectedLookData.Effects`), lays the blight on the ground (`InfectionBlight`: an
+ellipse from the building's footprint; not under units) and turns the model's fires, lights and smoke green
+(`ModelInstance.GreenFire`: the particles' custom data + 512, `InfectedLook.GreenGlsl` in `ParticleBatch` - additive
+sprites keep their brightness, mixed ones turn green-grey; the glow meshes and halo sprites the same). Which emitters:
+`InfectedLook.TurnsGreen` (`InfectedLookData.EmitterTurnsGreen` on the node name - fire, smoke, chimney smoke, glows
+and lights turn; insects, the meat flies, dust, flying stones, splinters and the harbour's water keep their colours).
+The additive light keeps the blending above.
+
 ## In the game
 
 `GameSession.Effects` (`WorldFx`) is made with the entities; `HandleEvents` runs first in the session's event
@@ -278,7 +348,8 @@ fireworks, camshake) with no drawn sprite, poison and ice, deaths and destructio
 clip `destroy` and their spray, the temple's dust, the burning resin field, the rocket smoke and no muzzle effect for
 other guns, fireworks once per move, tornado kept up by its ticks, quicksand, a spirit shown only while a shaman is
 selected, the clips' effect events: shakes and the stomp's ping - none of it drawn); the drawn fallbacks, a
-mission's effects, question marks, a cutscene item, the healing areas (`HealAreas`: a temple through
+mission's effects, question marks, a cutscene item, the SEAS buildings' steam mixed (`SeasSteam`,
+`fx_seas_steam.png`), the healing areas (`HealAreas`: a temple through
 `WorldFx.ReadyFx`, the SEAS fortress' `seas_hq_bunker` with `fx_heal_area`, `seas_healspring`, `healing_well_01` -
 their rays standing up, the temple also from the original's high camera, `fx_heal_temple_top.png`; the level-up's
 rays and a water hit's splashes: `fx_heal_*.png`, `fx_rays_levelup_splash.png`;

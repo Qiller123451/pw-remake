@@ -87,6 +87,8 @@ public sealed class MissionSession : IGameSim
     /// mission id in index.json</summary>
     public static string? MissionFolderOf(GameStart start, GameConfiguration cfg)
     {
+        // the remake's own missions (game/missions: RemakeMissions) by their token "remake:<name>"
+        if (RemakeMissions.IsToken(start.MissionFolder)) return RemakeMissions.FolderOf(start.MissionFolder);
         if (!string.IsNullOrEmpty(start.MissionFolder))
         {
             var f = Path.IsPathRooted(start.MissionFolder) ? start.MissionFolder : Path.Combine(cfg.MissionsDir, start.MissionFolder);
@@ -118,18 +120,20 @@ public sealed class MissionSession : IGameSim
         L.Info($"mission {s.Data.Id} {s.Data.Entry.Title}: {s.Data.Triggers.Count} triggers, {s.Data.Objects.Count} objects ({start})");
         Step(0.08, "Planning the mission");
         // ---- the campaign's plan, the map source without what the campaign places itself
-        var ccfg = new CampaignConfig { Difficulty = start.Difficulty, Tribe = start.Tribe, Cheats = start.Debug?.ForGame(), AiData = aiData, Army = start.Army, Humans = start.Seats != null ? start.SeatPlayers() : null, Gameplay = start.Gameplay };
+        var ccfg = new CampaignConfig { Difficulty = start.Difficulty, Tribe = start.Tribe, Cheats = start.Debug?.ForGame(), AiData = aiData, Army = start.Army, Humans = start.Seats != null ? start.SeatPlayers() : null, Gameplay = start.Gameplay, Color = start.Color };
         // a co-op campaign game (mode 2, docs/COOP.md): the seats are players of their own, no ally is "taken over"
         if (start.Coop != null)
         {
             ccfg.Coop = new Coop.CoopRuntime(start.Coop);
             ccfg.Humans = null;
             if (start.Coop.SeatOf(1) is { Tribe.Length: > 0 } s1) ccfg.Tribe = s1.Tribe;
+            // (seat 1's colour: its human's choice; an AI commander on seat 1 keeps the mission's)
+            ccfg.Color = start.Coop.SeatOf(1) is { Ai: false } h1 ? h1.Color : null;
         }
         var C = s.Campaign = new Campaign(s.Data, ccfg).Plan(rules, models);
-        var ula = WorldBuilder.FindMap(cfg, s.Data.Entry.Map) ?? throw new FileNotFoundException($"The map of mission {s.Data.Id} was not found in the installation: {s.Data.Entry.Map}");
+        // (the mission folder is the mission's map: its terrain, objects and regions - docs/MAP_FORMAT.md)
         Step(0.18, "Reading the map");
-        s.Map = WorldBuilder.MapSourceOf(ula, rules, models, C.Skip, forest);
+        s.Map = WorldBuilder.MapSourceOf(folder, rules, models, C.Skip, forest);
         // co-op: the map work's part of the definition (extension, resources) - src/Sim/Coop/CoopMapHook.cs
         Coop.CoopMapContext? mapCtx = null;
         if (C.Coop != null)
@@ -166,6 +170,8 @@ public sealed class MissionSession : IGameSim
         var sl = C.Human != null ? C.StartLocations[C.Human.Id] : null;
         Entity? own = sl == null && C.Human != null ? (Entity?)s.World.Buildings.FirstOrDefault(b => b.Owner == C.Human && b.Alive) ?? s.World.Units.FirstOrDefault(u => u.Owner == C.Human && u.Alive) : null;
         s.StartCamera = (sl?.X ?? own?.Pos.X ?? 0, sl?.Z ?? own?.Pos.Z ?? 0, Math.PI / 2 - C.Map["default_camera"].Num(0.785));
+        // (a start camera the map editor set: map_info.start_camera { x, y } - docs/MAP_EDITOR.md "Cameras")
+        if (C.Map["start_camera"] is System.Text.Json.Nodes.JsonObject scam) { var (scx, scz) = C.ToGame(scam["x"].Num(), scam["y"].Num()); s.StartCamera = (scx, scz, s.StartCamera.Yaw); }
         // ---- the trigger engine: starts with the first step
         if (!o.NoTriggers)
         {

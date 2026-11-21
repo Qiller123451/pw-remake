@@ -216,7 +216,7 @@ public partial class HelpWindow : Control
         Show();
     }
 
-    void Show()
+    new void Show()
     {
         var cur = _hist.Current ?? _book.Home;
         var (file, key) = HelpBook.Split(cur);

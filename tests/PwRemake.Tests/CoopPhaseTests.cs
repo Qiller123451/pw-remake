@@ -72,7 +72,8 @@ public static class CoopPhaseTests
                 }
                 t.Equal(0, R.GarrisonExtra, $"{w}: no extra garrison units in the hero phase");
                 t.True(R.Enemies.List.All(e => e.Placed.Count == 0), $"{w}: the enemy additions wait for the bases");
-                t.True(!R.CountScaling, $"{w}: the enemies' numbers are not scaled in the hero phase");
+                t.True(!R.EnemyScaling, $"{w}: the enemies' numbers are not scaled in the hero phase");
+                t.True(W.Players.All(p => p.CoopDamage == 1 && p.CoopHealth == 1), $"{w}: no enemy health or damage scaling in the hero phase");
                 // Béla's archers (the prison's, player 3): one action, one each (2 seats: 2 + 1, the fewest first)
                 var archers = W.Units.Where(u => u.Alive && u.Name == "hu_archer" && u.Owner?.Id == 3 && C.Regions.Find("prison_archer")!.Contains(u.Pos.X, u.Pos.Z)).ToList();
                 t.Equal(3, archers.Count, $"{w}: the prison's three archers");
@@ -101,7 +102,8 @@ public static class CoopPhaseTests
                     t.True(seat.Player.Res.Values.Any(v => v > 0), $"{w}: seat {seat.Seat}'s stock");
                 }
                 // (mission 1's barbarians are neutral until the story turns them: their garrisons are not scaled - as before)
-                t.True(R.CountScaling, $"{w}: the enemies' numbers scaled from the hand-over");
+                t.True(R.EnemyScaling, $"{w}: the enemies' numbers scaled from the hand-over");
+                t.True(W.Players.Where(p => R.IsScaled(p.Id)).All(p => p.CoopHealth == R.Scaling.Health && p.CoopDamage == R.Scaling.Damage), $"{w}: the scaled enemies' health and damage from the hand-over");
                 t.True(R.Enemies.List.All(e => e.Placed.Count > 0), $"{w}: the enemy additions placed at the hand-over");
             }
         }
@@ -283,7 +285,7 @@ public static class CoopPhaseTests
             t.True(W.Units.Any(u => u.Alive && u.Name == "schliemann_s0" && u.Owner == R.Seats[0].Player), $"{w}: Kleemann stays seat 1's");
             int spear = R.Seats.Sum(x => UnitsOf(W, x.Player).Count(u => u.Name.EndsWith("_spearman")));
             t.Equal(4, spear, $"{w}: the four start spearmen, dealt (not copied): {string.Join(" ", R.Seats.Select(x => $"{x.Seat}:{UnitsOf(W, x.Player).Count(u => u.Name.EndsWith("_spearman"))}"))}");
-            t.True(!R.CountScaling && R.Enemies.List.All(e => e.Placed.Count == 0), $"{w}: no extra enemies in the hero phase");
+            t.True(!R.EnemyScaling && R.Enemies.List.All(e => e.Placed.Count == 0), $"{w}: no extra enemies in the hero phase");
             var ais = R.Seats.Where(x => x.Ai).ToList();
             var d0 = ais.ToDictionary(a => a.Seat, a => a.Commander!.Army().Average(u => D(u, cx, cz)));
             s.Run(60);
@@ -315,7 +317,7 @@ public static class CoopPhaseTests
                 t.True(seat.Player.Res.Values.Any(v => v > 0), $"{w}: seat {seat.Seat}'s stock");
                 if (seat.Ai) t.True(seat.Commander!.Order == "none" && seat.Commander.Brain.Start is { } st && Math.Abs(st.X - sd.X!.Value) < 30 && Math.Abs(st.Z - sd.Z!.Value) < 30, $"{w}: seat {seat.Seat}'s commander rebased at its site ({seat.Commander})");
             }
-            t.True(R.CountScaling && R.Enemies.List.Where(e => e.Def.Seats <= R.Seats.Count).All(e => e.Placed.Count > 0), $"{w}: the enemy additions and the count scaling from the hand-over");
+            t.True(R.EnemyScaling && R.Enemies.List.Where(e => e.Def.Seats <= R.Seats.Count).All(e => e.Placed.Count > 0), $"{w}: the enemy additions and the count scaling from the hand-over");
             s.Run(30);
             t.True(!s.Over, $"{w}: the mission goes on");
         }
@@ -360,8 +362,11 @@ public static class CoopPhaseTests
         {
             var s = CoopTests.Session(t, CoopTests.CoopStart(t, cfg, 5, new[] { ("human", ""), ("human", ""), ("human", "") }));
             var C = s.Campaign; var W = s.World; var R = C.Coop!;
-            t.True(!R.HasHeroPhase && R.Dealing && !R.CountScaling, "05: a no-build mission deals its gifts and does not scale the enemies' numbers");
+            t.True(!R.HasHeroPhase && R.Dealing && !R.EnemyScaling, "05: a no-build mission deals its gifts and does not scale the enemies' numbers");
             t.Equal(0, R.GarrisonExtra, "05: no extra garrison units");
+            // no scaling at all in a no-build mission (Kacper 2026-11-20): the enemies keep their health and damage too
+            t.True(C.World.Players.All(p => p.CoopDamage == 1 && p.CoopHealth == 1 && p.CoopPopBase == null), "05: no enemy health, damage or population scaling");
+            t.True(C.World.Players.All(p => C.World.Brains.Get(p.Id) is not PwRemake.Sim.Ai.TribeAI ta || ta.WaveScale == 1), "05: no bigger waves");
             var counts = R.Seats.ToDictionary(x => x.Seat, x => R.UnitsOf(x));
             int fewest = R.Seats.OrderBy(x => counts[x.Seat]).ThenBy(x => x.Seat == 1 ? 9 : x.Seat).First().Seat;
             var sl = C.StartLocations[C.HumanSlot]!;
@@ -400,7 +405,7 @@ public static class CoopPhaseTests
     {
         var c = CampaignTests.LoadCfgPublic("base");
         if (c == null) t.Skip("no base");
-        var mj = Json.TryParseFile(System.IO.Path.Combine(c!.Config.MissionsDir, "02_single_02", "mission.json"));
+        var mj = PwRemake.Sim.Maps.PwMapReader.MissionOf(System.IO.Path.Combine(c!.Config.MissionsDir, "02_single_02"));
         var offer = PwRemake.Sim.Campaign.CampaignArmy.Of(mj, c.Rules, "", 1000 + (mj!["min_credits"]?.GetValue<double>() ?? 0))!;
         var army = offer.Defaults();
         var PB = new PointBuy(c.Rules, null);

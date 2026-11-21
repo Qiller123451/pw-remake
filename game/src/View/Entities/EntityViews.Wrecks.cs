@@ -20,6 +20,8 @@ public partial class EntityViews
         public ModelInstance? Hull;
         public readonly List<(WreckPart P, ModelInstance? M)> Parts = new();
         public int Seen;
+        /// <summary>the serial of the simulation's wreck clip last taken (EntityView.SyncAnim)</summary>
+        public int Serial = -1;
     }
     readonly Dictionary<Unit, WreckView> _wrecks = new();
 
@@ -45,7 +47,18 @@ public partial class EntityViews
             if (!_wrecks.TryGetValue(u, out var wv))
             {
                 wv = new WreckView { Hull = WreckModel(u.Wreck.Gfx, u, "hull") };
-                if (wv.Hull != null) { wv.Hull.Position = new Vector3((float)u.Pos.X, (float)u.Pos.Y, (float)u.Pos.Z); wv.Hull.Rotation = new Vector3(0, (float)u.Heading, 0); wv.Hull.SetBuildingState(4, 2, 1); }
+                if (wv.Hull != null)
+                {
+                    wv.Hull.Position = new Vector3((float)u.Pos.X, (float)u.Pos.Y, (float)u.Pos.Z); wv.Hull.Rotation = new Vector3(0, (float)u.Heading, 0);
+                    // (a script corpse is the unit's model of its own, not a ruin: ScriptCorpses.cs)
+                    if (!u.Wreck.Moves) wv.Hull.SetBuildingState(4, 2, 1);
+                    // its fire (AddFX "fire_corpses" + LinkAction to the corpse's link): the effect model on the corpse
+                    if (u.Wreck.Fire != null && wv.Hull.Attach(u.Wreck.Fire, string.IsNullOrEmpty(u.Wreck.FireLink) ? null : u.Wreck.FireLink, null, true) is { } fire && fire.Anim != null)
+                    {
+                        var fc = fire.Anim.Pick("anim") ?? fire.Template.ClipNames.Keys.FirstOrDefault(k => !k.Contains('#'));
+                        if (fc != null) fire.Anim.Play(fc, new PwRemake.View.Anim.PlayOptions { Loop = true, Restart = true, Fade = 0 });
+                    }
+                }
                 foreach (var p in u.Wreck.Parts ?? new List<WreckPart>())
                 {
                     var pm = WreckModel(p.Gfx, u, p.Gfx);
@@ -56,7 +69,7 @@ public partial class EntityViews
             }
             wv.Seen = _frame;
             // (seen where the player sees the owner or the place was ever explored: main.js)
-            bool shown = Hide?.Invoke(u) != true && (_sees(u.Owner) || Fog.Explored(u.Pos.X, u.Pos.Z));
+            bool shown = Hide?.Invoke(u) != true && (_sees(u.Owner) || FogExplored(u.Pos.X, u.Pos.Z));
             double died = W.Time - u.DeadT;
             if (wv.Hull != null)
             {
@@ -64,8 +77,16 @@ public partial class EntityViews
                 wv.Hull.Visible = on;
                 if (on)
                 {
-                    var clip = u.Wreck.Anim?.CurName ?? (wv.Hull.Template.ClipNames.ContainsKey("destroy") ? "destroy" : null);
-                    wv.Hull.SyncAnimation(clip, false, 1, died + u.Wreck.From, W.Time);
+                    // (a falling or sinking script corpse: its height of the moment, ScriptCorpses.cs Wreck.YAt)
+                    if (u.Wreck.Moves) wv.Hull.Position = new Vector3((float)u.Pos.X, (float)u.Wreck.YAt(u.DeadT), (float)u.Pos.Z);
+                    // the simulation's clip where it has one (held frames: the Scorpion's corpse at frame 249), else
+                    // "destroy" from the death
+                    if (u.Wreck.Anim != null && wv.Hull.Anim != null) EntityView.SyncAnim(wv.Hull, u.Wreck.Anim, ref wv.Serial, gdt, false);   // (advanced below, with its fire)
+                    else
+                    {
+                        var clip = wv.Hull.Template.ClipNames.ContainsKey("destroy") && !u.Wreck.Moves ? "destroy" : null;
+                        wv.Hull.SyncAnimation(clip, false, 1, died + u.Wreck.From, W.Time);
+                    }
                     wv.Hull.Advance(gdt);
                 }
             }

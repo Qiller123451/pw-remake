@@ -16,6 +16,7 @@ src/Net/                         the network layer - no Godot types (a dedicated
   NetHost.cs                     the host: lobby, start, turns, input delay, pause, lag, scenes, hashes, desync dumps, drop / rejoin, its replay
   NetClient.cs                   a player's side: hello, lobby, chat, turns, votes, hashes, dumps
   LockstepGame.cs                a machine's running game on the turns: pacing, catching up, hash reports, dumps; ContentFingerprint
+  MapTransfer.cs                 the lobby's map sent to a player who lacks it (Pack, Store), LobbyMapSync (a player's map check)
 src/Server/                      the dedicated server (console): a setup file, a lobby, the turns, the replay at the end
 src/Sim/Game/LockstepPresenter.cs the mission's interface answers, the same on every machine
 src/Sim/Game/GameStart.cs        Seats (who commands which player), SceneRule, Profile; Seats.Apply
@@ -69,6 +70,46 @@ host's **Start Game** when everybody is ready.
 quest log and the end screen do not stop the game; Enter opens the chat (to all / allies / enemies); a status line
 shows "Waiting for …" (a player lagging or reconnecting) and a desync. Quitting leaves the game; the host's leaving
 ends it.
+
+## Maps
+
+A skirmish lobby's map can be any map of the skirmish list: the installation's (prepared from the same installation on
+every machine) or a user's own (*My maps*: `User/<name>`, a map folder or a `.pwmap` in the user folder's `maps/` -
+docs/MAP_EDITOR.md "Saving and sharing"). Every machine must have **the same map**, byte for byte, or the worlds run
+apart from the first step:
+
+* the host puts the **content hash** of its map into the setup (`SkirmishSetup.MapHash` = `MapFiles.ContentHash`: FNV-1a
+  64 over every file's path and bytes - a map folder and its `.pwmap` have the same hash); `LobbyMap.Hash`;
+* each player compares it with its own copy of the map of that id, or a copy received before (`LobbyMap.Problem`)
+  whenever the map or the hash changes (`LobbyMapSync`, after every Poll) and tells the host (`map-check`: the hash it
+  compared with, the problem or none); a problem stands at the player's name and refuses the start
+  (`LobbyStart.Problem`); another map clears the old problems (and stops a transfer) and everybody checks again;
+* **a player who lacks the map, or has another version of it, gets it from the host** (Warcraft 3 style;
+  `MapTransfer`): it asks (`map-request`: the hash); the host sends the map as a `.pwmap` - a `.pwmap` as it is, a map
+  folder zipped file by file (the same content hash) - over the lobby's own connection in chunks of 64 KB (`map-data`:
+  hash, offset, total, base64), at most 8 chunks ahead of the player's acknowledgements (`map-ack`: the bytes received -
+  the host's loop never waits on a slow player); maps over **32 MB** are not sent (`map-fail` with the reason: copy it by
+  hand). The lobby shows the progress at the player's name ("is receiving the map "Island": 45 % of 2.3 MB";
+  `LobbyPeer.MapProgress` 0 .. 1; the joining player's map panel too); the start stays refused meanwhile;
+* the player checks what arrived before it keeps anything (`MapTransfer.Store`): the size, a zip whose entries stay
+  inside the map and unpack to no more than they claim (at most 512 MB in all), **the content hash = the lobby's**, a
+  map.lua that reads (data only); then it is saved as `My maps/downloaded/<hash>.pwmap` and the player's next
+  `map-check` clears the problem. The setup's map id finds that copy by the hash (`MapFiles.FindFor`,
+  `SkirmishMaps.Resolve(cfg, id, hash)`: the game, the loading screen, a saved game of it), so every machine builds its
+  world from the same bytes - determinism as with the installation's maps. Nothing of a received map runs while it is
+  checked: its data files are read by LuaData (data only), a mission's triggers.lua / custom.lua run only in the
+  mission's sandbox when it is played (docs/LUA_MAPS.md "The sandbox"), as for any map;
+* a machine that receives a start whose map it cannot match anyway leaves with the message instead of running a world
+  apart (`NetSession.OnStarted`).
+
+The game's host serves its own maps (`NetHost.MapFile` = `MapTransfer.PackFor`: the map of the id with the lobby's
+hash). A dedicated server serves the map file given with `--map <folder or .pwmap>` (its hash becomes the setup's
+`mapHash`; without `--map` the setup file may carry `mapHash`, and a player without the map is told to copy it).
+Network protocol 5 (2026-11-19): `mapHash`, `map-check`; **6** (2026-11-19): `map-request`, `map-data`, `map-ack`,
+`map-fail`, `LobbyPeer.mapProgress`; **7** (2026-11-20): co-op armies per seat - `coop-army`, `army-cancel`, the lobby
+state `armies` (`armyWait`), `CoopLobbyState.armyBudget` / `credits`, `CoopLobbySeat.army` / `armyDone`,
+`CoopSeat.army` (docs/COOP.md "Armies"); **8** (2026-11-21): the campaign colour - `GameStart.color` (Shared: the host's),
+`coop-color`, `CoopLobbySeat.color`, `CoopSeat.color` (docs/COOP.md "Colours").
 
 ## Transport: TCP
 
@@ -133,7 +174,14 @@ quits is dropped at once. The host leaving ends the game (in a dedicated server'
   everybody (each machine's mission UI). The mission's end is everybody's.
 * **Every human has a fog** of its own (each machine keeps all of them: the simulation asks a human's fog for that
   human's units). A shared player has one fog.
-* A mission with an army budget starts with the level's own army (no army screen in co-op).
+* A mission with an army budget: in the co-op campaign mode **every human buys the army of its own seat on its own
+  machine** (the army screen, with the host's budget; docs/COOP.md "Armies"). The army goes to the host (`coop-army`);
+  when the host presses Start and a human seat has not chosen yet, the lobby enters the state `armies` - every machine
+  shows who is still choosing and the seconds left, the army screen opens by itself on the machines still choosing - and
+  the host starts once every human seat has its army, or after `NetProtocol.ArmyTimeout` (120 s) with the level's army
+  for the seats still choosing (the host may go back to the lobby). The armies travel in the GameStart
+  (`CoopSeat.Army`, seat 1's also `GameStart.Army`), so every machine places the same units. Shared mode: the level's
+  army.
 
 ### Interface answers (LockstepPresenter)
 
@@ -203,14 +251,16 @@ found and fixed:
   is deterministic for the same input; static caches are pure functions of their keys (several worlds in one process,
   as in the tests, do not disturb each other).
 * Not covered: two machines with different game data (the lobby compares a fingerprint of the data files and the
-  mission index and refuses the start), or different builds (the version is compared).
+  mission index and refuses the start), different maps (the lobby compares the map's content hash: "Maps"), or
+  different builds (the version is compared).
 
 ## Dedicated server
 
-`dotnet run --project src/Server -- --setup lobby.json [--port 1905] [--players 2] [--replay out.pwsave]`: a NetHost
+`dotnet run --project src/Server -- --setup lobby.json [--port 1905] [--players 2] [--replay out.pwsave] [--map <map>]`: a NetHost
 without a player of its own, the lobby from a JSON file (a `LobbyState`: mode, skirmish setup or campaign start,
 co-op players, scene rule), it starts when `--players` humans are in and ready, relays the turns, compares the hashes
-and writes the game's replay when the game ends (Ctrl+C ends it too). It needs no game data (it runs no world).
+and writes the game's replay when the game ends (Ctrl+C ends it too). It needs no game data (it runs no world); with
+`--map` it sends that map to the players who lack it ("Maps").
 
 ## Tests
 
@@ -222,14 +272,26 @@ clients in one process over localhost TCP, each client with its own world; bots 
 * `CoopSharedHostRule`: mission 2 shared with the "host" rule; taking the allied player 3 over is refused in Shared mode.
 * `CoopCampaignTwoHumansAndAi`, `CoopCampaignTwoSeats`: the co-op campaign mode over the network (two clients and an AI
   commander; two seats with seat 3 empty) - docs/COOP.md "Tests".
+* `CoopCampaignArmies`: mission 2 (army budget) with two humans and an AI commander: seat 2 buys its army in the lobby
+  (a faction change drops it), the host starts, the state `armies` waits for seat 1, which buys on its machine; both
+  armies in the start and in every world, the AI commander's definition army, the same world; then nobody chooses and
+  the host's timeout starts with the level's armies.
 * `DesyncIsDetected`: a changed world found at the next check, the part named, the dumps compared.
 * `PauseHoldsEverybody`, `DropRejoinAndLeave` (lost, waited for, rejoined and caught up, another one dropped),
-  `LobbyRules` (chat, other data / version as a problem, slots freed, a late joiner refused), `DedicatedServer` (it
+  `LobbyRules` (chat, other data / version as a problem, slots freed, a late joiner refused; protocol 7), `DedicatedServer` (it
   starts by itself, its replay is the game).
 * `SaveAndReplayNetworkedGame`: the host's save and the host's turn record replay to the same world.
 * `MirageGameOptionsPathsTests`: MIRAGE's sixth stage / no titans through the skirmish lobby and the co-op lobby (as the
   players receive them) to the GameStart and every player's tech tree. Network protocol 4 since (a GameStart's
   `gameplay`); the debug option "First-shot delay" travels in the GameStart's `debug` as every debug option.
+* `EditorSaveTests.EditorSaveMultiplayerMapCheck` (`dotnet run EditorSaveMultiplayer`): a user map's hash in the lobby,
+  a player with another copy or none has a problem and the start is refused, the same copy clears it, another map too.
+* `MapTransferToPlayerWithoutMap`: two machines with maps folders of their own, the host's with a 0.4 MB map of the
+  editor, the other's empty: the player asks, the host sends 7 chunks (the lobby's progress 0 -> 16 % -> ... -> 100 %,
+  the start refused meanwhile), the copy is kept as `downloaded/<hash>.pwmap` with the host's hash, the problem goes,
+  the game starts - one world from the host's folder, one from the received file - and both are the same after 30 s;
+  a map of another hash, a "hash" that is a path, a file that is no zip and a zip with an entry outside the map are
+  refused, nothing of them kept.
 * `DeterminismTests`: FdLibm against V8 and System.Math, Lua's math and number strings under pl-PL, a skirmish under
   pl-PL.
 

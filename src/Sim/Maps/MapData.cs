@@ -1,5 +1,6 @@
-// The typed result of reading an original map file (.ula, Ula.ParseUla): the JS remake's `MapData` object of
-// maps/ula.js, field for field. Everything here is in MAP coordinates: x east 0 .. W, y SOUTH 0 .. H, z up (metres;
+// The typed shape of a map the simulation works on: the JS remake's `MapData` object of maps/ula.js, field for field -
+// filled from a map file of the remake's format (PwMap.ToMapData, docs/MAP_FORMAT.md) or, in the converter, by the
+// .ula reader (Ula.ParseUla). Everything here is in MAP coordinates: x east 0 .. W, y SOUTH 0 .. H, z up (metres;
 // left-handed, docs/MAP_FORMAT.md). MapSource (maps/source.js) turns it into what the world build needs, in game
 // coordinates (x - W/2, z = y - H/2).
 //
@@ -88,6 +89,13 @@ public sealed class WalkGrid
     /// <summary>map coordinates of the grid's corner (0 for an original map; negative for a map extended to the north /
     /// west by MapExtension)</summary>
     public int OffX, OffY;
+    /// <summary>the map editor's painted cells (null: none): 0 = auto (the slope rule / the map's own grid), 1 = painted
+    /// walkable, 2 = painted blocked (WalkOverride). walk.png keeps them as the values 192 / 64 (docs/MAP_FORMAT.md
+    /// "terrain/walk.png"); Cells already holds the result, the game reads only Cells.</summary>
+    public byte[]? Paint;
+
+    /// <summary>a deep copy</summary>
+    public WalkGrid Clone() => new() { W = W, H = H, OffX = OffX, OffY = OffY, Cells = (byte[])Cells.Clone(), Paint = (byte[]?)Paint?.Clone() };
 
     /// <summary>the cell of map point (mx, my) is walkable (outside the grid: no)</summary>
     public bool WalkableMap(double mx, double my)
@@ -128,7 +136,7 @@ public sealed class MapPreview
     public byte[] Rgba = Array.Empty<byte>();
 }
 
-/// <summary>An original map, as read from its .ula file (Ula.ParseUla).</summary>
+/// <summary>A map as the simulation reads it (PwMap.ToMapData; the converter: Ula.ParseUla).</summary>
 public sealed class MapData
 {
     // ---- Terr
@@ -155,6 +163,9 @@ public sealed class MapData
     public byte[] Mats = Array.Empty<byte>();
     /// <summary>the setting number of the terrain header as a name (SETTINGS; 'Jungle' when unknown)</summary>
     public string TerrainSetting = "Jungle";
+    /// <summary>the ground texture of each material index ("Jungle/scape_0.jpg", below assets/terrain/) when the map
+    /// names its own (a map file's terrain.materials, docs/MAP_FORMAT.md); null: the setting's 8 (Setting/scape_k.jpg)</summary>
+    public List<string>? Materials;
 
     // ---- LInf
     /// <summary>the level info's key/values (LevelName, MapName, Setting, MaxPlayers ...), in file order</summary>
@@ -169,12 +180,16 @@ public sealed class MapData
     public double DefaultCamera = 0.785;
     /// <summary>the time of day the level starts at, seconds of the day (Ula.DayTime)</summary>
     public double StartTime;
+    /// <summary>map.lua day_night (PwMap.DayNight), null: none</summary>
+    public World.DayNightSpec? DayNight;
     /// <summary>the ground texture set the remake has for the map (KNOWN_SETTINGS: TestSet -> Jungle ...)</summary>
     public string Setting = "Jungle";
     /// <summary>the setting by its own name (forest kinds are per setting)</summary>
     public string SettingName = "Jungle";
     public string Name = "";
     public double MaxPlayers = 2;
+    /// <summary>the configuration the map needs (map.lua requires: "MIRAGE"; "" = any - PwMap.Requires)</summary>
+    public string Requires = "";
 
     // ---- the rest
     public List<MapObject> Objects = new();

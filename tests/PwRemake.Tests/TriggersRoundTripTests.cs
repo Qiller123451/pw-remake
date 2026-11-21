@@ -6,6 +6,8 @@
 // Data: PW_CAMPAIGN_JSON (a folder with base/ and mirage/, each index.json + single_NN.json), default
 // /home/claude/testdata/campaign; skipped without it.
 using System;
+using PwRemake.Sim.Maps;
+using PwRemake.Sim.Content;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -43,6 +45,24 @@ public static class TriggersRoundTripTests
         p.WaitForExit();
         t.True(p.ExitCode == 0, $"converter ran ({se})");
         t.Log(so.Split('\n').LastOrDefault(l => l.Length > 0) ?? "");
+        // the game reads only the map format (docs/MAP_FORMAT.md): each mission folder of the intermediate layout is
+        // converted in place with its original map, as Prepare's tools/mapconvert does
+        var data = Environment.GetEnvironmentVariable("PW_INSTALL_DATA") is { Length: > 0 } dd ? dd : "/mnt/user-data/uploads/Paraworld/Data";
+        string[] folders = cfg == "mirage" ? new[] { "Base", "BoosterPack1", "BoosterPack3", "MIRAGE" } : new[] { "Base", "BoosterPack1" };
+        foreach (var mdir in Directory.GetDirectories(outDir).OrderBy(x => x, StringComparer.Ordinal))
+        {
+            var mjf = Path.Combine(mdir, "mission.json");
+            if (!File.Exists(mjf)) continue;
+            var map = JsonNode.Parse(File.ReadAllText(mjf))?["map"].Str() ?? "";
+            string? ula = PathUtil.FindCaseInsensitive(data, map);
+            var rest = System.Text.RegularExpressions.Regex.Replace(PathUtil.Norm(map), "^[^/]+/", "");
+            for (int i = folders.Length - 1; ula == null && i >= 0; i--) ula = PathUtil.FindCaseInsensitive(Path.Combine(data, folders[i]), rest);
+            t.True(ula != null, $"{Path.GetFileName(mdir)}: its map {map} is in the installation");
+            if (ula == null) continue;
+            var m = PwMapConvert.FromUla(ula, map);
+            PwMapConvert.AddMission(m, mdir);
+            PwMapWriter.WriteFolder(m, mdir, removeOldLayout: true);
+        }
         converted[cfg] = outDir;
         return outDir;
     }

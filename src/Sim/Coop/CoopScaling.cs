@@ -9,7 +9,8 @@
 //
 // Which players: every player hostile to seat 1 at the start of the mission, and every player that becomes hostile later
 // (re-checked when the diplomacy changes), except the definition's `exclude` and the seats. Wild animals (no player) are
-// left as they are. Everything is a pure function of GameStart (no randomness): fractions of units carry over from one
+// left as they are. When: only while the seats can build - a no-build mission and a hero phase scale nothing (no
+// extra units, health or damage: CoopRuntime.EnemyScaling). Everything is a pure function of GameStart (no randomness): fractions of units carry over from one
 // spawn to the next per player (Carry), so 3 spawns of 1 at ×1.5 make 1, 2, 1 extra.
 using System;
 using System.Collections.Generic;

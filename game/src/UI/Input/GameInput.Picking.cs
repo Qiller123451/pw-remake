@@ -164,10 +164,12 @@ public partial class GameInput
     }
 
     // distance along the ray to a resource: a standing cylinder of its radius and the height of its kind
-    static double? ResHit(ResNode n, Vector3 o, Vector3 d)
+    // (a carcass: round its body as it lies, EntityViews.BodyOf - the death clip throws it off the place it died at)
+    static double? ResHit(ResNode n, Vector3 o, Vector3 d, (double X, double Z, double Reach)? body = null)
     {
-        double h = RES_HEIGHT.GetValueOrDefault(n.Type, 2), r = ResRadius(n);
-        double ox = o.X - n.Pos.X, oz = o.Z - n.Pos.Z;
+        double h = RES_HEIGHT.GetValueOrDefault(n.Type, 2), r = body is { } bd ? Math.Max(ResRadius(n), Math.Min(8, bd.Reach)) : ResRadius(n);
+        double nx = body?.X ?? n.Pos.X, nz = body?.Z ?? n.Pos.Z;
+        double ox = o.X - nx, oz = o.Z - nz;
         double A = d.X * d.X + d.Z * d.Z, B = 2 * (ox * d.X + oz * d.Z), C = ox * ox + oz * oz - r * r;
         double D = B * B - 4 * A * C;
         if (A >= 1e-9 && D >= 0)
@@ -180,7 +182,7 @@ public partial class GameInput
         if (Math.Abs(d.Y) > 1e-6)
         {
             double t = (n.Pos.Y + h - o.Y) / d.Y;
-            double px = o.X + d.X * t - n.Pos.X, pz = o.Z + d.Z * t - n.Pos.Z;
+            double px = o.X + d.X * t - nx, pz = o.Z + d.Z * t - nz;
             if (t > 0 && px * px + pz * pz <= r * r) return t;
         }
         return null;
@@ -248,7 +250,7 @@ public partial class GameInput
             {
                 if (!seen.Add(n)) return;
                 if (!n.Alive || n.Amount <= 0 || !G.Fog.Explored(n.Pos.X, n.Pos.Z)) return;
-                var dd = ResHit(n, o, d);
+                var dd = ResHit(n, o, d, G.Entities.BodyOf(n));
                 if (dd != null && dd < hd) { hd = (float)dd.Value; hit = n; }
             });
         }
@@ -277,7 +279,9 @@ public partial class GameInput
             W.RHash.Query(gg.X, gg.Z, 6, n =>
             {
                 if (!n.Alive || n.Amount <= 0 || !G.Fog.Explored(n.Pos.X, n.Pos.Z)) return;
-                double dist = Math.Sqrt((n.Pos.X - gg.X) * (n.Pos.X - gg.X) + (n.Pos.Z - gg.Z) * (n.Pos.Z - gg.Z)) - ResRadius(n);
+                var bd = G.Entities.BodyOf(n);
+                double nx = bd?.X ?? n.Pos.X, nz = bd?.Z ?? n.Pos.Z, nr = bd is { } b2 ? Math.Max(ResRadius(n), Math.Min(8, b2.Reach)) : ResRadius(n);
+                double dist = Math.Sqrt((nx - gg.X) * (nx - gg.X) + (nz - gg.Z) * (nz - gg.Z)) - nr;
                 if (dist < rd) { rd = dist; rb = n; }
             });
             if (rb != null) return rb;

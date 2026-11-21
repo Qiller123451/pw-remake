@@ -36,6 +36,7 @@ Levels: `Trace` < `Debug` < `Info` < `Warn` < `Error` < `Fatal`. Categories are 
 | `Ai.*` | the computer players |
 | `Campaign`, `Campaign.Triggers`, `Scripting.Lua` | missions, the trigger engine, Lua scripts |
 | `View.*` | models, terrain, effects, sound |
+| `Editor` | the map editor: documents opened and made, Test map, strokes (Debug), its test runs (`EDITOR` lines) |
 | `Crash` | unhandled exceptions |
 
 ## Where it goes (`logging.json`)

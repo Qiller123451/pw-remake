@@ -1,7 +1,14 @@
-// The campaign menu (the browser remake's Menu.campaign): the missions of the configuration in playing order with
-// their texts, your tribe ("as in the mission" or any tribe the configuration lets you play - MIRAGE adds the SEAS),
-// the difficulty, MIRAGE's game options (sixth stage, no titans, flying units: GameStart.Gameplay), the debug options line, Start.
-// Missions that do not play yet are greyed out (CampaignStatus).
+// The campaign menu (the browser remake's Menu.campaign), two tabs (PwTabs, as the Options window):
+//   * "Campaign": the original campaign of the configuration (the tutorial and missions 1 - 16: MissionGroups.Original)
+//     in playing order with their texts;
+//   * "Custom campaigns" (CustomCampaignsTab): every other mission grouped as campaigns - the Booster Pack, MIRAGE's own
+//     missions, the remake's campaigns (Containment, Scenarios), My maps with triggers (edited copies of missions
+//     marked) and the user's campaigns (campaign.lua) - docs/MENUS.md "Campaign menu", docs/CAMPAIGN.md "Custom campaigns".
+// Below the tabs, for both: your tribe ("as in the mission" or any tribe the configuration lets you play - MIRAGE adds
+// the SEAS), your colour (CampaignColor: the skirmish palette and RGB picker without the colours of the mission's other
+// players; remembered per campaign), the difficulty, MIRAGE's game options (sixth stage, no titans, flying units: GameStart.Gameplay), the debug
+// options line, Start. Missions that do not play yet are greyed out (CampaignStatus). The tab and the choice shown last
+// are shown again (settings.json campaignTab, campaignMission, customSelection).
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,6 +17,7 @@ using System.Text.Json.Nodes;
 using Godot;
 using PwRemake.App;
 using PwRemake.Sim.Core;
+using PwRemake.Sim.Campaign;
 using PwRemake.Sim.Game;
 
 namespace PwRemake.UI;
@@ -32,8 +40,17 @@ public sealed record MissionEntry(int Id, string Key, string Folder, string Titl
             res.Add(new MissionEntry(o["id"].Int(), o["key"].Str(), o["folder"].Str(o["key"].Str()), title,
                 o["description"].Str(), o["tribe"].Str(), o["point_buy"].Bool(), o["min_credits"].Int(), o["map"].Str()));
         }
+        // the remake's own missions (game/missions: Outbreak ...), the same for every configuration; their folder is a
+        // token ("remake:outbreak") every machine resolves to its own copy (RemakeMissions)
+        foreach (var r in PwRemake.Sim.Campaign.RemakeMissions.List())
+            if (!res.Any(x => x.Id == r.Id)) res.Add(new MissionEntry(r.Id, r.Key, r.Token, r.Title, r.Description, r.Tribe, false, 0, ""));
         return res;
     }
+
+    /// <summary>the mission's folder on this machine (a remake mission's token resolved)</summary>
+    public string FolderPath(string missionsDir) => PwRemake.Sim.Campaign.RemakeMissions.FolderOf(Folder) ?? Path.Combine(missionsDir, Folder);
+    /// <summary>one of the remake's own missions (game/missions)</summary>
+    public bool IsRemake => PwRemake.Sim.Campaign.RemakeMissions.IsToken(Folder);
 }
 
 public partial class CampaignMenu : MenuScreen
@@ -43,42 +60,39 @@ public partial class CampaignMenu : MenuScreen
     ItemList _list = null!;
     Label _text = null!;
     OptionButton _tribe = null!, _diff = null!;
+    /// <summary>"Your colour" (CampaignColor): the shown mission's other players' colours greyed out</summary>
+    PlayerColorCell _color = null!;
+    string _colorKey = "campaign";
+    List<TakenColor> _taken = new();
     Label _debugLine = null!;
-    Button _start = null!;
+    Button _start = null!, _coop = null!;
+    readonly int? _tab;
+    /// <summary>the tab control (tests, screenshots: --screen custom)</summary>
+    public PwTabs Tabs { get; } = new() { SizeFlagsVertical = SizeFlags.ExpandFill };
+    CustomCampaignsTab? _custom;
 
-    public CampaignMenu() : base("Campaign", minWidth: 900) { }
+    /// <summary>tab: 0 Campaign, 1 Custom campaigns; null: the tab shown last</summary>
+    public CampaignMenu(int? tab = null) : base("Campaign", minWidth: 960) { _tab = tab; }
+
+    /// <summary>the menu's Start button (the custom tab sets its caption and state)</summary>
+    internal Button StartButton => _start;
 
     protected override void Build()
     {
         var s = GameApp.Settings;
         var cfg = GameApp.Config!;
-        _missions = MissionEntry.Load(cfg.MissionsDir).Where(m => !CampaignStatus.Hidden(cfg.Id, m.Id)).ToList();
+        var index = PwRemake.Sim.Campaign.MissionEntry.LoadIndex(cfg.MissionsDir);
+        var original = PwRemake.Sim.Campaign.MissionGroups.Original(cfg, index, id => CampaignStatus.Hidden(cfg.Id, id)).Select(e => e.Id).ToHashSet();
+        _missions = MissionEntry.Load(cfg.MissionsDir).Where(m => original.Contains(m.Id)).ToList();
         var b = Window.Body;
         b.AddChild(PwTheme.Heading($"Campaign · {cfg.Title}", 20));
 
-        var g = Group("Mission");
-        b.AddChild(g);
-        var split = new HBoxContainer { CustomMinimumSize = new Vector2(820, 300) };
-        split.AddThemeConstantOverride("separation", 12);
-        g.AddChild(split);
-        _list = new ItemList { CustomMinimumSize = new Vector2(330, 300), SelectMode = ItemList.SelectModeEnum.Single };
-        split.AddChild(_list);
-        var scroll = new ScrollContainer { CustomMinimumSize = new Vector2(470, 300), HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled };
-        split.AddChild(scroll);
-        _text = PwTheme.Para("", 14, PwTheme.Text);
-        _text.CustomMinimumSize = new Vector2(450, 0);
-        scroll.AddChild(_text);
-
-        int sel = 0;
-        for (int i = 0; i < _missions.Count; i++)
-        {
-            var m = _missions[i];
-            var st = CampaignStatus.Of(cfg.Id, m.Id);
-            int idx = _list.AddItem(m.Title);
-            if (st == MissionState.NotYet) { _list.SetItemCustomFgColor(idx, PwTheme.Dim); _list.SetItemTooltip(idx, "Not adapted for the remake yet"); }
-            if (m.Id == s.CampaignMission) sel = i;
-        }
-        _list.ItemSelected += i => ShowMission((int)i);
+        _start = PwTheme.Btn("Start mission", Start, 170);
+        Tabs.CustomMinimumSize = new Vector2(880, 400);
+        b.AddChild(Tabs);
+        Tabs.AddTab("Campaign", "The original campaign: the tutorial and missions 1 - 16", CampaignPage);
+        Tabs.AddTab("Custom campaigns", "Every other mission: the Booster Pack" + (cfg.IsMod ? $", {cfg.Mod}'s own missions" : "") +
+                    ", the remake's campaigns, your maps with triggers (and edited missions) and your own campaigns", () => _custom = new CustomCampaignsTab(this));
 
         var opts = new HBoxContainer();
         opts.AddThemeConstantOverride("separation", 24);
@@ -96,8 +110,15 @@ public partial class CampaignMenu : MenuScreen
             _tribe.SetItemMetadata(i, t);
             if (t == s.CampaignTribe) _tribe.Select(i);
         }
-        _tribe.ItemSelected += _ => { s.CampaignTribe = _tribe.GetItemMetadata(_tribe.Selected).AsString(); ShowMission(_list.GetSelectedItems().FirstOrDefault()); };
+        _tribe.ItemSelected += _ => { s.CampaignTribe = _tribe.GetItemMetadata(_tribe.Selected).AsString(); Refresh(); };
         gt.AddChild(_tribe);
+
+        // your colour (docs/CAMPAIGN.md "Your colour"): the shown mission's other players' colours can't be taken
+        var gc = Group("Your colour");
+        opts.AddChild(gc);
+        _color = new PlayerColorCell("", 220, "As in the mission") { BlockedBy = id => MissionColors.Blocker(id, _taken)?.Name };
+        _color.Chosen += id => CampaignColor.Remember(_colorKey, id);
+        gc.AddChild(_color);
 
         var gd = Group("Difficulty");
         opts.AddChild(gd);
@@ -129,18 +150,68 @@ public partial class CampaignMenu : MenuScreen
         b.AddChild(dbg);
         UpdateDebugLine();
 
-        _start = PwTheme.Btn("Start mission", Start, 170);
         // Co-op offline: you and one or two AI commanders, each seat its own faction and base (docs/COOP.md)
-        var coop = PwTheme.Btn("Co-op …", () => { s.Save(); Boot.Instance.Show(new CoopLobby(offline: true)); }, 140);
-        coop.TooltipText = "Play a mission with one or two AI commanders at your side (missions with a co-op definition)";
-        b.AddChild(Row(PwTheme.Btn("Back", () => { s.Save(); Boot.Instance.Show(new TitleScreen()); }, 140), coop, _start));
+        _coop = PwTheme.Btn("Co-op …", () => { s.Save(); Boot.Instance.Show(new CoopLobby(offline: true)); }, 140);
+        _coop.TooltipText = "Play a mission with one or two AI commanders at your side (missions with a co-op definition)";
+        b.AddChild(Row(PwTheme.Btn("Back", () => { s.Save(); Boot.Instance.Show(new TitleScreen()); }, 140), _coop, _start));
 
-        if (_missions.Count == 0)
+        Tabs.Changed = i => { s.CampaignTab = i; _coop.Visible = i == 0; Refresh(); };
+        Tabs.Select(Math.Clamp(_tab ?? s.CampaignTab, 0, 1));
+    }
+
+    /// <summary>the "Campaign" tab: the original campaign's missions and the chosen one's texts</summary>
+    Control CampaignPage()
+    {
+        var s = GameApp.Settings;
+        var cfg = GameApp.Config!;
+        var split = new HBoxContainer { CustomMinimumSize = new Vector2(840, 340) };
+        split.AddThemeConstantOverride("separation", 12);
+        _list = new ItemList { CustomMinimumSize = new Vector2(330, 340), SelectMode = ItemList.SelectModeEnum.Single };
+        split.AddChild(_list);
+        var scroll = new ScrollContainer { CustomMinimumSize = new Vector2(490, 340), HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled, SizeFlagsHorizontal = SizeFlags.ExpandFill };
+        split.AddChild(scroll);
+        _text = PwTheme.Para("", 14, PwTheme.Text);
+        _text.CustomMinimumSize = new Vector2(470, 0);
+        _text.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        scroll.AddChild(_text);
+
+        int sel = 0;
+        for (int i = 0; i < _missions.Count; i++)
         {
-            _text.Text = $"No missions in {cfg.MissionsDir}. Run the prepare tool (Game data on the title screen).";
-            _start.Disabled = true;
+            var m = _missions[i];
+            var st = CampaignStatus.Of(cfg.Id, m.Id);
+            int idx = _list.AddItem(m.Title);
+            if (st == MissionState.NotYet) { _list.SetItemCustomFgColor(idx, PwTheme.Dim); _list.SetItemTooltip(idx, "Not adapted for the remake yet"); }
+            if (m.Id == s.CampaignMission) sel = i;
         }
-        else { _list.Select(sel); ShowMission(sel); }
+        _list.ItemSelected += i => ShowMission((int)i);
+        if (_missions.Count == 0) _text.Text = $"No missions in {cfg.MissionsDir}. Run the prepare tool (Game data on the title screen).";
+        else _list.Select(sel);
+        return split;
+    }
+
+    /// <summary>the shown tab's texts and Start again (a tab or the tribe changed)</summary>
+    void Refresh()
+    {
+        if (Tabs.Current == 1) { _start.Text = "Start mission"; _custom?.Refresh(); return; }
+        _start.Text = "Start mission";
+        if (_missions.Count == 0) { _start.Disabled = true; return; }
+        var sel = _list.GetSelectedItems();
+        ShowMission(sel.Length > 0 ? sel[0] : 0);
+    }
+
+    /// <summary>"Your colour" for a mission folder (null: no mission - the box can't be used) and the campaign it is
+    /// remembered for (CampaignColor.Key): the other players' colours greyed out, the remembered colour or the mission's
+    /// own when it is one of theirs</summary>
+    internal void ShowColor(string? folder, string key, string? why = null)
+    {
+        _colorKey = key;
+        _taken = folder != null ? CampaignColor.Taken(folder) : new();
+        _color.SetDefaultColor(CampaignColor.MissionDefault(folder));
+        _color.Id = folder != null ? MissionColors.Resolve(CampaignColor.Remembered(key), _taken) ?? "" : "";
+        _color.UpdateBlocked();
+        _color.Disabled = folder == null;
+        _color.TooltipText = why ?? (_taken.Count > 0 ? "Taken by the mission's other players: " + string.Join(", ", _taken.Select(t => t.Name)) : "");
     }
 
     /// <summary>does this configuration have MIRAGE's game options (the sixth stage, no titans)?</summary>
@@ -168,6 +239,16 @@ public partial class CampaignMenu : MenuScreen
         if (i < 0 || i >= _missions.Count) return;
         var m = _missions[i];
         GameApp.Settings.CampaignMission = m.Id;
+        ShowColor(m.FolderPath(GameApp.Config!.MissionsDir), CampaignColor.Key(m.Id, m.Folder, null));
+        var (text, playable) = MissionText(m);
+        _text.Text = text;
+        _start.Disabled = !playable;
+    }
+
+    /// <summary>a mission of the configuration as the menus show it (title, description, the tribe you play, the army
+    /// budget, its status) and whether Start may play it (a mission not adapted yet: only with the debug options)</summary>
+    public static (string Text, bool Playable) MissionText(MissionEntry m)
+    {
         string tribe = GameApp.Settings.CampaignTribe;
         string who = tribe == "" || tribe == m.Tribe ? $"You play the {TribeInfo.Name(m.Tribe)}." :
             $"You play the {TribeInfo.Name(tribe)} instead of the {TribeInfo.Name(m.Tribe)}: your units and buildings are the {TribeInfo.Name(tribe)}'s equivalents.";
@@ -178,24 +259,34 @@ public partial class CampaignMenu : MenuScreen
             MissionState.Partial => "\n\nPlayable in parts: " + CampaignStatus.Note(GameApp.Config!.Id, m.Id),
             _ => "",
         };
-        _text.Text = $"{m.Title}\n\n{m.Description}\n\n{who}{(m.PointBuy ? $"\nArmy budget: at least {m.MinCredits} points." : "")}{note}";
-        _start.Disabled = st == MissionState.NotYet && !GameApp.Settings.UseDebug;
+        return ($"{m.Title}\n\n{m.Description}\n\n{who}{(m.PointBuy ? $"\nArmy budget: at least {m.MinCredits} points." : "")}{note}",
+                st != MissionState.NotYet || GameApp.Settings.UseDebug);
     }
 
     void Start()
     {
+        if (Tabs.Current == 1) { _custom?.Start(); return; }
         var s = GameApp.Settings;
         var m = _missions.FirstOrDefault(x => x.Id == s.CampaignMission);
         if (m == null) return;
         s.Save();
+        PlayMission(m, null, () => new CampaignMenu(0));
+    }
+
+    /// <summary>a mission of the configuration started as a campaign mission with the menu's tribe, difficulty, debug
+    /// options and game options (the army screen first when it has an army budget); cc: a user campaign's mission</summary>
+    public static void PlayMission(MissionEntry m, PwRemake.Sim.Game.CustomCampaignRef? cc, Func<Node> back)
+    {
+        var s = GameApp.Settings;
         var start = new GameStart
         {
             Configuration = GameApp.Config!.Id, Mode = GameMode.Campaign, Mission = m.Id, MissionFolder = m.Folder,
             Tribe = s.CampaignTribe, Difficulty = s.Difficulty, Debug = s.Debug.ForGame(), Seed = (ulong)System.DateTime.Now.Ticks,
-            Gameplay = GameplayFor(GameApp.Config!),
+            Gameplay = GameplayFor(GameApp.Config!), CustomCampaign = cc,
         };
-        L.Info($"start {start}");
-        StartWithArmy(m, start, () => new CampaignMenu());
+        start.Color = CampaignColor.For(m.FolderPath(GameApp.Config!.MissionsDir), CampaignColor.Key(start));     // (the campaign's remembered colour, if free)
+        L.Info($"start {start}{(cc != null ? $" (campaign {cc})" : "")}");
+        StartWithArmy(m, start, back);
     }
 
     /// <summary>--army-mission n: the army screen of campaign mission n (screenshots, tests)</summary>
@@ -216,7 +307,7 @@ public partial class CampaignMenu : MenuScreen
         if (m.PointBuy)
             try
             {
-                var mj = Json.TryParseFile(Path.Combine(cfg.MissionsDir, m.Folder, "mission.json"));
+                var mj = PwRemake.Sim.Maps.PwMapReader.MissionOf(m.FolderPath(cfg.MissionsDir));
                 var credits = GameApp.Settings.CampaignCredits.GetValueOrDefault($"{cfg.Id}:{m.Id}");
                 offer = PwRemake.Sim.Campaign.CampaignArmy.Of(mj, SkirmishMenu.RulesOf(cfg), start.Tribe, credits);
             }
@@ -249,6 +340,7 @@ public partial class CampaignMenu : MenuScreen
             Debug = (args.ContainsKey("debug") || GameApp.Settings.UseDebug) ? dbg.ForGame() : null,
             Seed = ulong.TryParse(args.GetValueOrDefault("seed", ""), out var seed) ? seed : 12345,
             Gameplay = GameplayFor(cfg),
+            Color = args.GetValueOrDefault("color") is { Length: > 0 } col ? col : null,     // (--color red / #rrggbb: the world refuses a taken one)
         };
         Boot.Instance.Show(new LoadingScreen(start, m));
     }

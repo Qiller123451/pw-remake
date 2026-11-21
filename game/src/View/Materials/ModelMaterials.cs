@@ -41,6 +41,9 @@ public sealed class MaterialTag
     public SettingSource? Settings;
     /// <summary>the setting of this material's texture ("icewaste"; null: the plain texture)</summary>
     public string? Setting;
+    /// <summary>a setting variant's plain texture (SettingMaterials.Variant; null: not a variant) - the SEAS paint keys
+    /// its white parts by it, never by the variant's painted snow (SeasPainted)</summary>
+    public Texture2D? Plain;
     /// <summary>the model's name (SeasMarkings boxes for one model)</summary>
     public string? Model;
     /// <summary>the Lambert material it was made from (single-sided; for the painted copies of SeasPainted)</summary>
@@ -336,7 +339,7 @@ void fragment() {
 	" + (twoSided ? "if (mirrored > 0.5) NORMAL = -NORMAL;" : "") + @"
 	vec4 a = albedo * texture(texture_albedo, UV);
 	if (use_vertex_color) a *= COLOR;
-	" + (paint ? "a.rgb = seas_paint(a.rgb, (albedo * textureLod(texture_albedo, UV, " + F(SEAS_PAINT_LOD) + ")).rgb, (albedo * textureLod(texture_albedo, UV, " + F(SEAS_MARK_LOD) + ")).rgb, seas_mask(UV));" : "") + @"
+	" + (paint ? "a.rgb = seas_paint(a.rgb, (albedo * (use_plain ? textureLod(paint_plain, UV, " + F(SEAS_PAINT_LOD) + ") : textureLod(texture_albedo, UV, " + F(SEAS_PAINT_LOD) + "))).rgb, (albedo * textureLod(texture_albedo, UV, " + F(SEAS_MARK_LOD) + ")).rgb, seas_unsnowed(seas_mask(UV), UV));" : "") + @"
 " + (snow ? SnowCover.Fragment : "") + @"
 	ALBEDO = a.rgb;
 	METALLIC = 0.0;
@@ -423,6 +426,9 @@ void fragment() {
     public static readonly float SEAS_MARK_LEVEL = Tune(6, 0.5f);
     /// <summary>Tuning: the mip level of the local average a marked texel's shading is measured against.</summary>
     static readonly float SEAS_MARK_LOD = Tune(7, 4f);
+    /// <summary>the share of white a setting variant adds to a texel (its snow) from which the paint fades, and where
+    /// it is gone (seas_snow)</summary>
+    const float SEAS_SNOW_FROM = 0.06f, SEAS_SNOW_TO = 0.4f;
     // (PW_SEAS_PAINT="max sat,min val,strength,lift,lod,share,mark level,mark lod": the constants for a tuning run,
     // docs/VIEW.md)
     static float Tune(int i, float d)
@@ -490,12 +496,18 @@ void fragment() {
         var m = LambertShader(tag.Source, tag.Source.CullMode == BaseMaterial3D.CullModeEnum.Disabled, true, tag.Snow);
         m.SetShaderParameter("albedo", Albedo(baseMat));
         m.SetShaderParameter("paint_col", party);
+        // a setting variant (MIRAGE's Icewaste seas_building_a / seas_tent: snow painted on the roofs, ledges and cloth):
+        // the white parts are those of the plain texture (its threshold, its key), and the snow the variant adds -
+        // brighter than the plain texel - stays unpainted (paint_plain: seas_snow). Keyed on the variant itself, the
+        // white snow was the "white part": yellow blotches on a yellow player's roofs, a yellow-green tent.
+        var keyTex = tag.Plain ?? tag.Source.AlbedoTexture;
+        if (tag.Plain != null) { m.SetShaderParameter("paint_plain", tag.Plain); m.SetShaderParameter("use_plain", true); }
         // (a texture of another tribe with SEAS markings - ash_specloc_d of the SEAS defences: its markings only, no
         // white key - a brightness no texel reaches)
-        bool seasTex = (tag.Source.AlbedoTexture?.ResourceName ?? "").StartsWith(SEAS_PAINT_TEXTURES, StringComparison.OrdinalIgnoreCase);
-        m.SetShaderParameter("paint_min_val", seasTex ? PaintThreshold(tag.Source.AlbedoTexture) : 2f);
-        if (SeasMarkings.Mask(tag.Source.AlbedoTexture, tag.Building, tag.Model) is { } mask) m.SetShaderParameter("paint_mask", mask);
-        if (SeasMarkings.OutlineFor(tag.Model, tag.Source.AlbedoTexture?.ResourceName) is { } o)
+        bool seasTex = (keyTex?.ResourceName ?? "").StartsWith(SEAS_PAINT_TEXTURES, StringComparison.OrdinalIgnoreCase);
+        m.SetShaderParameter("paint_min_val", seasTex ? PaintThreshold(keyTex) : 2f);
+        if (SeasMarkings.Mask(keyTex, tag.Building, tag.Model) is { } mask) m.SetShaderParameter("paint_mask", mask);
+        if (SeasMarkings.OutlineFor(tag.Model, keyTex?.ResourceName) is { } o)
         {
             m.SetShaderParameter("outline_pts", o.Points);
             m.SetShaderParameter("outline_n", o.Points.Length);
@@ -518,6 +530,9 @@ uniform vec2 outline_pts[12];
 uniform int outline_n = 0;
 uniform vec4 outline_uv = vec4(0.0);
 uniform float outline_w = 0.0;
+// a setting variant's plain texture (ModelMaterials.SeasPainted: the white key's source; use_plain false: none)
+uniform sampler2D paint_plain : source_color, hint_default_white, filter_linear_mipmap_anisotropic, repeat_enable;
+uniform bool use_plain = false;
 varying vec3 seas_lpos;
 vec2 seas_mask(vec2 uv) {{
 	vec2 m = texture(paint_mask, uv).rg;
@@ -534,6 +549,22 @@ vec2 seas_mask(vec2 uv) {{
 	}}
 	return m;
 }}
+// The snow a setting variant paints over the plain texture (MIRAGE's Icewaste seas_building_a / seas_tent): the share of
+// white the variant's texel adds to the plain one's, (variant - plain) / (1 - plain) in brightness (sRGB), 0..1 - the
+// paint fades out there, the snow stays white. 0 without a plain texture (the plain material) and where a variant adds
+// no white (the Jungle's moss, the Ashvalley's soot: the paint as on the plain texture).
+float seas_snow(vec2 uv) {{
+	if (!use_plain) return 0.0;
+	vec3 v = texture(texture_albedo, uv).rgb, p = texture(paint_plain, uv).rgb;
+#if CURRENT_RENDERER != RENDERER_COMPATIBILITY
+	v = pow(max(v, vec3(0.0)), vec3(1.0 / 2.2)); p = pow(max(p, vec3(0.0)), vec3(1.0 / 2.2));
+#endif
+	const vec3 LUM = vec3(0.2126, 0.7152, 0.0722);
+	float lp = dot(p, LUM);
+	return smoothstep({F(SEAS_SNOW_FROM)}, {F(SEAS_SNOW_TO)}, clamp((dot(v, LUM) - lp) / max(1.0 - lp, 0.05), 0.0, 1.0));
+}}
+// the markings with the snow kept unpainted as a green mark is (mk.g: the white key and the markings fade out)
+vec2 seas_unsnowed(vec2 mk, vec2 uv) {{ return vec2(mk.r, max(mk.g, seas_snow(uv))); }}
 vec3 rgb2hsv(vec3 c) {{
 	vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
 	vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));

@@ -19,7 +19,11 @@ public sealed class EmitterDef
     public string Tex = "";
     public int TilesWLog2, TilesHLog2, TileStart, TileLast;
     public int MidX = 127, MidY = 127;
+    /// <summary>drawn added to the screen, the texture's alpha unused (fire, sparks, rays); false: mixed by the texture's
+    /// alpha (smoke, steam, dust). The original's rule, from the sheet's GSF material: ResolveBlend</summary>
     public bool Additive;
+    /// <summary>the GSF material flags (attr1) the blending was taken from (ResolveBlend; 0: not known)</summary>
+    public uint GsfFlags;
     /// <summary>clips that make the emitter spray (a finishing move's blood, an effect's "anim"), lower case; null = always</summary>
     public HashSet<string>? Anims;
     // params
@@ -69,5 +73,71 @@ public sealed class EmitterDef
         d.Flags = (uint)(long)P["flags"].Num();
         if (d.Size == 0) d.Size = 1;           // (the JS: P.size || 1)
         return d;
+    }
+
+    // ------------------------------------------------------------------------------------------------ blending
+
+    /// <summary>
+    /// The original's blending of a particle sheet by its GSF material's flags (attr1). PWClient.exe 0x6c767f (the
+    /// particle material made of a GSF material): a material with alpha - alpha test 0x1 or alpha blend 0x2 - becomes
+    /// "&lt;texture&gt;_pm" (premultiplied: the renderer 0x704d40 multiplies the colour by the alpha and mixes it,
+    /// ONE / INVSRCALPHA - the texture's alpha shapes the sprite); one without becomes "&lt;texture&gt;_add" (handle |
+    /// 0x80000000: the renderer's additive path 0x705329, alpha 0 - the sheet is added, its alpha unused). The flag
+    /// 0x4 ("additive / self illuminated" of the meshes) is not looked at for particles: the SEAS buildings' steam
+    /// (particle_01.tga, flags 0x106) is a mixed sprite in the original.
+    /// </summary>
+    public static bool OriginalAdditive(uint attr1) => (attr1 & 0x3) == 0;
+
+    /// <summary>how the blending of an emitter was found (ResolveBlend)</summary>
+    public enum Blend { Kept, Material, Changed, Ambiguous }
+
+    /// <summary>
+    /// Sets Additive by the original's rule (OriginalAdditive) from the model's materials: (image URI, GSF attr1) of
+    /// each material of the .glb. The converter (pwexport gsf.py) writes the tile's "additive" from the material flag
+    /// 0x4 and drops the material's index, so the emitter's material is the one with the emitter's sheet and that
+    /// bit as written (in the export every emitter has exactly one such material, or several that agree). Without one
+    /// (no materials, an older export without gsf_flags) the converter's flag is kept; materials that disagree keep it
+    /// too (Ambiguous).
+    /// </summary>
+    public Blend ResolveBlend(IReadOnlyList<(string? Uri, uint Flags)> materials)
+    {
+        uint found = 0;
+        bool any = false, add = false;
+        foreach (var (uri, f) in materials)
+        {
+            if (f == 0 || uri == null || !string.Equals(uri, Tex, StringComparison.OrdinalIgnoreCase)) continue;
+            if (((f & 0x4) != 0) != Additive) continue;
+            bool a = OriginalAdditive(f);
+            if (any && a != add) return Blend.Ambiguous;
+            any = true; add = a; found = f;
+        }
+        if (!any) return Blend.Kept;
+        GsfFlags = found;
+        if (add == Additive) return Blend.Material;
+        Additive = add;
+        return Blend.Changed;
+    }
+
+    /// <summary>(image URI of the base colour texture, GSF attr1 of the extras "gsf_flags") of each material of a glTF
+    /// JSON (the root object: materials, textures, images)</summary>
+    public static List<(string? Uri, uint Flags)> MaterialsOf(JsonObject gltf)
+    {
+        var r = new List<(string?, uint)>();
+        if (gltf["materials"] is not JsonArray mats) return r;
+        var texs = gltf["textures"] as JsonArray; var imgs = gltf["images"] as JsonArray;
+        foreach (var m in mats)
+        {
+            string? uri = null;
+            if (m?["pbrMetallicRoughness"]?["baseColorTexture"]?["index"] is JsonNode ix && texs?[ix.Int()]?["source"] is JsonNode src)
+            {
+                uri = imgs?[src.Int()]?["uri"].Str();
+                if (string.IsNullOrEmpty(uri)) uri = null;
+            }
+            string fl = m?["extras"]?["gsf_flags"].Str() ?? "";
+            uint v = 0;
+            if (fl.Length > 0) uint.TryParse(fl.Split('/')[0], System.Globalization.NumberStyles.HexNumber, null, out v);
+            r.Add((uri, v));
+        }
+        return r;
     }
 }

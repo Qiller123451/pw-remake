@@ -59,20 +59,27 @@ public static class PartStates
     {
         foreach (var (o, p) in parts)
         {
-            bool todOk = p.Tod == TimeOfDay.Always || (p.Tod == TimeOfDay.Night) == s.Night;
-            int? arm = p.Arm;
-            bool armOk = arm == null || arm < 0 || s.ArmMask == null || ((s.ArmMask.Value >> arm.Value) & 1) == 1;
-            // wall pieces by part name (wallmap.js buildName, ModelLibrary.TagWallArms): only the parts the WallMap named
-            if (p.Comp != null) armOk = s.WallParts != null && s.WallParts.Contains(p.Comp);
-            // a gate's end pieces (attr bits 0x80 / 0x800 = render flags 7, 11) only on a diagonal gate
-            if (s.GateEnds != null && p.HasAttr && (p.Attr & PartBits.GATE_ENDS) != 0) armOk = armOk && s.GateEnds.Value;
-            // one geometry variant per wall piece (TagWallArms): the tile's pick, different per arm
-            // pick: [hub, arm 0..7] - each arm's pick comes from the edge it shares with its neighbour, so both halves of
-            // a wall segment use the same variant and the top line is even
-            if (armOk && p.VCount > 1) armOk = ((s.VariantPick != null ? s.VariantPick[(arm ?? -1) + 1] : 0) % p.VCount) == p.Variant;
-            if (p.Sig >= 0) o.Visible = armOk && todOk && PartBits.SigVisible(p.Sig, s.Level, s.Damage, s.Epoch);
-            else if (arm != null || p.Comp != null || s.GateEnds != null) o.Visible = armOk && todOk;
-            else if (p.Tod != TimeOfDay.Always) o.Visible = todOk;
+            if (Visible(p, s) is bool v) o.Visible = v;
         }
+    }
+
+    /// <summary>a part's visibility in a building state; null: the state does not decide it (ApplyState leaves it)</summary>
+    public static bool? Visible(PartRef p, in BuildingState s)
+    {
+        bool todOk = p.Tod == TimeOfDay.Always || (p.Tod == TimeOfDay.Night) == s.Night;
+        int? arm = p.Arm;
+        bool armOk = arm == null || arm < 0 || s.ArmMask == null || ((s.ArmMask.Value >> arm.Value) & 1) == 1;
+        // wall pieces by part name (wallmap.js buildName, ModelLibrary.TagWallArms): only the parts the WallMap named
+        if (p.Comp != null) armOk = s.WallParts != null && s.WallParts.Contains(p.Comp);
+        // a gate's end pieces (attr bits 0x80 / 0x800 = render flags 7, 11) only on a diagonal gate
+        if (s.GateEnds != null && p.HasAttr && (p.Attr & PartBits.GATE_ENDS) != 0) armOk = armOk && s.GateEnds.Value;
+        // one geometry variant per wall piece (TagWallArms): the tile's pick, different per arm
+        // pick: [hub, arm 0..7] - each arm's pick comes from the edge it shares with its neighbour, so both halves of
+        // a wall segment use the same variant and the top line is even
+        if (armOk && p.VCount > 1) armOk = ((s.VariantPick != null ? s.VariantPick[(arm ?? -1) + 1] : 0) % p.VCount) == p.Variant;
+        if (p.Sig >= 0) return armOk && todOk && PartBits.SigVisible(p.Sig, s.Level, s.Damage, s.Epoch);
+        if (arm != null || p.Comp != null || s.GateEnds != null) return armOk && todOk;
+        if (p.Tod != TimeOfDay.Always) return todOk;
+        return null;
     }
 }

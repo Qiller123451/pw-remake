@@ -11,6 +11,15 @@ namespace PwRemake.Sim.Game;
 /// campaign, docs/SEQUEL.md); Scenario: one of the remake's scenarios (Tribe: the tribe played)</summary>
 public enum GameMode { Campaign, Skirmish, Scenario, Sequel }
 
+/// <summary>a mission of a user campaign (GameStart.CustomCampaign): the campaign (its folder's name) and the mission's
+/// place in it (0-based)</summary>
+public sealed class CustomCampaignRef
+{
+    [JsonPropertyName("campaign")] public string Campaign { get; set; } = "";
+    [JsonPropertyName("index")] public int Index { get; set; }
+    public override string ToString() => $"{Campaign} #{Index + 1}";
+}
+
 /// <summary>A human of a lockstep game: the name shown, the player (World.Players id) whose orders the human gives -
 /// two seats on one player share it (co-op "shared"), and the network peer it was at the start (informational).</summary>
 public sealed class Seat
@@ -58,6 +67,15 @@ public sealed class GameStart
     /// defaults (sixth epoch on, titans on, flying units off). Every player of the mission gets them (Campaign.Build, the
     /// co-op seats and enemies). A skirmish has them in its setup (SkirmishSetup.EpochSix / RemoveTitans / FlyingEnabled).</summary>
     [JsonPropertyName("gameplay")] public Rules.GameplayOptions? Gameplay { get; set; }
+    /// <summary>a mission of a user campaign (the campaign menu's "Custom campaigns": docs/CAMPAIGN.md "Custom
+    /// campaigns"): the campaign's folder name and the mission's place in it - its win opens the next one, Continue
+    /// plays it. Null: any other game. Not part of the world (the menus' business).</summary>
+    [JsonPropertyName("customCampaign")] public CustomCampaignRef? CustomCampaign { get; set; }
+    /// <summary>a campaign mission (single player, Shared co-op): the colour the human player chose (a palette id of
+    /// Rules.Colors.PLAYER_COLORS or "#rrggbb"; the campaign menu's "Your colour", docs/CAMPAIGN.md "Your colour"). Null: the
+    /// mission's own colour - also when it is one another player of the mission has (Campaign.MissionColors). Part of the
+    /// world: the save and the replay give the same colour; a co-op campaign game has each seat's in CoopSeat.Color.</summary>
+    [JsonPropertyName("color")] public string? Color { get; set; }
 
     /// <summary>the players commanded by humans in a lockstep game (distinct, in seat order); empty without seats</summary>
     public List<int> SeatPlayers() => Seats == null ? new() : Seats.Select(s => s.Player).Distinct().ToList();
@@ -67,7 +85,7 @@ public sealed class GameStart
           (Debug != null ? " debug=[" + string.Join(", ", Debug.Summary()) + "]" : "") :
         $"{Mode} {Mission} ({MissionFolder}) config={Configuration} tribe={(Tribe == "" ? "mission's" : Tribe)} difficulty={Difficulty} seed={Seed}" +
         (Debug != null ? " debug=[" + string.Join(", ", Debug.Summary()) + "]" : "") +
-        (Gameplay != null && !Gameplay.IsDefault ? " " + Gameplay : "") +
+        (Gameplay != null && !Gameplay.IsDefault ? " " + Gameplay : "") + (Color != null ? " color=" + Color : "") +
         (Seats != null ? " seats=[" + string.Join(", ", Seats) + "]" : "") + (Coop != null ? " " + Coop : "");
 }
 

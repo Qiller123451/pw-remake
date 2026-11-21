@@ -1,5 +1,5 @@
-// A mission's data as the world setup reads it: the mission folder (docs/LUA_MAPS.md) - mission.json (the menu's
-// fields, map_info, players), world.json (objects, groups, regions, question marks, quests, variables, dialogues,
+// A mission's data as the world setup reads it: the mission folder (docs/LUA_MAPS.md, docs/MAP_FORMAT.md) - map.lua's
+// mission table (the menu's fields, map_info, players), world.lua (objects, groups, regions, question marks, quests, variables, dialogues,
 // sequences, refs) and the triggers of triggers.lua / custom.lua (Scripting's LuaMission: TriggerDefs with the
 // parameters as written). Together they are what the JS remake had in one pw-campaign/1 document (loadCampaign:
 // `data`), so the setup can follow setup.js field by field.
@@ -38,7 +38,7 @@ public sealed class MissionEntry
         var res = new List<MissionEntry>();
         if (!Directory.Exists(missionsDir)) return res;
         foreach (var d in Directory.GetDirectories(missionsDir).OrderBy(x => x, StringComparer.Ordinal))
-            if (Json.TryParseFile(Path.Combine(d, "mission.json")) is JsonNode m) res.Add(FromJson(m));
+            if (Maps.PwMapReader.MissionOf(d) is JsonNode m) res.Add(FromJson(m));
         return res;
     }
 }
@@ -48,7 +48,7 @@ public sealed class MissionData
     /// <summary>the mission folder</summary>
     public string Folder = "";
     public MissionEntry Entry = new();
-    /// <summary>mission.json and world.json</summary>
+    /// <summary>the mission's data (map.lua `mission`) and world (world.lua), as JSON nodes</summary>
     public JsonNode Mission = new JsonObject(), World = new JsonObject();
     /// <summary>the triggers and the engine's data (LuaMission.Script)</summary>
     public MissionScript Script = new();

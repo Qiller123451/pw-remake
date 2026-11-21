@@ -160,6 +160,8 @@ public sealed class PendingShot
 {
     public double T; public Weapon? W; public Entity? Target;
     public bool Melee;
+    /// <summary>a shot at the ground (World.FireAt at At: GroundAttack.cs)</summary>
+    public bool Ground;
     public List<Entity>? Victims;
     public V3 At;
 }

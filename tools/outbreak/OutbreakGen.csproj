@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- The generator of the "Outbreak" mission (docs/OUTBREAK.md): the terrain, the layout, the objects and the mission
+       data in the remake's map format (game/missions/outbreak). Reproducible: the same seed, the same files. Uses the
+       simulation's map code (PwMap, PwMapWriter) (no Godot). dotnet run -c Release, arguments: [out folder] [seed n]. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <RootNamespace>PwRemake.Tools.Outbreak</RootNamespace>
+    <AssemblyName>pwoutbreak</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/Sim/PwRemake.Sim.csproj" />
+  </ItemGroup>
+</Project>

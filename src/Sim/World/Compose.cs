@@ -233,6 +233,14 @@ public static class Compose
     public static bool CarrierStrikes(bool ranged, bool animal, bool gunFires, bool riderShoots, bool strikeClip)
         => !(ranged && animal && (gunFires || (riderShoots && strikeClip)));
 
+    /// <summary>
+    /// The classes whose fight clips play on their build-up, not on themselves (Composite.Fighter): MIRAGE's Scorpion
+    /// (Mirage.usl CSeasScorpion - seas_scorpion, the titan of the SEAS' launch pad seas_final_boss). Its own model
+    /// pirate_boss has no clips at all, so FightingObj's SetAnim(sFAnim) on the unit would play nothing - the remake's
+    /// Scorpion fought without moving a claw (Kacper 2026-11-21: "doesn't play its animation when attacking").
+    /// </summary>
+    public static bool FightsWithBuildUp(Rules.Rules D, string cls) => D.IsA(cls, "CSeasScorpion");
+
     /// <summary>an animal carrier (CarrierStrikes): a class of type ANML, or one drawn with an animal's model (from the
     /// animals' archives: the catapult mosasaurus, the submarine muraenosaurus, the cannon turtle are ships)</summary>
     public static bool IsAnimal(string clsType, string? arch) => clsType == "ANML" || (arch != null && arch.Contains("animals", StringComparison.OrdinalIgnoreCase));
@@ -241,9 +249,17 @@ public static class Compose
     public static string?[] GunClips(CompositeSpec gun) => new[] { gun.Anim, "attack_front", "gun_shoot" };
 
     /// <summary>hide mask for animals/vehicles: gear flags as set by the scripts, wounds by the hit point ratio (parts.js animalMask)</summary>
-    /// <summary>an animal class that keeps the wild look under an owner: the arena animals (CArenaAnimal and derived) -
-    /// mission 10's allied allosaurus wore a saddle and harness</summary>
-    public static bool WildLook(Rules.Rules D, string cls) => D.IsA(cls, "CArenaAnimal");
+    /// <summary>
+    /// an animal class that keeps the wild look under an owner - its OnInit hides the party colour, saddle, helmet,
+    /// armour, standard, armoured saddle and misc parts (SetRndInvMaskSingleFlagInv(..., false)): the arena animals
+    /// (CArenaAnimal and derived - mission 10's allied allosaurus wore a saddle and harness), the kennel's sabre-tooths
+    /// (CKennelEusmilus, Base Animal.usl:4087; Kacper 2026-11-20: the Outbreak kennel's eusmilus wore a saddle, harness
+    /// and the owner's colours), the Dragon Clan nest's dilophosaurs (CNinigiDilophosaurus, Animal.usl:4112) and MIRAGE's
+    /// gallimimus of the Dustriders' nest (CAjeGallimimus, Mirage.usl:1475)
+    /// </summary>
+    public static bool WildLook(Rules.Rules D, string cls) => WILD_LOOK_CLASSES.Any(c => D.IsA(cls, c));
+    /// <summary>the classes of WildLook (their scripts: Composite.MiscShown hides their misc parts too)</summary>
+    public static readonly string[] WILD_LOOK_CLASSES = { "CArenaAnimal", "CKennelEusmilus", "CNinigiDilophosaurus", "CAjeGallimimus" };
 
     public static int AnimalMask(bool owned,IEnumerable<int>? gear = null, bool noSaddle = false, double? hp = null, bool? misc = null, bool armor = false)
     {
@@ -279,6 +295,15 @@ public sealed class Composite
     /// <summary>trailer following the drawbar's hitch (FlexLinkAction); the view makes it follow</summary>
     public AttachedPart? Wagon;
     public AttachedPart? Bar;
+    /// <summary>
+    /// the build-up that plays the unit's fight clips (MIRAGE's Scorpion, CSeasScorpion: its body is the empty carrier
+    /// pirate_boss, links only; the robot is the build-up seas_eb_buildup - model scorpion - at psh2, m_xScorpion, and
+    /// AttackEnemy plays GetNextFightAnim on it; Compose.FightsWithBuildUp). null: the unit plays them itself.
+    /// </summary>
+    public AttachedPart? Fighter;
+    /// <summary>game time until the Fighter's last fight clip of a penetrating weapon runs on (CSeasScorpion's
+    /// SCORPION_FLAMER timer: the clip's length - 0.5 s; no new clip is started before)</summary>
+    public double FighterUntil = double.NegativeInfinity;
     string _maskKey = "";
     public string Key = "";
     /// <summary>open transporters: the free passenger links of the build-up (in order)</summary>
@@ -298,7 +323,7 @@ public sealed class Composite
         foreach (var p in Parts) p.Anim?.Stop();
         Wagon?.Anim?.Stop();
         Parts = new List<AttachedPart>(); Turrets = new List<AttachedPart>(); Gunners = new List<AttachedPart>();
-        Top = Gun = Rider = Wagon = Bar = null;
+        Top = Gun = Rider = Wagon = Bar = Fighter = null;
         Key = "";
     }
 
@@ -363,6 +388,7 @@ public sealed class Composite
             // the pirate boss ship's parts show the ship's damage (CPirateShip.UpdateDestructionFlags: PirateShip.cs)
             if (s.Kind == World.PIRATE_PART) { p.OwnState = true; p.VisLevel = 4; p.VisDmg = World.PirateDamage(u.Hp, u.MaxHp); }
         }
+        if (Compose.FightsWithBuildUp(W.Data, u.Name)) Fighter = Parts.FirstOrDefault(p => p.Spec!.Kind == "buildup" && p.Spec.Pi < 0 && p.Anim != null);
         Dep = Compose.DEPLOY.GetValueOrDefault(u.Name);
         if (Dep != null && u.Deploy == null) u.Deploy = new DeployState();
         if (Dep != null && u.Deploy!.State != "walk")
@@ -478,7 +504,7 @@ public sealed class Composite
     {
         var u = _u;
         if (wild) return WILD_MISC_Match(u.Gfx ?? u.Name);
-        if (u.Name == "hu_mammoth_lumber_upgrade" || u.Def?.Script == "CArenaAnimal") return false;
+        if (u.Name == "hu_mammoth_lumber_upgrade" || Compose.WildLook(u.World.Data, u.Name)) return false;
         if (TamedNoMiscMatch(u.Def?.Script ?? "")) return Parts.Any(p => CatapultMatch(p.Spec!.Gfx));
         return true;
     }
@@ -576,8 +602,31 @@ public sealed class Composite
         if (a != null) a.Paused = false;
     }
 
-    /// <summary>a shot: the gun's recoil clip once</summary>
-    public void Fired() { var g = Part("gun"); if (g?.Anim != null) { var a = g.Anim.Play("attack_front", new AnimOpts { Loop = false, Restart = true, Fade = 0 }); if (a != null) a.Paused = false; } }
+    /// <summary>
+    /// A blow of a unit whose build-up fights for it (Fighter; Mirage.usl CSeasScorpion.AttackEnemy): the fight clip on
+    /// the build-up once, at its own speed (SetAnim(sFAnim, 1)). A penetrating weapon's clip - both of the Scorpion's
+    /// weapons: its claws, sting and legs (seas_boss_weapon_melee_*: attack_1 / attack_4 / attack_3) and its flamethrower
+    /// against buildings (seas_boss_weapon_flamer_*: attack_2, 12 s) - is not started again while the last one runs
+    /// (SCORPION_FLAMER: its length - 0.5 s); the blows go on meanwhile. False: no Fighter, or it lacks the clip.
+    /// </summary>
+    public bool FighterStrike(string? clip, bool penetration, double now)
+    {
+        var f = Fighter;
+        if (f?.Anim == null || !f.Anim.Has(clip)) return false;
+        if (penetration && now < FighterUntil) return true;
+        var a = f.Anim.Play(clip, AnimOpts.Once(fade: 0.1));
+        if (a != null) a.Paused = false;
+        if (penetration) FighterUntil = now + f.Anim.Duration(clip) - 0.5;
+        return true;
+    }
+
+    /// <summary>
+    /// a shot of a unit set up to shoot: the gun's clip once - the log cannon's gun, else the weapon build-up's top
+    /// (CBuildUpWeapon.AttackEnemy: SetAnim(m_sAttackAnim = "attack_front", 1) on its primary object - the Black Widow's
+    /// seas_wehrspinne_top, MIRAGE's MG walker's seas_hq_machinegun_nest_top; they never moved, only the curled-up body
+    /// was posed)
+    /// </summary>
+    public void Fired() { var g = Part("gun") ?? Gun; if (g?.Anim != null) { var a = g.Anim.Play("attack_front", new AnimOpts { Loop = false, Restart = true, Fade = 0 }); if (a != null) a.Paused = false; } }
 
     /// <summary>
     /// turn the turrets towards a world point (relative to the carrier's heading); returns the first turret's error.
@@ -637,6 +686,9 @@ public sealed class Composite
         var d = Dep != null ? u.Deploy : null;
         if (d != null && d.State == "up" && u.World.Time >= d.Until) { d.State = "walk"; u.BusyAnim = false; u.Anim!.Play(u.IdleAnim); }
         double now = u.World.Time;
+        // a fight clip of the Fighter ran out: back on its standing clip (CSeasScorpion.SetAnim forwards the body's
+        // "standanim" - SetIdleAnim, the fight's end - to the build-up)
+        if (Fighter?.Anim is { Done: true } fa && fa.CurName != "standanim" && u.Alive) fa.Play(fa.Pick("standanim"));
         foreach (var p in Parts)
         {
             p.Anim?.Update(dt);

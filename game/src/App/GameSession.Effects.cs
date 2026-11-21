@@ -18,13 +18,13 @@ public partial class GameSession
     {
         var fx = new WorldFx(() => World, Models, View.Particles, Entities.ModelOf, Entities.PosOf, View.Ground.At)
         {
-            Visible = (x, z) => Fog.Visible(x, z),
-            Explored = (x, z) => Fog.Explored(x, z),
+            Visible = (x, z) => Stage?.NoFog == true || Fog.Visible(x, z),           // (a cutscene: everything as if seen)
+            Explored = (x, z) => Stage?.NoFog == true || Fog.Explored(x, z),
             MissionEffects = Mission?.Host.Effects,                 // (a skirmish: none)
         };
         fx.Level = GameApp.Settings.Particles;
         // a place the player has not explored sprays nothing (fog of war; main.js particles.seen)
-        View.Particles.Seen = (x, z) => Fog.Explored(x, z);
+        View.Particles.Seen = (x, z) => Stage?.NoFog == true || Fog.Explored(x, z);
         // the weapons' attack clips (not all named "attack": "seas_flamethrower_0"): their fire sprays only while one plays
         PwRemake.View.Fx.Particles.WeaponClips = World.Data.WeaponClips();
         fx.Gfx.Shake = (dur, s, fade, pos, range) => Camera.AddShake(dur, s, fade, pos, range);

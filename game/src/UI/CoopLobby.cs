@@ -13,8 +13,17 @@
 // faction; the players say they are ready, the host starts. The chat below. The campaign menu's mission list and texts
 // (index.json, CampaignStatus: missions not adapted yet are greyed).
 //
-// A mission with an army budget (point_buy) starts with the level's own army in co-op (no army screen: whose budget
-// would it be?).
+// A mission with an army budget (point_buy): offline, seat 1's army screen opens before the start (CampaignMenu.
+// StartWithArmy). Online in the co-op campaign mode every human buys the army of its own seat on its own machine ("My
+// army ..." in its seat's row, or the army screen that opens for everybody when the host starts: the lobby state
+// "armies", at most NetProtocol.ArmyTimeout seconds; a seat that has not chosen plays the level's army) - the budget is
+// the host's (CoopLobbyState.Credits), the armies travel to the host ("coop-army") and into GameStart (CoopSeat.Army).
+// docs/COOP.md "Armies". Shared mode keeps the level's army.
+//
+// Colours (docs/CAMPAIGN.md "Your colour"): every human picks the colour of its own seat (PlayerColorCell; online
+// "coop-color" to the host, CoopLobbySeat.Color -> CoopSeat.Color), greyed out: the mission's other players' colours and
+// the other human seats' choices. Shared mode: the host's choice for the shared player (GameStart.Color). The choice is
+// remembered (settings.json campaignColors "coop") and offered again in the next lobby when it is free there.
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -49,6 +58,10 @@ public partial class CoopLobby : MenuScreen
     CheckBox? _epoch6, _titans, _flying, _portals, _limits;
     LobbyState? _shown;
     bool _filling;
+    /// <summary>the colour cells of the rows (the lobby waits with rebuilding while a picker is open)</summary>
+    readonly List<PlayerColorCell> _colorCells = new();
+    /// <summary>the mission / seat the remembered colour was offered for (once each)</summary>
+    string? _autoColor;
 
     public CoopLobby(bool offline = false) : base(offline ? "Co-op" : "Multiplayer", minWidth: 1020)
     {
@@ -101,10 +114,13 @@ public partial class CoopLobby : MenuScreen
         l.Coop = new CoopLobbyState
         {
             Difficulty = old?.Difficulty ?? 0,
-            Definition = def?.Raw, MissionPlayers = CoopPlan.MissionSlots(Path.Combine(cfg.MissionsDir, m.Folder)),
+            Definition = def?.Raw, MissionPlayers = CoopPlan.MissionSlots(m.FolderPath(cfg.MissionsDir)),
             Seats = old?.Seats.Select(x => new CoopLobbySeat { Seat = x.Seat, Kind = x.Kind, Tribe = x.Tribe, Aggression = x.Aggression }).ToList() ?? new CoopLobbyState().Seats,
         };
         l.Coop.Seats[0].Tribe = tribe;
+        // an army budget: each seat's human buys its army (online); the budget is the host's credits of the mission
+        l.Coop.ArmyBudget = m.PointBuy;
+        l.Coop.Credits = s.CampaignCredits.GetValueOrDefault($"{cfg.Id}:{m.Id}");
         // a definition with room for two seats only: seat 3 empty
         if (def != null && !def.Supports(3)) l.Coop.Seats[2].Kind = "empty";
     }
@@ -116,7 +132,7 @@ public partial class CoopLobby : MenuScreen
         var res = new List<CoopChoice>();
         try
         {
-            var mj = Json.TryParseFile(Path.Combine(GameApp.Config!.MissionsDir, m.Folder, "mission.json"));
+            var mj = PwRemake.Sim.Maps.PwMapReader.MissionOf(m.FolderPath(GameApp.Config!.MissionsDir));
             var pl = mj?["players"] as JsonArray;
             if (pl == null) { res.Add(new CoopChoice { Player = 0, Name = "You", Main = true }); return res; }
             int human = -1;
@@ -202,7 +218,7 @@ public partial class CoopLobby : MenuScreen
             _portals = Chk(SkirmishMenu.PortalsText);
             _limits = Chk(SkirmishMenu.LimitsText);
         }
-        go.AddChild(PwTheme.Para("Missions with an army budget start with the level's own army.", 12, PwTheme.Dim));
+        go.AddChild(PwTheme.Para(_offline ? "A mission with an army budget: you buy seat 1's army before the start." : "A mission with an army budget: in the co-op campaign mode every player buys the army of their seat (\"My army\"; Shared mode: the level's army).", 12, PwTheme.Dim));
         // ---- the players / seats
         var gp = Group(Tx.Get("_MultiPlayerSelect_Players", "Players"));
         b.AddChild(gp);
@@ -273,6 +289,7 @@ public partial class CoopLobby : MenuScreen
     void Start()
     {
         if (Lobby is not { } l) return;
+        if (l.State == "armies") { N?.Client.HostCancelArmies(); return; }       // (the button reads "Back to the lobby")
         var p = LobbyStart.Problem(l);
         if (p != null) { _err.Text = p; return; }
         var profile = new MissionPresenterAdapter().LoadProfile();
@@ -290,6 +307,7 @@ public partial class CoopLobby : MenuScreen
     {
         var l = Lobby;
         if (l == null || ReferenceEquals(l, _shown)) return;
+        if (_colorCells.Any(c => IsInstanceValid(c) && c.Open)) return;      // (a picker is open: rebuilt when it closes)
         _shown = l;
         var cfg = GameApp.Config!;
         bool campaign = l.CoopMode == "campaign";
@@ -328,12 +346,64 @@ public partial class CoopLobby : MenuScreen
         }
         finally { _filling = false; }
         foreach (var ch in _players.GetChildren()) { _players.RemoveChild(ch); ch.QueueFree(); }
+        _colorCells.Clear();
         if (campaign) Seats(l); else Shared(l);
+        AutoColor(l);
         var problem = LobbyStart.Problem(l);
         var me = l.Peer(MeId);
         _err.Text = IsHost ? problem ?? "" : (me?.Ready ?? false) ? "Waiting for the host to start." : "";
         _start.Disabled = problem != null;
+        _start.Text = l.State == "armies" ? "Back to the lobby" : Tx.Get("_UI_PlLiWind_Button_StartGame", "Start Game");
         _ready.Text = (me?.Ready ?? false) ? "Not ready" : Tx.Get("_ActionView_ButtonReady", "Ready");
+        _ready.Disabled = l.State != "lobby";
+        if (l.State == "lobby") s_armyOpened = null;          // (a new Start opens the army screen again)
+        if (l.State == "armies" && campaign && l.Coop != null)
+        {
+            var open = l.Coop.ArmiesOpen.ToList();
+            _err.Text = $"Choosing the armies: waiting for {(open.Count == 0 ? "nobody" : string.Join(", ", open.Select(x => l.Players.FirstOrDefault(p => p.Seat == x.Seat)?.Name ?? $"seat {x.Seat}")))} - the game starts in {l.ArmyWait ?? 0} s at the latest (the level's army for a seat still choosing).";
+            _start.Disabled = !IsHost;
+            // the army screen opens by itself once for this player's seat
+            var mine = me != null ? l.Coop.Seats.FirstOrDefault(x => x.Seat == me.Seat && x.Kind == "human") : null;
+            string key = $"{l.Campaign?.Mission}:{me?.Seat}:{l.Campaign?.Seed}";
+            if (mine != null && !mine.ArmyDone && s_armyOpened != key) { s_armyOpened = key; OpenArmy(l, mine); }
+        }
+    }
+
+    /// <summary>the state "armies" opened this player's army screen for (mission, seat, seed): once per start</summary>
+    static string? s_armyOpened;
+
+    /// <summary>the army screen of this player's seat (docs/COOP.md "Armies"): the seat's faction, the host's budget, seats 2 /
+    /// 3 without the story heroes; Done sends the army to the host, Back while the host waits sends "the level's army"</summary>
+    void OpenArmy(LobbyState l, CoopLobbySeat seat)
+    {
+        var cfg = GameApp.Config!;
+        var c = l.Coop!;
+        var m = _missions.FirstOrDefault(x => x.Id == l.Campaign?.Mission);
+        if (m == null || N == null) return;
+        // the seat's faction: "" = the mission's (seat 1) / seat 1's (the others)
+        string tribe = seat.Tribe.Length > 0 ? seat.Tribe : seat.Seat == 1 ? "" : c.Seats.FirstOrDefault(x => x.Seat == 1)?.Tribe ?? "";
+        PwRemake.Sim.Campaign.CampaignArmy? offer = null;
+        try
+        {
+            var mj = PwRemake.Sim.Maps.PwMapReader.MissionOf(m.FolderPath(cfg.MissionsDir));
+            offer = PwRemake.Sim.Campaign.CampaignArmy.ForCoopSeat(mj, SkirmishMenu.RulesOf(cfg), tribe, c.Credits, seat.Seat);
+        }
+        catch (Exception ex) { L.Warn($"army screen of seat {seat.Seat}, mission {m.Id}: {ex.Message}"); }
+        if (offer == null) { N.Client.SetCoopArmy(null); return; }                // (nothing to buy here: the level's army)
+        var client = N.Client;
+        Boot.Instance.Show(new ArmyScreen(new ArmyScreen.Options
+        {
+            Tribe = offer.Tribe, Credits = offer.Credits, Total = offer.Total, Shown = offer.Credits, Army = seat.Army?.Clone() ?? offer.Defaults(), Mp = false,
+            Buildings = offer.Buildings, Allowed = offer.Allowed, Limits = offer.Limits, Defaults = offer.Defaults, DebugFree = false,
+            Title = $"My Army · seat {seat.Seat} · {m.Title}",
+            Back = () =>
+            {
+                // (the host waits for this seat: Back means the level's army)
+                if (client.Lobby?.State == "armies" && client.Lobby.Coop?.Seats.FirstOrDefault(x => x.Seat == seat.Seat) is { ArmyDone: false }) client.SetCoopArmy(null);
+                if (NetSession.Current?.Client == client && client.Start == null) Boot.Instance.Show(new CoopLobby());
+            },
+            Done = army => { client.SetCoopArmy(army); if (NetSession.Current?.Client == client && client.Start == null) Boot.Instance.Show(new CoopLobby()); },
+        }));
     }
 
     HBoxContainer PeerRow(LobbyPeer p)
@@ -349,6 +419,48 @@ public partial class CoopLobby : MenuScreen
         return row;
     }
 
+    /// <summary>a row's colour cell: the colours in `taken` greyed out ("used by ..."); chosen: remembered, then `set`</summary>
+    PlayerColorCell ColorCell(string? id, List<PwRemake.Sim.Campaign.TakenColor> taken, string defaultLabel, Color? dflt, bool editable, Action<string> set)
+    {
+        var cell = new PlayerColorCell(id ?? "", 190, defaultLabel) { BlockedBy = x => PwRemake.Sim.Campaign.MissionColors.Blocker(x, taken)?.Name };
+        cell.SetDefaultColor(dflt);
+        cell.UpdateBlocked();
+        cell.Disabled = !editable;
+        cell.Chosen += x => { CampaignColor.Remember("coop", x); set(x); };
+        _colorCells.Add(cell);
+        return cell;
+    }
+
+    /// <summary>the folder of the lobby's mission on this machine (its own colours)</summary>
+    string? FolderOf(LobbyState l) => _missions.FirstOrDefault(x => x.Id == l.Campaign?.Mission)?.FolderPath(GameApp.Config!.MissionsDir);
+
+    /// <summary>the remembered colour ("coop") offered once per mission and seat, when no other player has it</summary>
+    void AutoColor(LobbyState l)
+    {
+        if (l.State != "lobby" || l.Campaign == null || l.Coop == null) return;
+        var want = CampaignColor.Remembered("coop");
+        if (want.Length == 0) return;
+        var me = l.Peer(MeId);
+        if (l.CoopMode == "campaign")
+        {
+            if (me == null || me.Seat <= 0 || l.Coop.Seats.FirstOrDefault(x => x.Seat == me.Seat && x.Kind == "human") is not { Color: null }) return;
+            var key = $"c:{l.Campaign.Mission}:{me.Seat}";
+            if (_autoColor == key) return;
+            _autoColor = key;
+            if (PwRemake.Sim.Campaign.MissionColors.Resolve(want, l.Coop.TakenFor(me.Seat, l.Players)) is not { } col) return;
+            int sn = me.Seat;
+            if (_offline) HostSeat(cs => cs.Seats.First(x => x.Seat == sn).Color = col); else N?.Client.SetCoopColor(col);
+        }
+        else if (IsHost && l.Campaign.Color == null)
+        {
+            var key = $"s:{l.Campaign.Mission}";
+            if (_autoColor == key) return;
+            _autoColor = key;
+            if (PwRemake.Sim.Campaign.MissionColors.Resolve(want, l.Coop.TakenFor(1, Array.Empty<LobbyPeer>())) is not { } col) return;
+            var c = l.Clone(); c.Campaign!.Color = col; Set(c);
+        }
+    }
+
     /// <summary>Shared mode: everybody on the mission's player</summary>
     void Shared(LobbyState l)
     {
@@ -357,6 +469,13 @@ public partial class CoopLobby : MenuScreen
         {
             var row = PeerRow(p);
             row.AddChild(new Label { Text = $"{main?.Name ?? "the mission's player"} (shared)", CustomMinimumSize = new Vector2(300, 0) });
+            // the shared player's colour: the host's choice
+            if (p.Host && l.Coop != null)
+                row.AddChild(ColorCell(l.Campaign?.Color, l.Coop.TakenFor(1, Array.Empty<LobbyPeer>()), "As in the mission", CampaignColor.MissionDefault(FolderOf(l)), IsHost && l.State == "lobby", x =>
+                {
+                    if (Lobby is not { Campaign: not null } cur || !IsHost) return;
+                    var c = cur.Clone(); c.Campaign!.Color = x.Length > 0 ? x : null; Set(c);
+                }));
             if (p.Problem != null) row.AddChild(PwTheme.Para(p.Problem, 12, PwTheme.Lost));
             _players.AddChild(row);
         }
@@ -376,7 +495,7 @@ public partial class CoopLobby : MenuScreen
             row.AddThemeConstantOverride("separation", 10);
             row.AddChild(new Label { Text = $"Seat {sn}", CustomMinimumSize = new Vector2(60, 0), Modulate = PwTheme.Hi });
             // what the seat is (the host's): a human, an AI commander, empty (seat 3); seat 1 of an offline game is yours
-            var kind = new OptionButton { CustomMinimumSize = new Vector2(160, 26), Disabled = !IsHost || (_offline && sn == 1) || (sn == 3 && !def.Supports(3)) };
+            var kind = new OptionButton { CustomMinimumSize = new Vector2(160, 26), Disabled = !IsHost || (_offline && sn == 1) || (sn == 3 && !def.Supports(3)) || l.State != "lobby" };
             var kinds = new List<(string K, string T)>();
             if (!_offline || sn == 1) kinds.Add(("human", "Human"));
             if (sn > 1 || !_offline) kinds.Add(("ai", "AI commander"));
@@ -393,7 +512,7 @@ public partial class CoopLobby : MenuScreen
             else row.AddChild(new Label { Text = "open", CustomMinimumSize = new Vector2(180, 0), Modulate = PwTheme.Dim });
             // the faction: a human's own, the host's for an AI commander
             bool mine = who != null && who.Id == MeId;
-            var tribe = new OptionButton { CustomMinimumSize = new Vector2(190, 26), Disabled = !(mine || (IsHost && seat.Kind == "ai") || (_offline && IsHost)) };
+            var tribe = new OptionButton { CustomMinimumSize = new Vector2(190, 26), Disabled = !(mine || (IsHost && seat.Kind == "ai") || (_offline && IsHost)) || l.State != "lobby" };
             tribe.AddItem(sn == 1 ? "As in the mission" : "As seat 1"); tribe.SetItemMetadata(0, "");
             foreach (var t in cfg.PlayableTribes) { tribe.AddItem(TribeInfo.Name(t)); tribe.SetItemMetadata(tribe.ItemCount - 1, t); if (t == seat.Tribe) tribe.Select(tribe.ItemCount - 1); }
             tribe.ItemSelected += i =>
@@ -403,6 +522,26 @@ public partial class CoopLobby : MenuScreen
                 else HostSeat(cs => cs.Seats.First(x => x.Seat == sn).Tribe = tr);
             };
             row.AddChild(tribe);
+            // the seat's colour: a human's own (not the mission's other players' nor the other humans'); an AI commander's
+            // is the game's (the first free palette colour)
+            if (seat.Kind == "human" && who != null)
+                row.AddChild(ColorCell(seat.Color, c.TakenFor(sn, l.Players), sn == 1 ? "As in the mission" : "Automatic", sn == 1 ? CampaignColor.MissionDefault(FolderOf(l)) : null,
+                    (mine || (_offline && IsHost)) && l.State == "lobby", x =>
+                    {
+                        if (mine && !_offline) N?.Client.SetCoopColor(x);
+                        else HostSeat(cs => cs.Seats.First(q => q.Seat == sn).Color = x.Length > 0 ? x : null);
+                    }));
+            // a mission with an army budget: the seat's army (online; a human's own, bought on its machine)
+            if (c.BuysArmy(sn) && !_offline)
+            {
+                string st = seat.ArmyDone ? (seat.Army != null ? $"Army: bought ({seat.Army.Cards.Count})" : "Army: the level's") : l.State == "armies" ? "Army: choosing ..." : "Army: not chosen";
+                row.AddChild(new Label { Text = st, CustomMinimumSize = new Vector2(150, 0), Modulate = seat.ArmyDone ? Colors.White : PwTheme.Dim,
+                    TooltipText = sn == 1 ? "Seat 1 buys the level's army with the host's budget" : "Seats 2 and 3 buy their army with the same budget, without the story heroes (they are split by the hero split)" });
+                if (mine && (l.State == "lobby" || (l.State == "armies" && !seat.ArmyDone)))
+                {
+                    row.AddChild(PwTheme.Btn("My army ...", () => { if (Lobby is { } cur && cur.Coop?.Seats.FirstOrDefault(x => x.Seat == sn) is { } ss) OpenArmy(cur, ss); }, 130));
+                }
+            }
             if (seat.Kind == "ai")
             {
                 var ag = new OptionButton { CustomMinimumSize = new Vector2(140, 26), Disabled = !IsHost, TooltipText = "The AI commander's aggression at the start (changeable in the game)" };

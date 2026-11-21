@@ -80,7 +80,7 @@ public static class CutsceneActorTests
         {
             if (WorldBuilder.FindMap(c.Config, e.Map) == null) continue;
             // only missions with an actor of the player (slot 0) of a tribe's class the world does not have
-            var world = Json.ParseFile(Path.Combine(c.Config.MissionsDir, e.Folder, "world.json"));
+            var world = PwRemake.Sim.Maps.PwMapReader.WorldOf(Path.Combine(c.Config.MissionsDir, e.Folder));
             if (world == null) continue;
             var guids = world["objects"]!.AsArray().Select(o => o!["guid"].Str()).ToHashSet();
             bool any = world["sequences"]!.AsObject().Any(kv => (kv.Value?["play"]?["actors"]?.AsArray() ?? new JsonArray()).Any(a =>

@@ -82,6 +82,9 @@ public sealed class MapTree
     public double X, Z, Rot, Scale = 1, Wood;
     public bool Inside, Big, Forest;
     public string? Stump, Timber;
+    /// <summary>the remake's map attributes: infinite = 1 (never used up: ResNode.Infinite), fallen = 1 (lies felled from
+    /// the start: its log - the timber model - is drawn, workers take wood at once)</summary>
+    public bool Infinite, Fallen;
 }
 
 public sealed class MapDecor
@@ -99,6 +102,10 @@ public sealed class MapResource
 {
     public string? Model;
     public double X, Z, Rot, Amount;
+    /// <summary>attr infinite = 1: harvesting never uses it up (the remake's; ResNode.Infinite); attr scale: drawn and
+    /// blocking that much bigger</summary>
+    public bool Infinite;
+    public double Scale = 1;
 }
 
 public sealed class MapAnimal
@@ -217,6 +224,8 @@ public sealed class MapSource
     public Func<HeightField?, Func<double, double, double[]>> Splat = _ => (x, z) => Array.Empty<double>();
     public double DefaultCamera = 0.785;
     public double StartTime = 12 * 3600;
+    /// <summary>the map's day-night cycle (map.lua day_night), null: none</summary>
+    public World.DayNightSpec? DayNight;
     public string LevelName = "", Atmos = "";
     public Dictionary<string, bool>? AiOptions;
     public List<MapTree> Trees = new();
@@ -481,6 +490,9 @@ public sealed class MapSource
         Big = !NotBig.IsMatch(g),
     };
 
+    /// <summary>a map object's `scale` attribute (the remake's: 0.1 .. 10, 1 without it)</summary>
+    public static double AttrScale(string s) => double.TryParse(s, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var v) && v > 0 ? Math.Clamp(v, 0.1, 10) : 1;
+
     /// <summary>D = the rules (class models, scripts, resources), md = the parsed map (Ula), cfg = skirmish / campaign
     /// setup, hasModel = the asset manifest has a model of that name, forest = forest.json (null: no forest trees)</summary>
     public static MapSource OriginalSource(MapData md, IMapRules D, MapSourceConfig? cfg, Func<string, bool> hasModel, ForestData? forestData = null)
@@ -552,12 +564,13 @@ public sealed class MapSource
                 {
                     if (g == null) break;
                     var t = TreeOf(g, D, has);
-                    t.Model = use(g)!; t.X = x; t.Z = z; t.Rot = rot; t.Scale = 1; t.Inside = play.Inside(x, z, 2);
+                    t.Model = use(g)!; t.X = x; t.Z = z; t.Rot = rot; t.Scale = AttrScale(A("scale")); t.Inside = play.Inside(x, z, 2);
+                    t.Infinite = A("infinite") == "1"; t.Fallen = A("fallen") == "1";
                     use(t.Stump); use(t.Timber);
                     S.Trees.Add(t);
                     break;
                 }
-                case "STON": if (g != null) S.Stones.Add(new MapResource { Model = use(g), X = x, Z = z, Rot = rot, Amount = JsNum.Or(A("hitpoints"), 2000) }); break;
+                case "STON": if (g != null) S.Stones.Add(new MapResource { Model = use(g), X = x, Z = z, Rot = rot, Amount = JsNum.Or(A("hitpoints"), 2000), Infinite = A("infinite") == "1", Scale = AttrScale(A("scale")) }); break;
                 case "FRUI":
                     if (script == "CFishShoal" || Fish_.IsMatch(cls)) S.Fish.Add(new MapResource { Model = g != null ? use(g) : null, X = x, Z = z, Amount = Math.Min(JsNum.Or(A("hitpoints"), 1000), 2500) });
                     else if (g != null) S.Bushes.Add(new MapResource { Model = use(g), X = x, Z = z, Rot = rot, Amount = JsNum.Or(A("hitpoints"), 150) });
@@ -714,9 +727,9 @@ public sealed class MapSource
                 double i = Math.Floor((x + ox - wg.OffX) / 2), j = Math.Floor((z + oy - wg.OffY) / 2);
                 return i >= 0 && j >= 0 && i < wg.W && j < wg.H && wg.Cells[(int)j * wg.W + (int)i] == 1;
             };
-        S.Textures = Enumerable.Range(0, 8).Select(k => $"{md.Setting}/scape_{k}.jpg").ToList();
+        S.Textures = md.Materials?.ToList() ?? Enumerable.Range(0, 8).Select(k => $"{md.Setting}/scape_{k}.jpg").ToList();
         S.Scales = Enumerable.Range(0, 8).Select(_ => new[] { 1 / 24.0, 1 / 24.0 }).ToList();
-        S.Splat = splat; S.DefaultCamera = md.DefaultCamera; S.StartTime = md.StartTime;
+        S.Splat = splat; S.DefaultCamera = md.DefaultCamera; S.StartTime = md.StartTime; S.DayNight = md.DayNight;
         // the names the music picks its playlist by (engine/music.js): Root/Base/LevelName and material_atmos
         S.LevelName = md.Description.TryGetValue("LevelName", out var lvn) && lvn.Length > 0 ? lvn : md.Name;
         S.Atmos = md.Description.TryGetValue("material_atmos", out var atm) ? atm : "";

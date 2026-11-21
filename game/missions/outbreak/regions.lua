@@ -1,0 +1,25 @@
+-- The map's regions (docs/MAP_FORMAT.md "regions.lua"): a name and shapes { "rect" | "oval", x, y, w, h } (the box
+-- x .. x + w, y .. y + h in map metres; an oval is the ellipse in it; a 6th value false: switched off). Data only.
+return {
+  { name = "Base", shapes = { { "oval", 268, 268, 232, 232 } } },
+  { name = "Camp_A", shapes = { { "oval", 352, 292, 64, 64 } } },
+  { name = "Entrance_A", shapes = { { "oval", 388.219, 188.588, 40, 40 } } },
+  { name = "Camp_B", shapes = { { "oval", 412, 352, 64, 64 } } },
+  { name = "Entrance_B", shapes = { { "oval", 532.32, 338.194, 40, 40 } } },
+  { name = "Camp_C", shapes = { { "oval", 309.574, 394.426, 64, 64 } } },
+  { name = "Entrance_C", shapes = { { "oval", 220.494, 483.99, 40, 40 } } },
+  { name = "Village_1", shapes = { { "oval", 504.233, 207.269, 60, 60 } } },
+  { name = "Village_2", shapes = { { "oval", 448.668, 525.21, 84, 84 } } },
+  { name = "Village_3", shapes = { { "oval", 160.553, 272.28, 60, 60 } } },
+  { name = "Village_4", shapes = { { "oval", 313.963, 561.771, 66, 66 } } },
+  { name = "Village_5", shapes = { { "oval", 228.186, 67.779, 110, 110 } } },
+  { name = "Village_6", shapes = { { "oval", 602.749, 440.435, 86, 86 } } },
+  { name = "Village_7", shapes = { { "oval", 60.347, 378.009, 98, 98 } } },
+  { name = "Village_8", shapes = { { "oval", 369.405, 604.048, 110, 110 } } },
+  { name = "Village_9", shapes = { { "oval", 552.922, 573.795, 116, 116 } } },
+  { name = "Village_10", shapes = { { "oval", 93.61, 563.105, 116, 116 } } },
+  { name = "Village_11", shapes = { { "oval", 77.101, 94.025, 122, 122 } } },
+  { name = "Village_12", shapes = { { "oval", 556.946, 87.488, 116, 116 } } },
+  { name = "Pond", shapes = { { "oval", 655.444, 299.626, 44, 44 } } },
+  { name = "Rockfall", shapes = { { "oval", 259.02, 466.077, 36, 36 } } },
+}

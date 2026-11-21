@@ -216,7 +216,7 @@ public static class LoadingScreenTests
             var missions = PwRemake.Sim.Campaign.MissionEntry.LoadIndex(cfg.MissionsDir);
             foreach (var m in missions)
             {
-                var mj = Json.TryParseFile(Path.Combine(cfg.MissionsDir, m.Folder, "mission.json"));
+                var mj = PwRemake.Sim.Maps.PwMapReader.MissionOf(Path.Combine(cfg.MissionsDir, m.Folder));
                 var title = LoadingInfo.Title(m.Title, m.Name, m.Id);
                 t.True(!title.Contains("load failed"), $"{cfg.Id} {m.Id}: title {title}");
                 var desc = LoadingInfo.Clean(m.Description);

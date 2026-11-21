@@ -18,7 +18,7 @@ Port of `remake/src/ui/mission.js` and `remake/src/ui/cutscene.js` (pw-exporter 
 game/src/UI/Mission/
 ├─ Logic/                      no Godot types - compiled into the tests too
 │  ├─ MissionUiData.cs         the mission's UI data: quests' texts, dialogues, sequences (lines, speech, films,
-│  │                           timeline), question marks, texts, title (world.json, mission.json, texts/<lang>.json)
+│  │                           timeline), question marks, texts, title (world.lua, map.lua's mission, texts/<lang>.lua)
 │  ├─ MissionUiState.cs        mission.js: queues, frame timing, quests, ticker, markers, timers, cutscenes, end screen
 │  ├─ CutsceneTimeline.cs      cutscene.js without its three.js parts: bars, fades, skips, sounds, speech, subtitles
 │  ├─ MissionUiBridge.cs       IMissionHost's presentation calls -> the state; EndDialog / EndSequence back to the engine

@@ -9,6 +9,7 @@
 //   party colour                       -> SetPartyColor(colour) (+ SetAnimalTint for owned animals and vehicles)
 //   seen through buildings             -> SetBehind(role, colour) (UnitsBehind)
 //   the setting textures (buildings)   -> SetSetting(setting) (SettingMaterials: the biome where it stands)
+//   the infected look (view only)      -> SetInfected(stage) (ModelInstance.Infection.cs, InfectedLook)
 //   attached parts                     -> Attach(gfx, link) / Composite (riders, turrets, build-ups, flags)
 // and gives back what the simulation asked three.js for: link positions (LinkWorld), clip lengths (Anim.Duration).
 //
@@ -218,6 +219,8 @@ public partial class ModelInstance : Node3D
                 // (not on a party material: it already has the colour × 2; was colour² × 1.6 on the harness of
                 // dilophosaurus, gallimimus, iguanodon, mammoth, megaloceros ...)
                 if (animal && !party) m = ModelMaterials.AnimalTinted(m, animalCol!.Value);
+                // the infected look (SetInfected: ModelInstance.Infection.cs, InfectedLook) on the coloured material
+                m = Infected(m);
                 var mb = UnitsBehind.Apply(m, _behind, _behindCol);
                 mi.SetSurfaceOverrideMaterial(s, party || animal || mb != m0 ? mb : null);
             }
@@ -300,6 +303,7 @@ public partial class ModelInstance : Node3D
         obj.ToLinkFrame();
         l.AddChild(obj);
         _attached.Add(obj);
+        InfectAttached(obj);
         return obj;
     }
 
@@ -314,6 +318,7 @@ public partial class ModelInstance : Node3D
         obj.ToLinkFrame();
         link.AddChild(obj);
         _attached.Add(obj);
+        InfectAttached(obj);
         return obj;
     }
 
@@ -327,6 +332,7 @@ public partial class ModelInstance : Node3D
         if (_behind != BehindRole.None) obj.SetBehind(ChildRole(obj), _behindCol);
         AddChild(obj);
         _attached.Add(obj);
+        InfectAttached(obj);
         return obj;
     }
 

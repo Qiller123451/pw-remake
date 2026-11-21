@@ -61,15 +61,16 @@ public sealed class SkirmishSession : IGameSim
     /// AiData.ReadControlScript; null: ai.json's)</param>
     /// <param name="flags">how the simulation runs besides the setup (the game: SimFlags.Game - the world's fog of war,
     /// events, clip sounds; a saved game: its own; null: none, headless)</param>
-    public static SkirmishSession Create(SkirmishSetup setup, string? ulaPath, Rules.Rules rules, ModelManifest models, ForestData? forest = null, GroundBrushes? brushes = null, JsonNode? aiData = null, Action<double, string>? progress = null, string? aiControlScript = null, SimFlags? flags = null)
+    public static SkirmishSession Create(SkirmishSetup setup, string? ulaPath, Rules.Rules rules, ModelManifest models, ForestData? forest = null, GroundBrushes? brushes = null, JsonNode? aiData = null, Action<double, string>? progress = null, string? aiControlScript = null, SimFlags? flags = null, MapSource? map = null)
     {
         void Step(double k, string what) { try { progress?.Invoke(k, what); } catch (Exception) { } }
         var s = new SkirmishSession(setup);
         Step(0.1, "Reading the map");
         int players = Skirmish.ActiveSlots(setup).Count;
-        s.Map = string.IsNullOrEmpty(ulaPath)
+        // (map: a map source made by the caller - the map editor's Test map plays its map from memory, EditorPlaytest)
+        s.Map = map ?? (string.IsNullOrEmpty(ulaPath)
             ? MapSource.GeneratedSource(new MapSourceConfig { Players = players, Seed = setup.Seed })
-            : WorldBuilder.MapSourceOf(ulaPath, rules, models, null, forest);
+            : WorldBuilder.MapSourceOf(ulaPath, rules, models, null, forest));
         var S = s.Map;
         var opts = new WorldOptions
         {
@@ -201,6 +202,8 @@ public sealed class SkirmishSession : IGameSim
             var st = D.StartOf(p.Tribe);
             if (st == null) { L.Warn($"no start of the tribe {p.Tribe}"); Problems.Add($"no start of the tribe {p.Tribe}"); continue; }
             foreach (var (k, v) in st.Res) p.Res[k] = v;
+            // the map's start resources of the slot (Restrictions/Resources; all 0 on every original map: the tribe's start)
+            if (ms != null && ms.Res.Values.Any(v => v > 0)) foreach (var (k, v) in ms.Res) p.Res[k] = v;
             W.ClearArea(bx, bz, 16);
             double face = SMath.Atan2(-bx, -bz);
             // the main building; the Aje resource collector of a human player with an army budget is a card of the
@@ -235,8 +238,11 @@ public sealed class SkirmishSession : IGameSim
             if (o.Owner != null && p == null) continue;
             try
             {
-                if (o.Type == "BLDG") W.PlaceBuilding(o.Cls, p, o.X, o.Z, o.Rot, !(o.Attr.TryGetValue("building_ready", out var br) && br == "0"));
-                else W.Spawn(o.Cls, p, o.X, o.Z, new SpawnOpts { Level = Math.Max(o.Level, D.MinLevel(o.Cls, p)), Heading = o.Rot });
+                Entity? e = o.Type == "BLDG" ? W.PlaceBuilding(o.Cls, p, o.X, o.Z, o.Rot, !(o.Attr.TryGetValue("building_ready", out var br) && br == "0"))
+                    : W.Spawn(o.Cls, p, o.X, o.Z, new SpawnOpts { Level = Math.Max(o.Level, D.MinLevel(o.Cls, p)), Heading = o.Rot });
+                // the map editor's hit points at the start (the remake's attribute hp_percent, docs/MAP_EDITOR.md)
+                if (e != null && o.Attr.TryGetValue("hp_percent", out var hpp) && double.TryParse(hpp, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var pc) && pc > 0 && pc < 100)
+                    W.SetHp(e, Math.Max(1, Math.Round(e.MaxHp * pc / 100)));
             }
             catch (Exception e) { L.Warn($"map object not placed: {o.Cls} {e.Message}"); }
         }

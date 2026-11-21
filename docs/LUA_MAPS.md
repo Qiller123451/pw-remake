@@ -8,33 +8,46 @@ works inside: [TRIGGERS.md](TRIGGERS.md).
 
 ## 1. The mission folder
 
+A mission is a map of the remake's format ([MAP_FORMAT.md](MAP_FORMAT.md): its terrain, objects and regions) with the
+mission's files beside them:
+
 ```
 content/configs/<config>/missions/
 ├─ index.json                the campaign menu: the missions in playing order
 └─ 11_single_11/
-   ├─ mission.json           what the menu shows and the setup needs
-   ├─ world.json             objects, regions, groups, quests, question marks, variables, dialogues, sequences
+   ├─ map.lua                the map, and `mission = { ... }`: what the menu shows and the setup needs
+   ├─ terrain/, objects.lua, regions.lua, minimap.png     the map (MAP_FORMAT.md)
+   ├─ world.lua              objects, regions, groups, quests, question marks, variables, dialogues, sequences
    ├─ triggers.lua           the triggers (converted 1:1 from the original map)
    ├─ custom.lua             optional: your own code (loaded after triggers.lua)
-   └─ texts/uk.json          the mission's texts (key -> text); other languages beside it (de.json ...)
+   └─ texts/uk.lua           the mission's texts (key = text); other languages beside it (de.lua ...)
 ```
 
-The folders of the original missions are made by `tools/prepare/campaign_to_lua.py` from the toolkit's mission
-export (`python3 campaign_to_lua.py <json_dir> <missions_dir> [--force]`). Re-running it rewrites `triggers.lua`,
-`mission.json`, `world.json` and `texts/`; it never touches `custom.lua` - put your changes there, or copy the folder
-under a new name.
+The folders of the original missions are made by Prepare: the toolkit's mission export ->
+`tools/prepare/campaign_to_lua.py` (triggers.lua and the data as JSON, in `content/cache/missions/`) -> the map
+converter (`tools/mapconvert`: the original map + that folder -> the mission folder above; MAP_FORMAT.md
+"Converting"). Converting again rewrites `map.lua`, `world.lua`, `triggers.lua`, `texts/` and the map's files; it never
+touches `custom.lua` - put your changes there, or copy the folder under a new name.
 
-`mission.json`: `id` (0 = tutorial), `key`, `folder`, `title`, `description`, `tribe` (the player's: Hu, Aje, Ninigi,
-SEAS), `point_buy` (the army-building screen), `min_credits`, `map` (the original `.ula` below the installation's
-`Data` folder: the terrain), `lang`, `map_info` (start time, camera, weather, ...), `players` (slots 0-7 with tribe,
-team, diplomacy, resources, tech filters, start army, start location). `index.json` holds the menu fields of every
-mission.
+`map.lua`'s `mission`: `id` (0 = tutorial), `key`, `folder`, `title`, `description`, `tribe` (the player's: Hu, Aje,
+Ninigi, SEAS), `point_buy` (the army-building screen), `min_credits`, `map` (the original map it was made from, below
+the installation's `Data` folder), `lang`, `map_info` (start time, camera, weather, ...), `players` (slots 0-7 with
+tribe, team, diplomacy, resources, tech filters, start army, start location). `index.json` holds the menu fields of
+every mission.
 
-`world.json`: `objects`, `groups`, `question_marks`, `regions` (+ `region_tree`), `quests`, `variables`,
-`dialogs`, `sequences`, `refs` (GUID -> what it names), `trigger_tree`, `trigger_defaults` (the parameter defaults
-of every node type - the engine fills in what a node leaves out) and the export's `warnings`. The format of the
-entries is the toolkit's (`docs/CAMPAIGN_FORMAT.md` §10 of the ParaWorld Toolkit). Positions are map metres: x east,
-y south, z up, from the map's north-west corner.
+**The remake's own missions** (Outbreak: docs/OUTBREAK.md) are mission folders of this layout in `game/missions/<name>/`
+(shipped with the game, the same for every configuration), with `coop.lua` (their co-op definition, docs/COOP.md) and
+any Lua module `custom.lua` requires (Outbreak: `layout.lua`, the generator's data). A game names one by the token
+`remake:<name>` (GameStart.MissionFolder; `RemakeMissions`), the campaign menu lists them under Custom campaigns →
+"Remake missions".
+
+`world.lua` (`return { ... }`, Lua data - no functions: MAP_FORMAT.md "Lua data files"): `objects`, `groups`,
+`question_marks`, `regions` (+ `region_tree`), `quests`, `variables`, `dialogs`, `sequences`, `refs` (GUID -> what it
+names), `trigger_tree`, `trigger_defaults` (the parameter defaults of every node type - the engine fills in what a node
+leaves out), the export's `warnings` and the map editor's `cameras` (camera points: `name`, `x`, `y`, `angle`, `pitch`,
+`dist`). The map editor (docs/MAP_EDITOR.md "Regions and mission data", "Triggers") edits all of it and triggers.lua;
+`map_info.start_camera = { x, y }` (the editor's start camera) puts the mission's camera there at the start. The format of the entries is the toolkit's (`docs/CAMPAIGN_FORMAT.md` §10 of
+the ParaWorld Toolkit). Positions are map metres: x east, y south, z up, from the map's north-west corner.
 
 ## 2. Triggers
 
@@ -77,7 +90,7 @@ How a trigger runs (the original's rules, [TRIGGERS.md](TRIGGERS.md)):
 
 **Parameters** are the original's: strings, numbers, `true` / `false` (= 1 / 0). Numbers and strings are the same
 thing to the engine (`obj_owner = 1` and `obj_owner = "1"` are equal). A parameter left out has its default
-(`trigger_defaults` in world.json, which are the original editor's: e.g. `obj_owner = -2` "any owner",
+(`trigger_defaults` in world.lua, which are the original editor's: e.g. `obj_owner = -2` "any owner",
 `rgn_guid = "UniqueWorldRegion"` "the whole map"). Lists inside one parameter keep the original's separators (`|`,
 new lines `"\n"`, tabs `"\t"`). A name that is not a Lua identifier is written `["local"] = 1`.
 
@@ -136,6 +149,7 @@ told apart by a prefix: none (the subject), `dst_` (the targets of `ObjDo`), `B_
 | `DialogEnded` | DSEN | `dlgscene_name` | that dialogue scene ended (for the rest of the mission) |
 | `GroupInRegion` | GREG | `group`, query, `obj_count` | MIRAGE: the members of the group the query finds pass `obj_count` |
 | `Check` | CHCK | a Lua function | your function returns true (§3) |
+| `DayPhase` | DAYN | `phase` (`day`, `dusk`, `night`, `dawn`), `night` (optional count: `==1`, `>=3`) | the remake's own: the map's day-night cycle (map.lua `day_night`, docs/MAP_FORMAT.md) is in that phase (and night number = how many dusks have begun). Without `once` it fires each time the phase begins; false on a map without a cycle |
 
 ### 2.3 Actions
 
@@ -242,12 +256,23 @@ runs, not while the files load). Objects are numbers (ids), positions map metres
 | `api.objects.info(id)` | `{ id, guid, name, class, type, owner, x, y, z, hp, maxhp, level, alive, hidden }` or nil |
 | `api.objects.find_one(guid or name)`, `api.objects.group(group)` | one object; the members of a group |
 | `api.objects.add_to_group(group, id)`, `api.objects.remove(id)`, `api.objects.appear(id, flags)` | groups, delete, appearance flags |
-| `api.units.spawn(class, owner, x, y [, level [, group]])` | creates a unit / building, returns its id |
+| `api.units.spawn(class, owner, x, y [, level [, group [, noscale]]])` | creates a unit / building, returns its id (`noscale` true: one, even for a co-op's scaled enemy - a unique boss) |
+| `api.units.spawn_own(class, slot, x, y [, level])` | the class in the slot's own tribe (seat 1: the chosen tribe's equivalent; a co-op seat: its tribe's - the tribe swap), never scaled |
+| `api.units.scale(id, k)`, `api.units.maxhp(id, hp)` | draw a unit k times its size; new maximum hit points (healed to them) |
+| `api.units.burn(id [, seconds])` | sets a unit on fire: the original's fire on it, its hit points run down evenly, it dies after `seconds` (default 8) whatever its armour (Outbreak: the infected in the sunlight); false if burning already |
+| `api.units.gather(id, res)` | sends a worker to gather `"food"`, `"wood"` or `"stone"` at the nearest source within 120 m (food: its owner's field / slaughterhouse with a free place first); false: not a worker, nothing there |
 | `api.units.move(id, x, y [, attack])`, `.attack(id, target)`, `.stop(id)`, `.teleport(id, x, y)` | orders (`move`: at the unit's own pace) |
 | `api.units.kill(id)`, `.hp(id, hp)`, `.owner(id, player)`, `.invulnerable(id, on [, seconds])`, `.anim(id, name [, loops])` | change a unit |
 | `api.players.resource(p, name [, "+100"])`, `.attribute(p, name)`, `.relation(a, b [, rel])`, `.tech(p, filter [, on])` | players |
 | `api.ui.infobar(text)`, `.ping(x, y [, id])`, `.unping(id)`, `.dialog(path)`, `.sequence(path [, quit])`, `.sound(name)`, `.reveal(x, y [, radius, seconds])` | presentation |
 | `api.ai.behavior(p, behavior [, module])` | a computer player's behaviour |
+| `api.daynight.enabled()`, `.phase()` (`"day"`, `"dusk"`, `"night"`, `"dawn"`), `.is_night()`, `.night()` (the night number), `.left()` (s left of the phase), `.to_night()`, `.to_day()`, `.darkness()` (0 .. 1), `.clock()` (the time of day, s) | the map's day-night cycle (map.lua `day_night`); a map without one: `enabled()` false, `phase()` nil |
+| `api.daynight.set{ day =, night =, first_day = }` | new lengths of the cycle (s; the ones left out stay) - for the mission's start, e.g. by its difficulty (Outbreak: 3-minute days on Hard) |
+| `api.objects.infect(id [, stage])`, `api.objects.infection(id)` | the infected stage 0 .. 3 a building or unit is drawn with (docs/INFECTED_LOOK.md; part of the world: saved, the same on every machine) |
+| `api.exists(class)` | the configuration's rules know the class (a map for the official game and MIRAGE picks its classes: `hu_zombie_archer` only in MIRAGE); the rules' spelling (`Wild_Boar`, `Mammoth`) or lower case |
+| `api.players.seats()` | the human side's player slots: the human player, in a co-op game every seat (docs/COOP.md) |
+| `api.players.epoch(slot [, raise_to])` | the slot's epoch; with `raise_to` its epoch upgrades first, as if researched (no "epoch reached" message) - a mission that starts in a later epoch |
+| `api.players.attribute(slot, "max_units" \| "epoch")` | (besides the resources and `units`) the unit limit, the epoch |
 
 ## 5. The sandbox
 

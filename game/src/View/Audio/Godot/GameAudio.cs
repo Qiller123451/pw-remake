@@ -8,7 +8,8 @@
 //   a game starts  GameAudio.I.StartGame(levelName, atmos, tribe)  the level's playlist and ambience
 //   every frame    GameAudio.I.UpdateWorld(dt, gameTime, cameraTarget, yaw, homes, Atmo.State(mat, high, day), cameraHeight)
 //   events         Sfx.PlayEvent / Sfx.Ui / Sfx.Voice / Sfx.Feedback.* / Sfx.Anim / Sfx.Music.* (Sfx.cs)
-//   the game ends  GameAudio.I.EndGame() (combat music off), back in the menus Menu()
+//   the game ends  GameAudio.I.EndGame() (combat music off behind the end screen)
+//   game left      GameAudio.Current?.Menu() from GameSession._ExitTree (every exit: menu, load, editor, retry)
 //   settings       GameAudio.I.ApplySettings(GameApp.Settings)
 using System;
 using System.Collections.Generic;
@@ -104,7 +105,8 @@ public sealed partial class GameAudio : Node
     public bool MusicHeld = true;
 
     // ---------------------------------------------------------------- what the game tells it
-    /// <summary>The menus: the main theme (MainMenu switch; the game's switches off).</summary>
+    /// <summary>The menus: the main theme (MainMenu switch; the game's switches off), no ambience. Also when a game
+    /// is left (GameSession._ExitTree) - MusicMgr.usl turns the game's switches off whenever no game runs.</summary>
     public void Menu()
     {
         MusicHeld = false;

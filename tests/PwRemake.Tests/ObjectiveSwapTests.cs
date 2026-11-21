@@ -90,7 +90,7 @@ public static class ObjectiveSwapTests
             {
                 var folder = Path.Combine(c.Config.MissionsDir, e.Folder);
                 if (!File.Exists(Path.Combine(folder, "triggers.lua"))) continue;
-                var mj = Json.TryParseFile(Path.Combine(folder, "mission.json"));
+                var mj = PwRemake.Sim.Maps.PwMapReader.MissionOf(folder);
                 var human = mj?["players"]?.AsArray().FirstOrDefault(p => p?["type"].Str() == "human");
                 var from = human?["tribe"].Str() ?? e.Tribe;
                 var slot = (human?["id"].Int() ?? 0).ToString();

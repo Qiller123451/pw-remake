@@ -39,6 +39,9 @@ public sealed class ModelLibrary
     /// <summary>Called for every new instance of a model with particle emitters (assets.js Assets.onClone: the game's
     /// Particles.Track). null: nobody sprays them (the model viewer without particles).</summary>
     public Action<ModelInstance>? OnInstance;
+    /// <summary>Called for an emitter of another model hung on a node of an instance (the infected look's flies:
+    /// ModelInstance.SetInfected - the game's Particles.TrackNode). null: not sprayed.</summary>
+    public Action<Node3D, PartRef, ModelInstance>? OnEmitter;
     readonly Dictionary<string, ModelTemplate?> _templates = new(StringComparer.OrdinalIgnoreCase);
     readonly HashSet<string> _loading = new(StringComparer.OrdinalIgnoreCase);
 
@@ -204,6 +207,7 @@ public sealed class ModelLibrary
                 if (Extra(n, "attr") is Variant v) { tag.HasAttr = true; tag.Attr = AttrOf(v); break; }
         }
         // particle emitters (engine/particles.js draws them; their part states are kept here)
+        List<(string?, uint)>? emitMats = null;
         Walk(model, n =>
         {
             if (n is MeshInstance3D || Extra(n, "kind") is not Variant k || k.AsString() != "particles") return;
@@ -213,6 +217,11 @@ public sealed class ModelLibrary
             if (Extra(n, "emitter") is Variant ev && ev.VariantType == Variant.Type.Dictionary)
                 try { t.Emitter = PwRemake.View.Fx.EmitterDef.FromJson(System.Text.Json.Nodes.JsonNode.Parse(Godot.Json.Stringify(ev)) as JsonObject); }
                 catch (Exception ex) { L.WarnOnce("emitter:" + name, $"model {name}: emitter {n.Name} unreadable ({ex.Message})"); }
+            // the original's blending by the sheet's GSF material (alpha bits 0x3, not the converter's 0x4: the SEAS
+            // buildings' steam is a mixed sprite - added, its grey sheet showed as glowing squares; docs/EFFECTS.md)
+            if (t.Emitter != null && t.Emitter.ResolveBlend(emitMats ??= PwRemake.View.Fx.EmitterDef.MaterialsOf(json.Root))
+                    == PwRemake.View.Fx.EmitterDef.Blend.Ambiguous)
+                L.WarnOnce("emitblend:" + name + n.Name, $"model {name}: emitter {n.Name}: materials of {t.Emitter.Tex} disagree on the blending");
         });
         // day and night parts (buildings' and ships' lamps: PartBits.TodOf), the particle emitters too (fireflies)
         foreach (var (n, t) in c.Tags) if (t.HasAttr) t.Tod = PartBits.TodOf(t.Attr, fourcc);
@@ -299,13 +308,23 @@ public sealed class ModelLibrary
         {
             var animated = new HashSet<string>();
             foreach (var (_, a) in clips) for (int t = 0; t < a.GetTrackCount(); t++) animated.Add(ClipTools.TrackTarget(a.TrackGetPath(t)));
-            MergeStatic(c, animated, opts.Gate ? PartBits.GATE_ENDS : 0);    // (a gate's end pieces stay apart)
+            MergeStatic(c, animated, opts.Gate ? PartBits.GATE_ENDS : 0, BuildUp.Keep(fourcc));    // (a gate's end pieces stay apart)
         }
         // building state, epoch and damage stage of the static parts and of the particle emitters (fires of the epoch
         // variants, smoke of the damage stages)
         if (!PartBits.IsDynamicKind(fourcc))
             foreach (var (_, t) in c.Tags)
                 if (t.Sig < 0 && t.HasAttr) { int sg = PartBits.StaticSig(t.Attr, opts.Gate ? PartBits.GATE_ENDS : 0); if (sg != PartBits.SigAll) t.Sig = sg; }
+        // the parts that rise out of the ground or sink into it while the building is built: the top of each in the GSF
+        // frame (the engine's chunk box, PWClient 0x7aa060)
+        bool buildUp = false;
+        if (BuildUp.Of(fourcc) is { } bum)
+            foreach (var (n, t) in c.Tags)
+            {
+                if (!t.HasAttr || (t.Attr & (bum.Appear | bum.Disappear)) == 0 || t.Kind == PartKind.Particles) continue;
+                buildUp = true;
+                if (n is MeshInstance3D bmi && bmi.Mesh != null) t.Top = BoxIn(bmi, c.Model).End.Z;
+            }
         Mark("merge");
         // small rigid parts (a weapon, a cup, a lantern) cast no shadow: their shadows are a few pixels, but each is one
         // more draw in the shadow pass for every unit and building carrying it
@@ -355,7 +374,7 @@ public sealed class ModelLibrary
         var tpl = new ModelTemplate
         {
             Name = name, Info = info, Options = opts, Fourcc = fourcc, Extras = rootEx, Scene = gen, Loops = loops, Sounds = sounds,
-            Pick = pick, HasSkeleton = gen.FindChild("Skeleton3D", true, false) != null,
+            Pick = pick, HasSkeleton = gen.FindChild("Skeleton3D", true, false) != null, HasBuildUp = buildUp,
         };
         if (clips.Count > 0)
         {
@@ -609,7 +628,7 @@ public sealed class ModelLibrary
     /// Static (non skinned, non animated) meshes: merged per part signature into the model root's frame, one surface
     /// per material. keep: attribute bits that keep parts apart (a gate's end pieces).
     /// </summary>
-    static void MergeStatic(Ctx c, HashSet<string> animatedNodes, uint keep)
+    static void MergeStatic(Ctx c, HashSet<string> animatedNodes, uint keep, uint buildKeep = 0)
     {
         var root = c.Model;
         bool Moving(Node n) { for (Node? p = n; p != null && p != root; p = p.GetParent()) if (animatedNodes.Contains(p.Name)) return true; return false; }
@@ -625,8 +644,11 @@ public sealed class ModelLibrary
             }
             int sig = t.HasAttr ? PartBits.StaticSig(t.Attr, keep) : PartBits.SigAll;     // (a gate's end flags are no epoch bits)
             bool shadow = mi.CastShadow != GeometryInstance3D.ShadowCastingSetting.Off;
-            var k = sig + "|" + (t.Arm?.ToString() ?? "") + "|" + (t.VCount > 1 ? t.Variant + "/" + t.VCount : "") + "|" + (int)t.Tod + "|" + (t.Comp ?? "") + "|" + (keep != 0 && t.HasAttr ? (t.Attr & keep).ToString() : "") + "|" + shadow + "|" + t.SeasKeep;
-            if (!groups.TryGetValue(k, out var g)) groups[k] = g = (new PartRef { HasAttr = t.HasAttr, Attr = keep != 0 && t.HasAttr ? t.Attr & keep : t.Attr, Sig = sig != PartBits.SigAll ? sig : -1, Tod = t.Tod, Arm = t.Arm, Variant = t.Variant, VCount = t.VCount, Comp = t.Comp, SeasKeep = t.SeasKeep }, shadow, new());
+            // (the build-up flags keep apart what rises, sinks or stays while the building is built, and the groups that
+            // rise together: BuildUp)
+            var k = sig + "|" + (t.Arm?.ToString() ?? "") + "|" + (t.VCount > 1 ? t.Variant + "/" + t.VCount : "") + "|" + (int)t.Tod + "|" + (t.Comp ?? "") + "|" + (keep != 0 && t.HasAttr ? (t.Attr & keep).ToString() : "") + "|" + shadow + "|" + t.SeasKeep
+                + "|" + (buildKeep != 0 && t.HasAttr ? (t.Attr & buildKeep).ToString() : "");
+            if (!groups.TryGetValue(k, out var g)) groups[k] = g = (new PartRef { HasAttr = t.HasAttr, Attr = keep != 0 && t.HasAttr ? t.Attr & (keep | buildKeep) : t.Attr, Sig = sig != PartBits.SigAll ? sig : -1, Tod = t.Tod, Arm = t.Arm, Variant = t.Variant, VCount = t.VCount, Comp = t.Comp, SeasKeep = t.SeasKeep }, shadow, new());
             for (int s = 0; s < am.GetSurfaceCount(); s++) g.surfs.Add((mi, s, am.SurfaceGetMaterial(s)));
             merged.Add(mi);
         }

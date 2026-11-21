@@ -109,6 +109,36 @@ public sealed class HudGame
         return ActionsOf(e).Where(a => a.Cat != "Build/BLDG" && a.Kind != "Moves" && a.Visible && !a.Disabled).ToList();
     }
 
+    /// <summary>the object the Produce menu speaks for: the only one selected, or of several buildings the first that
+    /// produces (CommandBar.usl PreprocessObjects keeps one building of a selection; the cards go to the least busy of
+    /// the selected buildings of its class - LeastBusy)</summary>
+    public Entity? Producer(IReadOnlyList<Entity> sel)
+    {
+        if (sel.Count == 1) return ProducerActions(sel[0]).Any(a => a.Kind != "Moves") ? sel[0] : null;
+        if (sel.Count == 0 || !sel.All(e => e is Building)) return null;
+        return sel.FirstOrDefault(e => ProducerActions(e).Any(a => a.Kind != "Moves"));
+    }
+
+    /// <summary>
+    /// Where n of an action go with several buildings of the producer's class selected (CmdButton.usl sends the card to
+    /// CCommandBar.SortByQueue(selection); MIRAGE's server takes the first of it, Mirage.usl CGPCEmitter.SortByQueue):
+    /// each to the finished one that offers it with the fewest entries in its queue, of equal ones the one furthest on
+    /// with its current entry. One producer: all n to it.
+    /// </summary>
+    public List<(Entity E, int N)> LeastBusy(Entity prod, IReadOnlyList<Entity> sel, ActionDef a, int n)
+    {
+        var cands = sel.Where(e => e == prod || (e is Building { Built: true } && e.Name == prod.Name && e.Alive && e.Owner == Me && ProducerActions(e).Any(x => x.Id == a.Id))).ToList();
+        if (cands.Count <= 1) return new() { (prod, n) };
+        var add = cands.ToDictionary(e => e, _ => 0);
+        static double Progress(Entity e) => e.Queue.Count > 0 && e.Queue[0].Total > 0 ? e.Queue[0].T / e.Queue[0].Total : 0;
+        for (int i = 0; i < n; i++)
+        {
+            var best = cands.OrderBy(e => e.Queue.Count + add[e]).ThenByDescending(e => add[e] == 0 ? Progress(e) : 0).First();
+            add[best]++;
+        }
+        return cands.Where(e => add[e] > 0).Select(e => (e, add[e])).ToList();
+    }
+
     List<ActionDef> ActionsOf(Entity e) => D.ActionsOf(e.RulesOwner(), e.Name, e.Kind, e.Def?.Type ?? e.Cls);
 
     /// <summary>rally points: only for what produces units (barracks, harbours, mobile camps ...) and the moving
@@ -228,7 +258,7 @@ public sealed class HudGame
             H.SetInputMode("place", a);
             return;
         }
-        var prod = sel.Count > 0 ? sel[0] : null;
+        var prod = Producer(sel) ?? (sel.Count > 0 ? sel[0] : null);
         if (prod == null) return;
         // minelayer / corsair: mines and water turrets are built at a point in the water (choose it with the mouse)
         if (prod is Unit pu && pu.Naval && Regex.IsMatch(a.Results.Count > 0 ? a.Results[0].Obj : "", "mineship_mine|water_turret"))
@@ -240,8 +270,15 @@ public sealed class HudGame
             return;
         }
         // an upgrade of the object itself goes to every selected object of its class (QueueActionCommand.Also)
-        var also = a.Kind == "Upgrades" && sel.Count > 1 ? sel.Skip(1).Where(e => e.Name == prod.Name).Select(e => e.Id).ToArray() : null;
-        Send(new QueueActionCommand { Producer = prod.Id, Action = a.Path, Count = shift ? 5 : 1, Also = also }, Fail);
+        if (a.Kind == "Upgrades" && sel.Count > 1 && a.Results.Any(r => r.Cls == "local"))
+        {
+            var also = sel.Where(e => e != prod && e.Name == prod.Name).Select(e => e.Id).ToArray();
+            Send(new QueueActionCommand { Producer = prod.Id, Action = a.Path, Count = shift ? 5 : 1, Also = also }, Fail);
+            return;
+        }
+        // anything else with several buildings of the class selected: to the least busy (LeastBusy)
+        foreach (var (e, n) in LeastBusy(prod, sel, a, shift ? 5 : 1))
+            Send(new QueueActionCommand { Producer = e.Id, Action = a.Path, Count = n }, Fail);
     }
 
     /// <summary>right click on a card: the last of that action in the producer's queue is cancelled (G.unqueue)</summary>

@@ -210,8 +210,35 @@ public sealed class WallMap : IWallMap
     /// <summary>solid scenery at a nav cell (the JS asked W.sceneryCell, which no world set: null)</summary>
     public Func<int, bool>? SceneryCell;
     double? _hOff;
+    /// <summary>without a world (the map editor): the ground height at game (x, z)</summary>
+    Func<double, double, double>? _ground;
 
     public WallMap(double x0 = 4, double z0 = 4) { X0 = x0; Z0 = z0; }
+
+    /// <summary>a wall map without a world (the map editor: Detached + Put, then PartsOf / ZOf): the map's wall grid
+    /// (MapSource.WallGrid), the class table, the ground height and the map's water level / kind for the engine's
+    /// heights (as HeightAt does for a world). No obstacles: every tile is valid, no trees, the whole grid is on the map.</summary>
+    public static WallMap Detached(double[]? grid, Dictionary<string, int[]> classes, Func<double, double, double> ground, double? water, string? kind)
+    {
+        var m = new WallMap(grid != null && grid.Length > 0 ? grid[0] : 4, grid != null && grid.Length > 1 ? grid[1] : 4) { Classes = classes, _ground = ground };
+        m._hOff = water != null ? SEA_LEVEL - water.Value : (kind == "original" ? 0 : 30);
+        return m;
+    }
+
+    /// <summary>a wall-map object written without a Building (the map editor): its tile(s) as Add writes them - an old
+    /// two-tile gate (not centred on a tile) on both tiles. rot: the heading (Building.Rot). null: not a wall-map class.</summary>
+    public (int I, int J, int Type, int D)? Put(string cls, int owner, double x, double z, double rot)
+    {
+        if (ClassOf(cls) is not { } c) return null;
+        int type = c[2], race = type != WT.TRAP ? c[0] : 1;
+        var (i, j) = TileOf(x, z);
+        int d = type == WT.GATE ? GateDOf(rot) : -1;
+        var old = type == WT.GATE ? OldGateTiles(x, z, d) : null;
+        if (old != null) { (i, j) = old.Value.A; d = old.Value.D; }
+        Write(i, j, owner & OWNER, race, c[1], type);
+        if (old != null) Write(old.Value.B.I, old.Value.B.J, owner & OWNER, race, c[1], type);
+        return (i, j, type, d);
+    }
 
     /// <summary>the wall map of a world (world.js constructor: new WallMap(...opts.wallGrid), its world and class table)</summary>
     public static WallMap For(World w)
@@ -277,7 +304,7 @@ public sealed class WallMap : IWallMap
     public double HeightAt(double x, double z)
     {
         var W = World;
-        if (W == null) return 30;
+        if (W == null) return _ground != null ? _ground(x, z) + (_hOff ?? 0) : 30;
         _hOff ??= W.WaterLevel != null ? SEA_LEVEL - W.WaterLevel.Value : (W.MapKind == "original" ? 0 : 30);
         return W.Height(x, z) + _hOff.Value;
     }
@@ -687,9 +714,9 @@ public sealed class WallMap : IWallMap
     // ---------------------------------------------------------------- objects on the map (AddObj 0x7de950, RemoveObj 0x7dee80)
     // an old two-tile gate (the campaign maps: on a tile edge or corner, walls_re.md §1.4) -> [tile A, tile B, d] with
     // B = A + d, or null for a gate centred on a tile
-    ((int I, int J) A, (int I, int J) B, int D)? OldGateTiles(Building b, int d)
+    ((int I, int J) A, (int I, int J) B, int D)? OldGateTiles(Building b, int d) => OldGateTiles(b.Origin.X, b.Origin.Z, d);
+    ((int I, int J) A, (int I, int J) B, int D)? OldGateTiles(double x, double z, int d)
     {
-        double x = b.Origin.X, z = b.Origin.Z;
         var (ci, cj) = TileOf(x, z); var (cx, cz) = Centre(ci, cj);
         if (Math.Sqrt((x - cx) * (x - cx) + (z - cz) * (z - cz)) < 1) return null;
         ((int, int), (int, int), int)? best = null; double bd = 1;
@@ -797,10 +824,11 @@ public sealed class WallMap : IWallMap
         }
     }
 
-    int GateDOf(Building b)
+    int GateDOf(Building b) => GateDOf(b.Rot);
+    static int GateDOf(double a)
     {
         // d from the gate's rotation: its local x along d
-        double a = b.Rot, x = SMath.Cos(a), z = -SMath.Sin(a);
+        double x = SMath.Cos(a), z = -SMath.Sin(a);
         int d = DirIndex((int)Math.Floor(x + 0.5), (int)Math.Floor(z + 0.5));
         return d >= 0 ? d : 3;
     }

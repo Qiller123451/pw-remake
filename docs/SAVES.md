@@ -29,7 +29,7 @@ A `.pwsave` is a zip archive anyone can open:
 | entry | |
 |---|---|
 | `header.json` | readable: `format` ("pwremake-save"), `version`, `build` (the game's version), `name`, `kind` (manual / quick / auto), `date`, `mode`, `configuration` (+ title), `mission`, `missionFolder`, `title`, `tribe`, `difficulty`, `debug`, `gameTime` (s), `steps`, `commands` |
-| `game.json` | `start` (the GameStart), `setup` (a mode's own setup; null for a campaign mission), `flags` (SimFlags), `steps`, `commands`, `answers`, `hashes`, `view` |
+| `game.json` | `start` (the GameStart - with the campaign colour chosen, `color` / `coop.seats[].color`: docs/CAMPAIGN.md "Your colour"), `setup` (a mode's own setup; null for a campaign mission), `flags` (SimFlags), `steps`, `commands`, `answers`, `hashes`, `view` |
 | `thumb.jpg` | the game view, 256 px wide (when the pause menu opened, or at the quick save / autosave) |
 
 A save of 3 game minutes is 1-2 KB plus the picture; an hour of play is a few hundred KB at most (only the player's

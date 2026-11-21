@@ -300,7 +300,7 @@ public sealed partial class World
                 n.T = 20;
                 var (x, z) = b.ExitPoint(b.Pos.X + 5, b.Pos.Z + 5);
                 var u = W.SpawnUnit(n.Spawn, b.Owner, x, z, 1, 0, new UnitOpts { Autonomous = true });
-                if (u != null) { u.HomeX = b.Pos.X; u.HomeZ = b.Pos.Z; u.HomeRadius = 50; n.Members.Add(u); }
+                if (u != null) { u.HomeX = b.Pos.X; u.HomeZ = b.Pos.Z; u.HomeRadius = 50; n.Members.Add(u); W.InheritInfection(b, u); }
             }
             foreach (var u in n.Members) if (u.Task.Type == "idle" && Math.Sqrt((u.Pos.X - b.Pos.X) * (u.Pos.X - b.Pos.X) + (u.Pos.Z - b.Pos.Z) * (u.Pos.Z - b.Pos.Z)) > 50) W.Order(u, new Order("move") { X = b.Pos.X, Z = b.Pos.Z });
         }
@@ -320,7 +320,7 @@ public sealed partial class World
             // countdown (the user saw it in the game); elsewhere without the option it deletes itself
             if (!W.Opts.Warpgate && !W.Opts.Multiplayer) { b.WarpInert = true; return; }
             if (!W.Opts.Warpgate) { W.Later(0.05, "deleteBuilding", new Args { ["b"] = b }); return; }
-            b.WarpSight = W.Players.Select(p => W.RevealArea(p, b.Pos.X, b.Pos.Z, 20)).ToList();
+            b.WarpSight = W.Players.Select(p => (Reveal?)W.RevealArea(p, b.Pos.X, b.Pos.Z, 20)).ToList();
             W.Emit("warpgate", new Args { ["building"] = b, ["state"] = "started" });
         }
         public override void Built(Building b, World W) { if (!b.Alive || b.WarpInert) return; b.WarpT = (W.Opts.WarpgateMinutes != 0 ? W.Opts.WarpgateMinutes : 10) * 60; W.Emit("warpgate", new Args { ["building"] = b, ["state"] = "finished" }); }
@@ -550,6 +550,18 @@ public sealed partial class World
         ["CSeasWarpGate"] = new WarpGateB(),
         ["CSeasPsiDisruptor"] = new PsiDisruptorB(), ["CSeasSpeaker"] = new SpeakerB(), ["CSeasStygiNest"] = new StygiNestB(),
         ["CTeslaMachine"] = new TeslaMachineB(),
+    };
+
+    /// <summary>the class a building of this script class breeds by itself (a nest's animals: the kennel's sabre-tooths,
+    /// the Dragon Clan's dilophosaurs, MIRAGE's gallimimus and stygimoloch nests) - its models are loaded with the map
+    /// (GameSession.PreloadList), not when the first animal is born</summary>
+    public static string? BreedsClass(string? script) => script switch
+    {
+        "CKennel" => "hu_kennel_eusmilus",
+        "CNinigi_Dilophosaurus_Nest" => "ninigi_dilophosaurus",
+        "CAjeGalliNest" => GALLI,
+        "CSeasStygiNest" => STYGI_SPAWN,
+        _ => null,
     };
 
     // ------------------------------------------------------------------------------------------ world mixin

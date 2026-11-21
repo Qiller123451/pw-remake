@@ -136,7 +136,7 @@ public sealed partial class TribeAI
                 foreach (var u in g.Units)
                 {
                     n += S.Pool.Count(x => x.Name == u.Cls && x.Level <= lv);
-                    if (u.Npc != null && !lords.Contains(u.Npc)) continue;
+                    if (u.Npc != null && !SpecialAllowed(u.Npc, lords)) continue;
                     cls = u.Cls; flag = u.ObjFlag;
                 }
                 if (cls == null) continue;
@@ -170,6 +170,20 @@ public sealed partial class TribeAI
             if (at != null && !S.Blds.Any(b => b.Name == at)) AddOnTop("BLDG/" + at);
         }
     }
+    /// <summary>SpecialAllowed (MIRAGE AiGoalMinistryOfDefense.usl:1071-1167; the base game: the hero must be there,
+    /// MOD:233): a mix row with a value - a hero's class, or MIRAGE's 'flyers_enabled' / 'titans_enabled' - is trained
+    /// only when its hero is at level 3 or more (GetAvailableNPCs). MIRAGE first drops 'titans_enabled' rows when the
+    /// titans are removed and 'flyers_enabled' rows - meant - when flying is off: its script tests RemoveTitans() there
+    /// (:1072, a bug; docs/MODDER_NOTES.md §15); the remake tests FlyingEnabled. Without the option FreeSpecials (the
+    /// remake does not have it; MIRAGE's default off) the hero test follows - which neither value ever passes, so with
+    /// MIRAGE's defaults neither row is trained (as in MIRAGE: the free specials' age table :1080-1166 is never read).</summary>
+    public bool SpecialAllowed(string npc, HashSet<string> lords)
+    {
+        if (npc == "flyers_enabled" && MirageAi && !OptFlying) return false;
+        if (npc == "titans_enabled" && OptRemoveTitans) return false;
+        return lords.Contains(npc);
+    }
+
     // RequestXtraUnits (FM:569-607): with resources to spare (more than 200 food, 200 wood and 100 stone that no
     // request waits for) one more unit is trained on every fight think - the best the village can make, wherever the
     // pyramid has room (the reserved slots of the standing army do not apply). Not for the SEAS, not at difficulty 0-1.

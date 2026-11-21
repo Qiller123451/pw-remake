@@ -360,7 +360,8 @@ public sealed partial class TribeAI
             }
             case "sail":
             {
-                if (F.Ships.Count == 0) { var left = a.Alive().Where(u => !u.Inside).ToList(); if (left.Count == 0) { a.End("dead"); return; } a.Crossed = true; AttackGo(S, a, left); return; }
+                // every transport lost on the way: the crossing is over (FerryDone clears it), who got out fights on
+                if (F.Ships.Count == 0) { var left = a.Alive().Where(u => !u.Inside).ToList(); FerryDone(a); if (left.Count == 0) { a.End("dead"); return; } a.Crossed = true; AttackGo(S, a, left); return; }
                 int to = AimIsland(F.Aim, a);
                 foreach (var s in F.Ships)
                 {
@@ -380,7 +381,6 @@ public sealed partial class TribeAI
                 FerryDone(a);
                 if (landed.Count == 0) { a.End("dead"); return; }
                 a.Crossed = true;
-                a.FerryState = null;
                 AttackGo(S, a, landed);
                 return;
             }
@@ -394,11 +394,14 @@ public sealed partial class TribeAI
     }
     /// <summary>everybody out at home (EmergencyUnboard, WC:347-377)</summary>
     void FerryUnload(Attack a) { foreach (var s in a.FerryState!.Ships) if (s.Alive && (s.Passengers?.Count ?? 0) > 0) Hands.Order(P, new[] { s }, new Order("unload")); }
-    /// <summary>the transports go back to the harbour, free again</summary>
-    void FerryDone(Attack a)
+    /// <summary>the transports go back to the harbour, free again; the attack's crossing is over (FerryState cleared: a
+    /// crossing ended by a lost or attacked transport, a timeout or the attack's end kept it - and its transports
+    /// claimed - before)</summary>
+    internal void FerryDone(Attack a)
     {
         var F = a.FerryState;
         if (F == null) return;
+        a.FerryState = null;
         var S = this.S ?? Census();
         var h = HarbourOf(S);
         foreach (var s in F.Ships)

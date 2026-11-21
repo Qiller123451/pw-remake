@@ -75,7 +75,7 @@ public partial class LoadingScreen : Control
         string title = s.MapName ?? "", desc = "", setting = "Jungle", map = s.Map;
         try
         {
-            var path = GameApp.Config == null ? null : SkirmishMaps.Resolve(GameApp.Config, s.Map);
+            var path = GameApp.Config == null ? null : SkirmishMaps.Resolve(GameApp.Config, s.Map, s.MapHash);
             if (path != null)
             {
                 var h = SkirmishMaps.Header(path);
@@ -104,7 +104,7 @@ public partial class LoadingScreen : Control
     bool IsSkirmish => _start.Mode == GameMode.Skirmish;
 
     /// <summary>how this mission is loaded (what the original's journal and ready button go by)</summary>
-    LoadKind Kind => IsSkirmish || _start.Mode != GameMode.Campaign ? LoadKind.Other
+    LoadKind Kind => IsSkirmish || _start.Mode != GameMode.Campaign || PwRemake.Sim.Editor.Triggers.TestMission.IsTestFolder(_start.MissionFolder) ? LoadKind.Other   // (the map editor's Test map: no ready button)
         : _resume != null ? LoadKind.SavedGame
         : _start.Seats != null ? LoadKind.Network
         : LoadKind.Campaign;
@@ -114,7 +114,9 @@ public partial class LoadingScreen : Control
     {
         var a = GameApp.UserArgs();
         if (a.ContainsKey("journal-wait")) return false;
-        return new[] { "quit-after", "screenshot", "shots", "autoplay", "quit-when-done" }.Any(a.ContainsKey);
+        // (a measuring or picture-taking run that quits by itself: --perf, --outbreak-shots, --save-at, --end-at sat at the
+        // ready button for good - a "load" of the Outbreak mission that never ended)
+        return new[] { "quit-after", "screenshot", "shots", "autoplay", "quit-when-done", "editor-walkthrough", "perf", "outbreak-shots", "save-at", "end-at" }.Any(a.ContainsKey);
     }
 
     public override void _Ready()
@@ -401,7 +403,7 @@ public partial class LoadingScreen : Control
     };
 
     /// <summary>the font sizes and outlines follow the picture's height (768 px: the original's size)</summary>
-    void Scale()
+    new void Scale()
     {
         float h = Math.Max(240, _stage.Size.Y), k = h / 768f;
         _title.LabelSettings.FontSize = (int)Math.Round(34 * k);
@@ -487,9 +489,9 @@ public partial class LoadingScreen : Control
         {
             var dir = GameApp.Config?.MissionsDir;
             if (IsSkirmish) return null;
-            return dir == null ? null : Json.TryParseFile(Path.Combine(dir, _mission.Folder, "mission.json"));
+            return dir == null ? null : PwRemake.Sim.Maps.PwMapReader.MissionOf(Path.Combine(dir, _mission.Folder));
         }
-        catch (Exception ex) { L.Warn($"mission.json of {_mission.Folder}: {ex.Message}"); return null; }
+        catch (Exception ex) { L.Warn($"the mission data of {_mission.Folder}: {ex.Message}"); return null; }
     }
 
     static System.Text.Json.Nodes.JsonNode? ReadHelp(List<AssetSource> sources)

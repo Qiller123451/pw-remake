@@ -123,6 +123,56 @@ cheat manager's spawn of the missing units is for skirmish maps only. The JS end
 has no build action for is not ordered (an empty need). `TrainableOf` reports the reason of the producer closest to
 making the unit ("level", "cost" before "req" of a farm in another mode). Tests: `WaveTests`.
 
+## The cheat manager's free units (2026-11-20)
+
+At the squad timeout (above) the original's BuildSquad task calls `SpawnUnits`: every missing unit is asked of the
+cheat manager (`CAiCheatMgr.SpawnUnit`, AiImprovementMgr.usl:125-296). It gives units **only on skirmish maps and only
+at difficulty 9** (`if(m_bMultimap&&!m_bCustommap&&m_iDifficulty!=9) return`, :156; the base game the same without
+MIRAGE's `m_bCustommap`), never on a campaign map (:139) nor to a MIRAGE `CampaignAI` player
+(CustomMapSettings.txt). The remake now does the same (`TribeAI.CheatSpawn`, Attack.cs; `CheatSpawnAllowed`), both
+configurations, with the script's rules:
+
+* no trade units (`hu_cart`, `aje_trade_dino`, `ninigi_cart`; MIRAGE also `seas_trade_dino`), no fishing boats /
+  floating harbour (MIRAGE also `seas_carrier`), workers only below 15, not a unique class already there;
+* a free place in the pyramid plus 5 / 2 / 1 / 1 / 0 extra places per level (SolarsSponsoredUnitTuner);
+* a visible build action - the game options' `flying_disabled` / `titans_disabled` and later epochs keep a class out
+  - and its producing building finished with 5 hit points or more, the one nearest to the village; the unit appears
+  there (the spawn effect), gets its ObjFlag upgrade and its level (the need's level, else GetProperLevel) and walks
+  out, then joins the squad.
+
+Not for a co-op AI commander (an AI assist disables its cheater, CM:495). The other callers of SpawnUnit in the scripts
+(GeneralAttack's spawned solutions, outposts, the ministry of defence's `p_bSpawn`, the SEAS special attack's
+triceratops, the naval scouting) belong to goals the remake does not run. Test: `MirageAiOptionsTests.CheatSpawnSkirmish9`.
+
+## MIRAGE: the AI follows the game options (2026-11-20)
+
+MIRAGE's AI reads the game options through `CMirageAIMgr` (Ai/misc/MirageAIMgr.usl). For the options the remake has
+(Rules/GameplayOptions.cs; `TribeAI.OptEpochSix` / `OptFlying` / `OptRemoveTitans`, MIRAGE only):
+
+| option | where MIRAGE's AI reads it | the remake |
+|---|---|---|
+| MaxEpoch 6 (`EpochSix`) | BuildVillage.UpdateBuildList:406-409: `bEpochSix` asks for `final_stage` at epoch 5; `m_bFinalStage` (GetCurrentAge(brain, true) = 6) adds the sixth stage's buildings (mud pits, mines, launch pads ...); the gifts' epoch factor 4 at age 6 (CM Think:524) | the build list's atoms `bEpochSix`, `m_bFinalStage`, `!m_bFinalStage` (Data.cs; before, unknown atoms - never requested); `AiAge` for the gifts |
+| FlyingEnabled | GeneralAttack.UpdateSolutionWithSpecUnits:647: from epoch 3, difficulty 4 and up, a squad of the main village also asks for 2 flyers (Aje / Hu pteranodons, Dragon Clan cargolifters + a dirigible from epoch 4, SEAS flying helicopters); MinistryOfDefense.SpecialAllowed:1072 for the unit mix's `flyers_enabled` rows | `SpecUnits` (Attack.cs: army-table squads and the village's scripted waves); `SpecialAllowed` (Army.cs) |
+| RemoveTitans | SpecialAllowed:1076, the mix's `titans_enabled` rows | `SpecialAllowed` |
+| BldgMaxCapacity | no AI read: the engine refuses a building over the limit | the planner asks `World.LimitRoom` (Economy.cs, already) |
+| Portals | no AI read (only the Ninigi's Explode list names the terminus, BV:2682) | nothing to do |
+
+**MIRAGE's bug** (`AiGoalMinistryOfDefense.usl:1072`): `SpecialAllowed` drops the `flyers_enabled` rows when
+`RemoveTitans()` is on - meant is "when flying is **off**" (`!FlyingEnabled()`). The remake implements the intended
+test. In practice it matters only with MIRAGE's option FreeSpecials (the remake does not have it; off by default):
+without it a row with a value passes only when a hero of that name is there at level 3+, which `flyers_enabled` /
+`titans_enabled` never are - so with the defaults neither row is trained in MIRAGE nor in the remake. MIRAGE's
+`bFreeSpec` / `bSupply` build rows stay off (options the remake does not have). The hero part of
+UpdateSolutionWithSpecUnits (Babbage's mobile suit, Schliemann's zombies ...) is not ported yet.
+
+**GetAICheatModifier** (FightingObj.usl:9747: weapon cycle × 0.95 / 0.9 at slot difficulty 8 / 9) is applied in MIRAGE
+to every fighting object's weapon duration (FO:9654 - towers and turrets are `CTower : CBuilding : CFightingObj`, and
+their throwing stones' reload uses the same duration, Building.usl:3523), to the ranged / melee durations (10577,
+10617, 10742) and to build-up weapons through their carrier (BuildUpBase.usl:1136). The remake already matches: every
+weapon timer goes through `World.AttackDuration` with the owner's `AiMods.WeaponTime` (units, buildings' turrets and
+stones, the build-up gunners `GunnerUpdate`, open transporters). Tests: `MirageAiOptionsTests` (OptionAtoms,
+FlyersAndTitans, CheatWeaponDuration).
+
 ## Co-op allies and stalls (2026-11-12)
 
 Player reports: "AI allies don't seem that smart and this one got stuck without progressing further" (a Dustrider AI
@@ -370,6 +420,16 @@ on another island than the player's (tests `FerryTests`):
    else the land nearest to it within 24 m (`World.LandIslandNear`), else the land of the attack's first living
    target, else the land within 60 m. (A co-op wave that cannot walk to its seat at all goes by boat or comes ashore:
    docs/COOP.md "Waves that cannot walk".)
+11. **A crossing that ended kept its state** (2026-11-20): only a landing cleared the attack's `FerryState`; a crossing
+   ended by a lost or attacked transport, a timeout, every transport sunk on the way or the attack's own end kept it,
+   with its transports' list - and an attack ended from outside (not by the crossing) kept its transports claimed, so
+   they never served another crossing. Now `FerryDone` clears it and frees the transports, and `Attack.End` calls it
+   (test `FerryTests.FerryStateCleared`).
+12. **Mission 12's Aje on other seeds** (2026-11-20): `Mission12ShipCrossing` failed on seeds 2, 6 and 7 with "p5: a
+   crossing" - not the AI: the test ordered the attack at 30 s, and the Aje (workers and a resource collector at the
+   start) train their first raptor handler at 30 - 50 s by the seed; with no fighter the brain has no squad and the
+   test left it out. The test now waits for each crossing player's first fighter (up to 2 minutes more): seeds 1 - 8
+   cross and land within the test's 4 minutes (seeds 1, 2, 6, 7: both players 130 - 150 s after the order).
 
 Kept as the original's rules (intended delays): a crossing waits up to 2 minutes for a transport being trained, seven
 boarding rounds of 7 crossing thinks (15-25 s each), the squad timeout before a wave sets out (100 / 80 / 60 s), the

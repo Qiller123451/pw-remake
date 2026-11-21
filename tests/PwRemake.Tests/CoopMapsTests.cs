@@ -215,18 +215,17 @@ public static class CoopMapsTests
         if (c == null) return null;
         var e = MissionEntry.LoadIndex(c.Config.MissionsDir).FirstOrDefault(x => x.Id == id);
         if (e == null) return null;
-        var f = Path.Combine(c.Config.MissionsDir, e.Folder, "mission.json");
-        return File.Exists(f) ? System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(f)) : null;
+        return PwRemake.Sim.Maps.PwMapReader.MissionOf(Path.Combine(c.Config.MissionsDir, e.Folder));
     }
     static HashSet<string> MissionClasses(string cfg, int id)
     {
         var c = CampaignTests.LoadCfgPublic(cfg)!;
         var e = MissionEntry.LoadIndex(c.Config.MissionsDir).First(x => x.Id == id);
         var set = new HashSet<string>();
-        var m = System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(Path.Combine(c.Config.MissionsDir, e.Folder, "mission.json")))!;
+        var m = PwRemake.Sim.Maps.PwMapReader.MissionOf(Path.Combine(c.Config.MissionsDir, e.Folder))!;
         foreach (var p in m["players"]!.AsArray())
             foreach (var a in p?["start_army"]?.AsArray() ?? new System.Text.Json.Nodes.JsonArray()) set.Add(((string?)a!["class"] ?? "").ToLowerInvariant());
-        var wj = System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(Path.Combine(c.Config.MissionsDir, e.Folder, "world.json")))!;
+        var wj = PwRemake.Sim.Maps.PwMapReader.WorldOf(Path.Combine(c.Config.MissionsDir, e.Folder))!;
         foreach (var o in wj["objects"]!.AsArray()) set.Add(((string?)o!["class"] ?? "").ToLowerInvariant());
         return set;
     }
@@ -239,7 +238,7 @@ public static class CoopMapsTests
         var e = MissionEntry.LoadIndex(c!.Config.MissionsDir).First(x => x.Id == id);
         var f = WorldBuilder.FindMap(c.Config, e.Map);
         if (f == null) t.Skip($"map {e.Map} not staged");
-        return Ula.ParseUlaFile(f!);
+        return MapFiles.Read(f!);
     }
 
     static ulong Hash(MapData md)
@@ -267,7 +266,7 @@ public static class CoopMapsTests
                 var md = OriginalMap(t, cfg, id);
                 ulong h0 = Hash(md);
                 var a = MapExtension.Apply(md, plan);
-                var b = MapExtension.Apply(Ula.ParseUlaFile(FindMapFile(cfg, id)), plan);
+                var b = MapExtension.Apply(MapFiles.Read(FindMapFile(cfg, id)), plan);
                 string w = $"{cfg} {id:00} ({seats} seats)";
                 t.Equal(h0, Hash(md), $"{w}: the original map data is not changed");
                 t.Equal(Hash(a), Hash(b), $"{w}: deterministic");
@@ -712,7 +711,7 @@ public static class CoopMapsTests
         var c = CampaignTests.LoadCfgPublic("base");
         if (c == null) t.Skip("base configuration not found");
         var f = FindMapFile("base", 1);
-        var s0 = MapSource.OriginalSource(Ula.ParseUlaFile(f), new RulesMapAdapter(c!.Rules), new MapSourceConfig(), n => c.Models.Has(n), c.Forest);
+        var s0 = MapSource.OriginalSource(MapFiles.Read(f), new RulesMapAdapter(c!.Rules), new MapSourceConfig(), n => c.Models.Has(n), c.Forest);
         var s1 = WorldBuilder.MapSourceOf(f, c.Rules, c.Models, null, c.Forest);
         t.Equal(s0.Size, s1.Size, "single player: size"); t.Equal(s0.Origin![0], s1.Origin![0], "single player: origin");
         t.Equal(s0.Trees.Count, s1.Trees.Count, "single player: trees"); t.Equal(s0.Half![0], s0.Origin[0], "an original map: half size = origin");

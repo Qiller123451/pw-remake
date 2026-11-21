@@ -27,6 +27,16 @@ public sealed class AppSettings
     /// <summary>MIRAGE's game options of a campaign mission - single player and co-op (the campaign menu's / co-op
     /// lobby's "Sixth stage", "No titans", "Flying units": GameStart.Gameplay); MIRAGE's defaults: sixth stage on, titans on, flying units off</summary>
     [JsonPropertyName("campaignGameplay")] public PwRemake.Sim.Rules.GameplayOptions CampaignGameplay { get; set; } = new();
+    /// <summary>the campaign menu's tab shown last (0 Campaign, 1 Custom campaigns) and the custom tab's entry chosen last
+    /// ("mission:41", "map:Island", "user:My campaign:2", "remake:sequel" ...: CustomCampaignsTab)</summary>
+    [JsonPropertyName("campaignTab")] public int CampaignTab { get; set; } = 0;
+    [JsonPropertyName("customSelection")] public string CustomSelection { get; set; } = "";
+    /// <summary>the user campaigns' progress: "&lt;campaign folder&gt;" -> the missions won in order (the next one is open)</summary>
+    [JsonPropertyName("customCampaignWon")] public Dictionary<string, int> CustomCampaignWon { get; set; } = new();
+    /// <summary>the colour chosen per campaign (the campaign menu's "Your colour", docs/CAMPAIGN.md "Your colour"): key
+    /// (CampaignColor.Key: "campaign" the original, "booster", "mod", "other:&lt;folder&gt;", "remake", "maps",
+    /// "user:&lt;campaign&gt;", "coop" the co-op lobby's seat) -> a palette id or "#rrggbb"; none: the mission's colour</summary>
+    [JsonPropertyName("campaignColors")] public Dictionary<string, string> CampaignColors { get; set; } = new();
 
     // the skirmish menu (game/src/UI/SkirmishMenu.cs): the last setup per configuration, the own army presets
     [JsonPropertyName("skirmish")] public Dictionary<string, SkirmishSetup> Skirmish { get; set; } = new();
@@ -80,6 +90,11 @@ public sealed class AppSettings
     /// colouring", OptionsMenu.usl AlternativeColoringPFHP): "health" = the health gradient red .. green of
     /// Effects/Selection.tga (default), "player" = the owner's colour (wild animals: their circle colour)</summary>
     [JsonPropertyName("hpBarColors")] public string HpBarColors { get; set; } = "health";
+    /// <summary>the hit point bars of the unit cards (the info window's portrait, the army controller's cards) by the
+    /// health left: green at full, yellow at half, red when low - the original's "alternative colouring" of the army
+    /// controller (OptionsMenu.usl AlternativeColoringACHP: hslicehp, UI/Hud/Logic/HpBarRule.cs). Off: the original's
+    /// default, the owner's colour. On by default (Kacper asked for green .. red)</summary>
+    [JsonPropertyName("cardHpHealth")] public bool CardHpHealth { get; set; } = true;
     /// <summary>the build / produce menu opens when workers or a building are selected (settings.autoMenu)</summary>
     [JsonPropertyName("autoMenu")] public bool AutoMenu { get; set; } = true;
     /// <summary>tooltips next to what the mouse is over (off: the original window above the minimap)</summary>
@@ -163,7 +178,7 @@ public sealed class AppSettings
     {
         var s = Json.Load<AppSettings>(AppPaths.SettingsFile) ?? new AppSettings();
         s.Debug ??= new DebugOptions();
-        s.Skirmish ??= new(); s.ArmyPresets ??= new(); s.CampaignCredits ??= new(); s.CampaignGameplay ??= new();
+        s.Skirmish ??= new(); s.ArmyPresets ??= new(); s.CampaignCredits ??= new(); s.CampaignGameplay ??= new(); s.CustomCampaignWon ??= new(); s.CampaignColors ??= new(); s.CustomSelection ??= "";
         // (older settings: autosave off was 0 minutes)
         if (s.AutosaveMinutes <= 0) { s.Autosave = false; s.AutosaveMinutes = 10; }
         return s;

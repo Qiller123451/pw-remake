@@ -5,6 +5,10 @@
 //    not an "attack" clip - its flame stream and smoke spray only while one plays (the view: Particles.IsAttackClip)
 //  * a dead carrier's parts stop (Composite.Died): the ankylosaurus' catapult kept swinging "attack_front" on the
 //    dead body - riders, turrets, build-ups hold a pose, no clip of theirs runs on
+//  * the kennel's sabre-tooths (CKennelEusmilus), the Dragon Clan nest's dilophosaurs (CNinigiDilophosaurus) and
+//    MIRAGE's nest gallimimus (CAjeGallimimus) keep the wild look under an owner (their OnInit hides saddle, harness,
+//    party colour), and an infected kennel breeds infected guards (Kacper 2026-11-20, Outbreak: "Kennel Eusmilus do
+//    not have skin" - they came out of the infected kennel healthy, in saddle and harness)
 using System.Linq;
 using PwRemake.Sim.World;
 
@@ -26,6 +30,34 @@ public static class AnimalLookTests
         t.True(((arena.HideMask >> SADDLE) & 1) == 1 && ((arena.HideMask >> PARTYCOL) & 1) == 1 && !arena.PartyTinted,
             $"an owned arena allosaurus: saddle and party colour hidden (mask {arena.HideMask:x})");
         t.True(((tamed.HideMask >> SADDLE) & 1) == 0 && tamed.PartyTinted, $"an owned aje_allosaurus: saddle shown (mask {tamed.HideMask:x})");
+    }
+
+    public static void KennelGuardsWildAndInfected(TestContext t)
+    {
+        foreach (var (env, cfg) in new[] { ("PW_DATA", "base"), ("PW_DATA_MIRAGE", "MIRAGE") })
+        {
+            var dir = System.Environment.GetEnvironmentVariable(env);
+            if (string.IsNullOrEmpty(dir)) continue;          // (the MIRAGE data: when PW_DATA_MIRAGE is set)
+            var (R, M) = Sys1.Load(t, dir);
+            foreach (var cls in new[] { "hu_kennel_eusmilus", "ninigi_dilophosaurus" }.Concat(cfg == "MIRAGE" ? new[] { "aje_gallimimus" } : new string[0]))
+                t.True(Compose.WildLook(R, cls), $"{cfg}: {cls} keeps the wild look");
+            t.True(!Compose.WildLook(R, "hu_eusmilus") && !Compose.WildLook(R, "Eusmilus"), $"{cfg}: the eusmilus rider's mount and the wild one are no kennel guards");
+            var W = Sys1.NewWorld(R, M);
+            var p = Sys1.AddPlayer(W, R, 1, "Hu");
+            var healthy = W.PlaceBuilding("hu_kennel", p, 60, 60, 0, true)!;
+            var kennel = W.PlaceBuilding("hu_kennel", p, 160, 160, 0, true)!;
+            W.SetInfection(kennel, 2);
+            for (int i = 0; i < 30 / World.STEP && (kennel.Nest?.Members.Count ?? 0) < 2; i++) W.Step();
+            var guards = kennel.Nest?.Members ?? new System.Collections.Generic.List<Unit>();
+            t.True(guards.Count > 0, $"{cfg}: the infected kennel breeds its guards ({guards.Count})");
+            foreach (var g in guards)
+            {
+                t.True(g.Infection == 2, $"{cfg}: {g.Name} of the infected kennel is infected like it (stage {g.Infection})");
+                t.True(((g.HideMask >> SADDLE) & 1) == 1 && ((g.HideMask >> PARTYCOL) & 1) == 1 && !g.PartyTinted,
+                    $"{cfg}: {g.Name}: no saddle, no harness in the owner's colours (mask {g.HideMask:x})");
+            }
+            t.True((healthy.Nest?.Members ?? new()).All(g => g.Infection == 0), $"{cfg}: the healthy kennel's guards are healthy");
+        }
     }
 
     public static void WeaponClipsOfTheRules(TestContext t)

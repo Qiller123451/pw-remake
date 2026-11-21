@@ -81,6 +81,107 @@ public static class BuildingRuinTests
         t.True(bad.Count == 0, $"{bad.Count} building classes do not play their destruction:\n      " + string.Join("\n      ", bad));
     }
 
+    /// <summary>
+    /// The other way round (2026-11-20, "check every building of every tribe"): every destruction clip of the model
+    /// data - a "&lt;model&gt;_dest" with a clip - that nothing in the remake leaves. Used are the ruins of every building
+    /// class at every level (its gfx per level, World.RuinOf), of the parts it may show (World.RuinPartsOf, every variant),
+    /// a ship's and a vehicle's wreck (Combat.ShipWreck, VehicleWreck - the vehicles' were missing: 22 classes of
+    /// MIRAGE), MIRAGE's pirate ship parts and the ruins of another name. What is left is listed
+    /// and must be scenery (no class of the rules: a map prop's model, docs/VIEW.md "Destruction"); a ruin of a class
+    /// that is never used fails the test.
+    /// </summary>
+    public static void BaseUnusedDestructionClips(TestContext t) => Unused(t, Sys2.Base);
+    public static void MirageUnusedDestructionClips(TestContext t) => Unused(t, Sys2.Mirage);
+
+    /// <summary>a destroyed vehicle leaves its wreck "&lt;gfx&gt;_dest" (Combat.VehicleWreck, Vehicle.usl CreateCorpse), the
+    /// live model hidden, gone after 10 s; one that has no such model keeps its own death</summary>
+    public static void VehicleLeavesItsWreck(TestContext t)
+    {
+        var (w, p, _) = Sys2.World(t, Sys2.Base, size: 256);
+        var tank = w.SpawnUnit("hu_steam_tank", p, 10, 10, 3, 0);
+        t.True(tank != null, "a steam tank");
+        w.Kill(tank!, null);
+        t.Equal("hu_steam_tank_dest", tank!.Wreck?.Gfx, "its wreck");
+        Sys2.Run(w, 9);
+        t.True(!tank.Removed, "the wreck stands for 10 s");
+        Sys2.Run(w, 2);
+        t.True(tank.Removed, "then it is gone");
+        var cart = w.SpawnUnit("hu_cart", p, 20, 10, null, 0);
+        if (cart != null && w.Models.Has((cart.Gfx ?? "") + "_dest")) { w.Kill(cart, null); t.True(cart.Wreck != null, "the cart's wreck"); }
+    }
+
+    /// <summary>a building whose model an upgrade replaced (the Norse large tower's ballista: hu_large_tower_upgrade)
+    /// leaves the ruin of that model (World.RuinOf on its current Stats.Gfx; CBuildingCorpse.Init(GetGfxName()))</summary>
+    public static void UpgradedBuildingLeavesItsRuin(TestContext t)
+    {
+        var (w, p, _) = Sys2.World(t, Sys2.Base, size: 256);
+        var b = w.PlaceBuilding("hu_large_tower", p, 0, 0);
+        t.True(b != null, "a large tower");
+        t.True(Sys1.Invent(w.Data, p, "hu_ballista_upgrade"), "the ballista upgrade");
+        b!.RefreshRules();
+        t.Equal("hu_large_tower_upgrade", b.Gfx?.ToLowerInvariant(), "the upgraded model");
+        w.KillBuilding(b, null);
+        t.Equal("hu_large_tower_upgrade_dest", b.Ruin, "the upgraded model's ruin");
+    }
+
+    /// <summary>the wagons drawn by animals (the chariot's, the Dragon Clan cart's and drum wagon's): their models have a
+    /// "_dest" with a clip, but the original's scripts make no corpse of them - an animal leaves its CharacterCorpse
+    /// (Animal.usl:900), only CVehicle / CShip / CBuilding make "_dest" corpses - so the remake leaves none either</summary>
+    static readonly HashSet<string> WAGONS = new(StringComparer.OrdinalIgnoreCase) { "hu_chariot_trailer_dest", "ninigi_cart_dest", "ninigi_drumwagon_dest" };
+
+    static void Unused(TestContext t, string data)
+    {
+        var (w, _, _) = Sys2.World(t, data, size: 256);
+        var D = w.Data;
+        var used = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var classGfx = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);     // a model -> a class that shows it
+        foreach (var (name, info) in D.Index)
+        {
+            for (int l = 1; l <= 5; l++)
+            {
+                var g = D.Stats(name, l, null)?.Gfx;
+                if (string.IsNullOrEmpty(g)) continue;
+                classGfx.TryAdd(g, name);
+                // a building's ruin, a ship's or a vehicle's wreck (Combat.ShipWreck / VehicleWreck)
+                if (info.Type is "BLDG" or "SHIP" or "VHCL") { used.Add(g + "_dest"); used.Add(g + "_dest_water"); }
+            }
+            if (D.ClassGfx(name) is { } cg) classGfx.TryAdd(cg, name);
+            foreach (var c in D.Composites(name))
+                foreach (var g in c.Variants.Count > 0 ? c.Variants : new List<string> { c.Gfx })
+                {
+                    if (string.IsNullOrEmpty(g)) continue;
+                    classGfx.TryAdd(g, name);
+                    if (info.Type is "BLDG" or "SHIP") used.Add(g + "_dest");
+                }
+        }
+        // the models an upgrade gives a class (a tech tree modificator "replace /Objects/<tribe>/<type>/<class>/gfx": the
+        // Norse large tower's ballista, the bunker's upgrade, the Dustriders' farm types and big tent ...): Building.Stats
+        // follows the owner's tree, World.RuinOf leaves "<that gfx>_dest"
+        var tt = System.IO.File.ReadAllText(System.IO.Path.Combine(data, "techtree.json"));
+        foreach (System.Text.RegularExpressions.Match m in System.Text.RegularExpressions.Regex.Matches(tt,
+            "\"path\":\"/Objects/[^/\"]+/(BLDG|SHIP|VHCL|ANML|CHTR)/([^/\"]+)(?:/[^\"]*)?/gfx\",\"value\":\"([^\"]+)\""))
+        {
+            var g = m.Groups[3].Value;
+            classGfx.TryAdd(g, m.Groups[2].Value);
+            if (m.Groups[1].Value is "BLDG" or "SHIP" or "VHCL") { used.Add(g + "_dest"); used.Add(g + "_dest_water"); }
+        }
+        // ruins of another name (World.RUIN_GFX: MIRAGE's ninigi_large_tower) and the pirate ship's parts (PirateShip.cs)
+        used.Add("ninigi_smoke_tower_dest");
+        foreach (var n in new[] { "pirate_boss", "pirate_boss_tail", "pirate_boss_row", "pirate_boss_sail", "pirate_boss_cannons", "pirate_boss_cannons_reduced",
+            "ninigi_pirate_ship", "ninigi_pirate_ship_tail", "ninigi_pirate_ship_row", "ninigi_pirate_ship_sail", "ninigi_pirate_ship_cannons" })
+            used.Add(n + "_dest");
+        var withClip = w.Models.Names.Where(m => m.EndsWith("_dest", StringComparison.OrdinalIgnoreCase) && Clips(w, m) > 0).OrderBy(m => m, StringComparer.Ordinal).ToList();
+        var unused = withClip.Where(m => !used.Contains(m)).ToList();
+        // a model of a class (what the ruin's name points at) whose ruin with a clip is never left = a missing destruction
+        var ofClass = unused.Where(m => classGfx.ContainsKey(m[..^5]) && !WAGONS.Contains(m)).Select(m => $"{m} ({classGfx[m[..^5]]})").ToList();
+        t.Log("wagons of animals (no corpse in the original's scripts): " + string.Join(", ", unused.Where(WAGONS.Contains)));
+        var scenery = unused.Where(m => !classGfx.ContainsKey(m[..^5])).ToList();
+        t.Log($"{withClip.Count} models \"<model>_dest\" with a clip; {withClip.Count - unused.Count} left by a class");
+        t.Log("not left by any class (scenery - map props of their own): " + (scenery.Count == 0 ? "none" : string.Join(", ", scenery)));
+        t.True(withClip.Count > 50, "the data's ruins");
+        t.True(ofClass.Count == 0, $"{ofClass.Count} destruction clips of a class's model never played:\n      " + string.Join("\n      ", ofClass));
+    }
+
     /// <summary>a destroyed building's ruin parts keep the live part's link and turn; the live parts are not drawn on the
     /// ruin (EntityView.SimParts) - checked here on the simulation's side: the nest keeps no live turret among them</summary>
     public static void TurretRuinKeepsItsTurn(TestContext t)

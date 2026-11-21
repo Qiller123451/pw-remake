@@ -11,7 +11,9 @@
 // told its setting (ModelInstance.SetSetting: buildings, their attached parts, the map's decoration and objects) draws
 // those surfaces with Variant(material, setting) - one copy per (material, setting), shared by every model of that
 // kind there: a village of 40 Norse buildings in the Icewaste adds one material per atlas material, not per building.
-// The party colour, SEAS paint and "units behind" copies are made from the variant as from the plain material.
+// The party colour, SEAS paint and "units behind" copies are made from the variant as from the plain material - the
+// SEAS paint with its white parts found on the plain texture, so the variant's painted snow stays white
+// (MaterialTag.Plain, ModelMaterials.SeasPainted).
 // No variant in that setting (the Dustriders in the Northland, caves, content prepared before the variants): the plain
 // material. Option "Setting textures on buildings" (Options, Graphics; AppSettings.SettingTextures, default on,
 // applied at once - Epoch): off, every building plain and no shader snow (SnowCover).
@@ -76,6 +78,8 @@ public static class SettingMaterials
             {
                 GsfFlags = tag.GsfFlags, Party = tag.Party, Glow = tag.Glow, Map = tex, Paint = tag.Paint, Building = tag.Building,
                 Snow = tag.Snow, Model = tag.Model, Source = src, SettingKey = tag.SettingKey, Settings = tag.Settings, Setting = setting,
+                // (the SEAS paint keys the white parts by the plain texture, not by the variant's painted snow)
+                Plain = tag.Map,
             });
             v = c;
         }

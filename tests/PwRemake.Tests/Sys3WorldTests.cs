@@ -313,7 +313,7 @@ public static class Sys3WorldTests
         var shoal = W.Resources.FirstOrDefault(r => r.Water);
         if (shoal == null) t.Skip("no fish on the map");
         var wn = W.WaterNav!;
-        var (bx, bz) = wn.Center(wn.NearestFree(wn.Idx(shoal.Pos.X + 30, shoal.Pos.Z), 40));
+        var (bx, bz) = wn.Center(wn.NearestFree(wn.Idx(shoal!.Pos.X + 30, shoal.Pos.Z), 40));
         var boat = E.U("hu_fishing_boat", E.P, bx, bz);
         t.True(W.StartFishing(boat, shoal), "a boat at the map's fish");
         for (int i = 0; i < 2400 && boat.Carry == null; i++) W.Step();
@@ -323,7 +323,7 @@ public static class Sys3WorldTests
         var ship = E.U("hu_transport_ship", E.P, sx, sz);
         var shore = W.ShorePoint(ship, 400);
         if (shore == null) t.Skip("no land near the sea");
-        var man = E.U("hu_warrior", E.P, shore.Value.X, shore.Value.Z);
+        var man = E.U("hu_warrior", E.P, shore!.Value.X, shore.Value.Z);
         W.Order(man, new Order("board") { Target = ship });
         for (int i = 0; i < 4000 && !man.Inside; i++) W.Step();
         t.True(man.Inside && man.InsideOf == ship, "boarded at the map's shore");
@@ -511,7 +511,7 @@ public static class Sys3WorldTests
         t.True(jet.Pos.X > 10, "flies");
         t.True(W.SetFlying(jet, false), "lands");
         E.Step(3.1);
-        t.True(!jet.Flying && jet.LiftH == 0 && !jet.LocalTT.Has(MirageMoves.F.jet), "on the ground");
+        t.True(!jet.Flying && jet.LiftH == 0 && !jet.LocalTT!.Has(MirageMoves.F.jet), "on the ground");
         // explosive rounds: a switch that costs the lumberjack 15 hit points a second
         var lj = E.W.SpawnUnit("seas_lumberjack_minigun", E.P, 20, 20, 5);
         if (lj != null)

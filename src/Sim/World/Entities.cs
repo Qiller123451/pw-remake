@@ -475,7 +475,7 @@ public sealed partial class Unit : Entity
     /// <summary>
     /// idle behaviour from IdleAnims.txt: weighted random choice of stand / idle animations, each played as the engine's
     /// start / loop / end clip - its start part, min_loops .. max_loops of its loop part, its end part (AnimCtl.PlayLoops;
-    /// a clip without loop marks: that many times whole) - then the next. The end part of what the unit did before (a
+    /// the set's standanim and a clip without loop marks: once, as CIdleAnimMgr.StartAnim) - then the next. The end part of what the unit did before (a
     /// worker's hammering or chopping, a healer's heal_0, a shot's raised bow) plays out first: the original ends those
     /// actions with it (AnimActionStopLoop) before the idle animation is set.
     /// </summary>
@@ -505,6 +505,10 @@ public sealed partial class Unit : Entity
         foreach (var e in opts) { r -= e.Weight; if (r <= 0) { pick = e; break; } }
         int loops = pick.MinLoops + (int)Math.Floor(World.Rng.Next() * (pick.MaxLoops - pick.MinLoops + 1));
         IdleCur = pick.Anim.ToLowerInvariant();
+        // the original plays the set's standanim once (SetAnim(.., 1, 0)) and a clip without loop marks once too (a
+        // fidget, an animal's roar - CIdleAnimMgr.StartAnim: SetSLEAnim gives it no length, SetAnim(anim, 1, 0)); only
+        // a start / loop / end clip loops min .. max times (the draws stay as they were)
+        if (string.Equals(pick.Anim, set[0].Anim, StringComparison.OrdinalIgnoreCase) || !A.Has(IdleCur + "#l")) loops = 1;
         IdleLeft = A.PlayLoops(IdleCur, loops, true, true, 1, null, 0.25);
     }
 
@@ -1520,6 +1524,11 @@ public sealed partial class ResNode : Entity
     public double RotT;
     /// <summary>other options of the map source (data)</summary>
     public Args Opts = new();
+    /// <summary>the remake's infinite resource (map attribute infinite = 1, docs/MAP_FORMAT.md): every load is taken
+    /// without lessening Amount - it is never used up (the HUD shows ∞)</summary>
+    public bool Infinite;
+    /// <summary>a tree that lay felled from the start (map attribute fallen = 1): the view draws its log at rest</summary>
+    public bool Fallen;
 
     public ResNode(World world, string type, string res, double x, double z, double amount, ResOpts? opts = null)
         : base(world, "res", null, x, z)
@@ -1538,6 +1547,7 @@ public sealed partial class ResNode : Entity
         Rot = opts.Rot; Scale = opts.Scale;
         StumpKind = opts.StumpKind; TimberKind = opts.TimberKind;
         if (opts.Extra != null) Opts = opts.Extra;
+        Infinite = opts.Infinite;
     }
 }
 
@@ -1551,6 +1561,8 @@ public sealed class ResOpts
     public string? Name, StumpKind, TimberKind;
     public double Rot, Scale = 1;
     public Args? Extra;
+    /// <summary>never used up (ResNode.Infinite)</summary>
+    public bool Infinite;
 }
 
 // ======================================================================= projectiles

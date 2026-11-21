@@ -64,7 +64,7 @@ public static class MirageAjeTests
         if (f == null) t.Skip("MIRAGE's AI scripts not in the installation");
         var A = new AiData(c.Ai);
         t.Equal(0.0, A.Gift(9, true)["food"], "ai.json: no gifts (the toolkit reads the base game's form only)");
-        t.True(A.ReadControlScript(File.ReadAllText(f)), "the control script is read");
+        t.True(A.ReadControlScript(File.ReadAllText(f!)), "the control script is read");
         t.Equal(0.0, A.Gift(4, true, 1, 0)["food"], "player 0 gets nothing (Think: m_iPlayerID!=0)");
         t.Equal(0.0, A.Gift(1, true, 1, 1)["food"], "difficulty 0-1: nothing");
         var med = A.Gift(4, true, 1, 1);

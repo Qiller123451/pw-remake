@@ -10,7 +10,7 @@ public static class ControlsList
 {
     public static readonly (string Keys, string What)[] Rows =
     {
-        ("Left click / drag", "Select / box select (Shift adds) · double-click: all of that kind on screen (Ctrl: of that type, Shift: everything)"),
+        ("Left click / drag", "Select / box select (Shift adds - buildings too, Ctrl adds or removes) · double-click: all of that kind on screen (Ctrl: of that type, Shift: everything)"),
         ("F1", "The help book, at what is under the mouse, being placed or selected"),
         ("Right click", "Move, attack, gather, build, repair, deliver, heal (healers), enter a bunker / transport, set rally point"),
         ("Right drag", "Draw an arrow: the group lines up there facing the arrow, the longer the arrow the wider the ranks"),

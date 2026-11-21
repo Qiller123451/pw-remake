@@ -413,7 +413,7 @@ public sealed class GroundLayers
             Scales.AddRange(S.Scales);
             return;
         }
-        foreach (var id in S.BiomeLayer.Biomes)
+        foreach (var id in S.BiomeLayer!.Biomes)      // (not single: the map has a biome layer)
         {
             var b = set.Get(id) ?? baseBiome;
             Biomes.Add(b);

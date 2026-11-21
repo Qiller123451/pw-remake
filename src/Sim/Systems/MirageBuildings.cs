@@ -297,6 +297,7 @@ public sealed partial class World
         double rot = b.Rot;
         RemoveEntity(b);
         var u = SpawnUnit(unit, owner, at.X, at.Z, lv, rot);
+        InheritInfection(b, u);
         if (u != null) Emit("launched", new Args { ["building"] = b, ["unit"] = u });
         return u;
     }

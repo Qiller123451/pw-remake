@@ -40,7 +40,7 @@ public static class CutsceneMission13Tests
         var A = new SeqActors(s.Campaign, Play(s, "sc_4070.seq"));
         var car = A.List.First(a => a.A["name"].Str() == "seas_carrier_10" && a.A["items"]!.AsArray().Any(i => i!["anim"].Str() == "unload"));
         if (car.Prop == null) t.Skip("the carrier is not bound to a prop in this content");
-        t.True(car.Prop.Anim?.Has("unload") == true, "the carrier's model has its unload clip");
+        t.True(car.Prop!.Anim?.Has("unload") == true, "the carrier's model has its unload clip");
         var clips = new SceneClips(A);
         var an = clips.Of(car.Prop);
         t.True(an != null, "the bound carrier gets a clip of the scene");
@@ -160,7 +160,7 @@ public static class CutsceneMission13Tests
         var root = Environment.GetEnvironmentVariable("PW_CONTENT") is { Length: > 0 } pc ? pc : "/home/claude/testcontent";
         var dir = Path.Combine(root, "configs", "base", "missions");
         if (!Directory.Exists(dir)) t.Skip("no base missions");
-        JsonObject Seqs(string folder) => (Json.ParseFile(Path.Combine(dir, folder, "world.json"))?["sequences"] as JsonObject) ?? new JsonObject();
+        JsonObject Seqs(string folder) => (PwRemake.Sim.Maps.PwMapReader.WorldOf(Path.Combine(dir, folder))?["sequences"] as JsonObject) ?? new JsonObject();
 
         // sc_4070
         var sc = Seqs("13_single_13")["Cpn_single_001/single_13/sc_4070.seq"]?["play"]?["actors"] as JsonArray;

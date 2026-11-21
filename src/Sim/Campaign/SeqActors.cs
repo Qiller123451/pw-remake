@@ -105,7 +105,11 @@ public sealed class SeqActors
                 // (Registry.Select, CoopRuntime.OwnerMatches) - the freed spearmen dealt to the seats are mission 1's
                 // spearmen of sc_1040 all the same, and the scene's end puts them on Stina's side of the rockfall
                 bool OwnerOk(Entity e) => e.Owner == owner || (C.Coop != null && e.Owner != null && bOwner >= 0 && C.Coop.OwnerMatches(e.Owner.Id, bOwner));
-                rec = recs.FirstOrDefault(r => !taken.Contains(r) && Live(r) && (Lc(r.Cls) == cls || Lc(r.Cls) == own || C.Objects.ClassIs(r, cls)) &&
+                // (scenery - a record that is only a prop - is bound by class only when the binding names it: sc_1040's
+                // rockfall stones Northland_Stones_05_9 / _01_9 are the scene's own, and bound to the first map stone of
+                // their class - a hidden one that appears after the scene - they were never drawn, the boulder hung over
+                // the walkway with nothing under it and the spearmen climbed over nothing)
+                rec = recs.FirstOrDefault(r => !taken.Contains(r) && Live(r) && (ObjOf(r) != null || nm.Length > 0) && (Lc(r.Cls) == cls || Lc(r.Cls) == own || C.Objects.ClassIs(r, cls)) &&
                     (bOwner == -2 || (ObjOf(r) != null ? OwnerOk(ObjOf(r)!) : bOwner < 0)) &&
                     (!(lvl >= 0) || ObjOf(r) == null || ((ObjOf(r) as Unit)?.Level ?? 1) - 1 == lvl) &&
                     (nm.Length == 0 || Lc(r.Name) == Lc(nm)));

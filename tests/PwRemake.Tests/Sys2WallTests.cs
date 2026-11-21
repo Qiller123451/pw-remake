@@ -52,7 +52,7 @@ public static class Sys2WallTests
         var workers = new List<Unit> { w.SpawnUnit("hu_worker", p, -40, -10)!, w.SpawnUnit("hu_worker", p, -40, -14)! };
         p.Debug = debug;
         var before = p.Res.ToDictionary(kv => kv.Key, kv => kv.Value);
-        int n = w.PlaceWall(p, a, line.Select(x => (x.I, x.J, x.X, x.Z, x.State == "have")).ToList(), workers, false);
+        int n = w.PlaceWall(p, a, line!.Select(x => (x.I, x.J, x.X, x.Z, x.State == "have")).ToList(), workers, false);
         t.Equal(10, n, "ten pieces placed");
         if (!p.Debug) foreach (var r in Rules.RES) t.Equal(before[r] - 10 * a.Cost[r], p[r], $"{r}: ten pieces paid");
         var pieces = Pieces(w, "hu_palisade");
@@ -147,7 +147,7 @@ public static class Sys2WallTests
         t.Equal(0, w.WallPreviewOf(p, null).Count, "no line: nothing");
         // the line placed (finished): a new line from its east end shows that piece too, with its arm towards the new tile
         w.PlaceWall(p, a, line!.Select(x => (x.I, x.J, x.X, x.Z, false)).ToList(), new List<Unit>(), false);
-        var last = line[^1];
+        var last = line![^1];
         var end = WM.At(last.I, last.J)!.Wall!;
         var line2 = w.WallLineOf(p, a, last.X + 8, last.Z, last.X + 24, last.Z);
         t.True(line2 != null && line2.Count >= 2, "a second line next to the first");
@@ -188,7 +188,7 @@ public static class Sys2WallTests
                 t.True(line != null && line.Count == 10, $"{tribe}: a line of {wall.Results[0].Obj}");
                 w.PlaceWall(p, wall, line!.Select(x => (x.I, x.J, x.X, x.Z, false)).ToList(), new List<Unit>(), false);
                 var WM = w.Walls!;
-                var (mx, mz) = WM.Centre(line[4].I, line[4].J);
+                var (mx, mz) = WM.Centre(line![4].I, line[4].J);
                 foreach (var a in acts)
                 {
                     var name = a.Results[0].Obj;

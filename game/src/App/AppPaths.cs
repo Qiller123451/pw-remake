@@ -1,7 +1,8 @@
 // Where the game keeps its things on disk.
 //
 //   user folder (Godot's user://, on Windows %APPDATA%\Godot\app_userdata\ParaWorld Remake):
-//     settings.json, logging.json, logs/, saves/
+//     settings.json, logging.json, logs/, saves/, maps/ (the user's own maps: the map editor's saves, imported .pwmap
+//     files - MapFiles.UserDir), campaigns/ (the user's campaigns: UserCampaign.Dir), cache/ (custom maps prepared as missions)
 //   content folder: content/ in the repository root (the editor: game/..; an exported game: found from the
 //     executable's folder upwards, else next to the executable), or what settings.json "contentRoot" says - the configurations made by the prepare tool (docs/CONTENT.md)
 using System.IO;
@@ -16,6 +17,12 @@ public static class AppPaths
     public static string SavesDir => Path.Combine(UserDir, "saves");
     public static string SettingsFile => Path.Combine(UserDir, "settings.json");
     public static string LoggingFile => Path.Combine(UserDir, "logging.json");
+    /// <summary>the user's own maps (docs/MAP_EDITOR.md "Saving and sharing"; ids "User/&lt;name&gt;")</summary>
+    public static string MapsDir => Path.Combine(UserDir, "maps");
+    /// <summary>things made from other files that can be made again (custom maps prepared as missions)</summary>
+    public static string CacheDir => Path.Combine(UserDir, "cache");
+    /// <summary>the user's campaigns: one folder per campaign with its campaign.lua (docs/CAMPAIGN.md "Custom campaigns")</summary>
+    public static string CampaignsDir => Path.Combine(UserDir, "campaigns");
 
     /// <summary>The folder of the Godot project (editor) or of the executable (exported game).</summary>
     public static string GameDir => OS.HasFeature("editor")

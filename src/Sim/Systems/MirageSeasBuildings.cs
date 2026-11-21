@@ -252,6 +252,7 @@ public sealed partial class World
         var (x, z) = b.ExitPoint(b.Pos.X + 5, b.Pos.Z + 5);
         var u = SpawnUnit(STYGI_SPAWN, b.Owner, x, z, 1, 0, new UnitOpts { Autonomous = true });
         if (u == null) return;
+        InheritInfection(b, u);
         u.HomeX = b.Pos.X; u.HomeZ = b.Pos.Z; u.HomeRadius = NEST_RADIUS_1;
         n.Members.Add(u);
     }

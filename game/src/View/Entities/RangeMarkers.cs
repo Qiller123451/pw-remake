@@ -99,7 +99,7 @@ void fragment() {
     readonly List<(double A0, double A1)> _scratch = new();
     readonly System.Diagnostics.Stopwatch _clock = System.Diagnostics.Stopwatch.StartNew();
     /// <summary>markers drawn (the option "Show attack ranges")</summary>
-    public bool Show = true;
+    public new bool Show = true;
 
     public RangeMarkers(GameSession s) { S = s; Name = "RangeMarkers"; }
 

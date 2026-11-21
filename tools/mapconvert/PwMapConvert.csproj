@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- The map converter (docs/MAP_FORMAT.md "Converting"): the original maps (.ula) and the campaign's mission folders
+       -> the remake's map format. Prepare runs it (tools/prepare/prepare.py); dotnet run (in tools/mapconvert) with a
+       command. Uses the simulation's map code (PwMapConvert, PwMapWriter) - no Godot. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <RootNamespace>PwRemake.Tools.MapConvert</RootNamespace>
+    <AssemblyName>pwmapconvert</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/Sim/PwRemake.Sim.csproj" />
+  </ItemGroup>
+</Project>

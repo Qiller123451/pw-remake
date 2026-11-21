@@ -88,6 +88,10 @@ public partial class SelectionOverlay : Node3D
         return img == null ? null : ImageTexture.CreateFromImage(img);
     }
 
+    /// <summary>the Attack mode with an area weapon: the splash circle that follows the mouse (the original's range marker
+    /// of m_fAreaRange, SecondaryInputController.usl) - red where the shot can go, grey inside the minimum range; null:
+    /// none (GameInput sets it every frame)</summary>
+    public (double X, double Z, double R, bool Ok)? AimArea;
     /// <summary>a ring where an order went (overlay.js marker)</summary>
     public void Marker(double x, double z, int color) => _markers.Add((x, z, 0, color));
     /// <summary>the message line while there is no HUD</summary>
@@ -99,22 +103,34 @@ public partial class SelectionOverlay : Node3D
     void PutRing(Entity e, double x, double z, int rgb, double op, string key)
     {
         var (r, ax, az, cx, cz) = SelectionRing.Shape(e);
+        r = BodyR(e, r);
+        if (S.Entities.BodyOf(e) != null) { cx = 0; cz = 0; }      // (a carcass: x, z are already its body's middle)
         _ground.Add(x + cx, z + cz, r, rgb, (float)op, key, null, ax, az);
     }
 
-    /// <summary>the selection circle's radius: round the model's selection volume (SelectionRing - a walker's legs, a
-    /// brachiosaurus' neck, a ship's hull), at least a building's footprint / a flat plot's whole pick volume
-    /// (Building.PickR) / a bit wider than a unit's body</summary>
+    /// <summary>the selection circle's radius: the original's from the model's GSF box (SelectionRing.Original), else
+    /// round the model's selection volume (a walker's legs, a brachiosaurus' neck, a ship's hull), at least a building's
+    /// footprint / a flat plot's whole pick volume (Building.PickR) / a bit wider than a unit's body</summary>
     public static double RingR(Entity e) => SelectionRing.Of(e);
     /// <summary>a question mark's circle (its model is about 2 m across)</summary>
     const double MARK_R = 1.4;
-    (double X, double Z) At(Entity e) { var p = S.Entities.PosOf(e); return e is Building ? (e.Pos.X, e.Pos.Z) : (p.X, p.Z); }
+    public (double X, double Z) At(Entity e)
+    {
+        // (a carcass: round its body as it lies - EntityViews.BodyOf)
+        if (S.Entities.BodyOf(e) is { } bd) return (bd.X, bd.Z);
+        var p = S.Entities.PosOf(e); return e is Building ? (e.Pos.X, e.Pos.Z) : (p.X, p.Z);
+    }
+    /// <summary>a carcass's ring: round its body's bones (at most 8 m), never smaller than the ring it had</summary>
+    public double BodyR(Entity e, double r) => S.Entities.BodyOf(e) is { } bd ? Math.Max(r, Math.Min(8, bd.Reach + 0.4)) : r;
+    /// <summary>a resource's bar: grey, like a health bar (how much is left of it)</summary>
+    public static readonly Color FOOD_BAR = new(0.78f, 0.78f, 0.76f);
 
     public void Step(double dt)
     {
         var W = S.World;
         if (!S.Cinematic)
         {
+            if (AimArea is { } aa) Put(aa.X, aa.Z, aa.R, aa.Ok ? 0xff3a2a : 0x9a9a9a, 0.9, "aim");
             foreach (var e in S.Selection.Items)
             {
                 if (!e.Alive) continue;
@@ -296,7 +312,7 @@ public partial class OverlayCanvas : Control
 
     public override void _Draw()
     {
-        if (S.Mission == null || S.Cinematic) { DrawMessages(); return; }
+        if (S.Sim == null || S.Cinematic) { DrawMessages(); return; }   // (not S.Mission: a skirmish, a custom map and the sequel's missions have none - their bars and drag box were not drawn)
         var cam = S.Renderer.Camera;
         var size = GetViewportRect().Size;
         var hover = S.Input.Hover;
@@ -376,6 +392,22 @@ public partial class OverlayCanvas : Control
         }
         foreach (var u in S.World.Units) One(u);
         foreach (var b in S.World.Buildings) One(b);
+        // gatherable resources (trees, stone, bushes, fruit, carcasses ...): what is left as a grey bar low across the front
+        // of the ring, while selected or under the mouse (a carcass: round its body; Alt: every carcass on screen)
+        void Food(ResNode n)
+        {
+            if (!n.Alive || n.Infinite || n.Amount <= 0 || n.Max <= 0 || !S.Fog.Explored(n.Pos.X, n.Pos.Z)) return;
+            var (fx, fz) = O.At(n);
+            float fr = (float)O.BodyR(n, SelectionOverlay.RingR(n));
+            var ffoot = new Vector3((float)fx, 0, (float)fz) + toCam * (fr * 0.7f);
+            ffoot.Y = (float)S.World.Height(ffoot.X, ffoot.Z) + 0.1f;
+            if (SpanAt(ffoot, fr * 0.85f) is not { } F) return;
+            Line(F, n.Amount / n.Max, SelectionOverlay.FOOD_BAR, GroundRings.BAR_BACK);
+        }
+        var foodShown = new HashSet<ResNode>();
+        foreach (var se in S.Selection.Items) if (se is ResNode srn && foodShown.Add(srn)) Food(srn);
+        if (hover is ResNode hn && foodShown.Add(hn)) Food(hn);
+        if (alt) foreach (var arn in S.World.Resources) if (arn.Type == "corpse" && foodShown.Add(arn)) Food(arn);
         // the formation arrow (CFormPreview): from the press point to the cursor
         if (S.Input.Arrow is { } a)
         {

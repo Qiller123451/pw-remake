@@ -45,6 +45,7 @@ public sealed class SourceMap : IWorldMap
     public double? Water => S.Water;
     public string Setting => S.Setting;
     public double? StartTime => S.StartTime;
+    public DayNightSpec? DayNight => S.DayNight;
     public double[] WallGrid => S.WallGrid ?? new double[] { 0, 0 };
     public Func<double, double, bool>? Walkable => S.Walkable;
     public double MaxSlope => S.MaxSlope ?? MapSource.MAX_SLOPE;
@@ -69,26 +70,17 @@ public static class WorldBuilder
     static readonly Logger L = Log.For("Campaign.World");
     sealed class DecorEntry { public double X, Z; public List<int>? Cells; public bool Gone; }
 
-    /// <summary>main.js mapSource for a campaign mission: the original map (.ula below the installation's Data folder,
-    /// any of the configuration's folders) without the objects the campaign places itself (skip)</summary>
-    public static MapSource MapSourceOf(string ulaPath, Rules.Rules rules, ModelManifest models, ISet<string>? skip, ForestData? forest)
+    /// <summary>main.js mapSource: a map of the remake's format (a map folder - a campaign mission's folder -, a .pwmap;
+    /// docs/MAP_FORMAT.md) without the objects a campaign places itself (skip)</summary>
+    public static MapSource MapSourceOf(string mapPath, Rules.Rules rules, ModelManifest models, ISet<string>? skip, ForestData? forest)
     {
-        var md = MapFiles.Read(ulaPath);              // (with the remake's biome layer, or a remake map: docs/BIOMES.md)
+        var md = MapFiles.Read(mapPath);              // (with its biome layer: docs/BIOMES.md)
         return MapSource.OriginalSource(md, new RulesMapAdapter(rules), new MapSourceConfig { SkipObjects = skip }, n => models.Has(n), forest);
     }
 
-    /// <summary>the .ula of a mission: entry.Map ("Base/Maps/Cpn_single_001/single_11.ula") below the installation's Data
-    /// folder, else the same path below each of the configuration's folders (the last one that has it)</summary>
-    public static string? FindMap(GameConfiguration cfg, string map)
-    {
-        if (string.IsNullOrEmpty(map)) return null;
-        MapFiles.UseInstall(cfg.Install);
-        if (MapFiles.FindRemake(map) is { } rm) return rm;       // "Remake/<file>.pwmap.json": game/maps
-        var p = PathUtil.FindCaseInsensitive(Path.Combine(cfg.Install, "Data"), map);
-        if (p != null) return p;
-        var rest = Regex.Replace(PathUtil.Norm(map), "^[^/]+/", "");
-        return cfg.GameFile(rest);
-    }
+    /// <summary>the converted map of a setup's map id ("Base/Maps/Multiplayer/multi_2_jun_001.ula"): MapFiles.Find - the
+    /// configuration's maps folder (Prepare converts the installation's maps there)</summary>
+    public static string? FindMap(GameConfiguration cfg, string map) => MapFiles.Find(cfg, map);
 
     /// <summary>main.js buildWorld (the simulation): the world on the map source, its landscape, the campaign's players
     /// and objects (c.Build), the map's wild animals and nests (c.WildlifeReady). The brains and the debug options come
@@ -129,7 +121,16 @@ public static class WorldBuilder
             if (!t.Inside) continue;
             var stump = Tpl(t.Stump) ? t.Stump : Tpl("jungle_tree_01_stump") ? "jungle_tree_01_stump" : null;
             var timber = Tpl(t.Timber) ? t.Timber : null;     // (the falling log: the view's)
-            W.AddResource("tree", "wood", t.X, t.Z, t.Wood, new ResOpts { Radius = t.Big ? 1.5 : 1.1, Cells = cells, StumpKind = stump, TimberKind = timber, Rot = t.Rot, Scale = t.Scale, Name = t.Model, MaxWorkers = 4 });
+            var tn = W.AddResource("tree", "wood", t.X, t.Z, t.Wood, new ResOpts { Radius = (t.Big ? 1.5 : 1.1) * t.Scale, Cells = cells, StumpKind = stump, TimberKind = timber, Rot = t.Rot, Scale = t.Scale, Name = t.Model, MaxWorkers = 4, Infinite = t.Infinite });
+            // a tree lying felled from the start (fallen = 1): a log at once - no chopping, no fall (the view draws it at rest);
+            // a big one takes more workers round it
+            if (t.Fallen)
+            {
+                tn.Fallen = true;
+                W.FellTreeQuiet(tn);
+                tn.Radius = 2.2 * t.Scale;
+                tn.MaxWorkers = (int)Math.Clamp(Math.Round(5 * t.Scale), 5, 16);
+            }
         }
         // the map's plants and decoration, for ClearVegetation
         var decorList = new List<DecorEntry>();
@@ -168,16 +169,16 @@ public static class WorldBuilder
             foreach (var n in W.Resources)
             {
                 if ((n.Type != "tree" && n.Type != "timber") || Math.Sqrt((n.Pos.X - x) * (n.Pos.X - x) + (n.Pos.Z - z) * (n.Pos.Z - z)) > r) continue;
-                if (n.Alive) W.DepleteNodeOf(n);
+                if (n.Alive && !n.Infinite) W.DepleteNodeOf(n);     // (an infinite resource stays: a mission's landmark)
             }
             res.VegetationLog.Add((x, z, r));
         };
         foreach (var s in S.Stones)
         {
             if (!Tpl(s.Model)) continue;
-            double r = Math.Max(2, RadiusOf(s.Model!) * 0.8);
+            double r = Math.Max(2, RadiusOf(s.Model!) * 0.8) * s.Scale;
             var cells = nav.MarkCircle(s.X, s.Z, r * 0.85);
-            W.AddResource("stone", "stone", s.X, s.Z, s.Amount != 0 ? s.Amount : 2000, new ResOpts { Radius = r, Cells = cells, Name = s.Model, MaxWorkers = 8 });
+            W.AddResource("stone", "stone", s.X, s.Z, s.Amount != 0 ? s.Amount : 2000, new ResOpts { Radius = r, Cells = cells, Name = s.Model, MaxWorkers = s.Scale > 1 ? (int)Math.Clamp(Math.Round(8 * s.Scale), 8, 20) : 8, Scale = s.Scale, Infinite = s.Infinite });
         }
         foreach (var b in S.Bushes)
         {

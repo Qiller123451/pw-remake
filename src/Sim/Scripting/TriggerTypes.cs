@@ -25,7 +25,7 @@ public static class TriggerTypes
         ["CVAR"] = () => new Conditions.CVAR(), ["QUES"] = () => new Conditions.QUES(), ["PLYR"] = () => new Conditions.PLYR(),
         ["TECH"] = () => new Conditions.TECH(), ["PLDE"] = () => new Conditions.PLDE(), ["DIPL"] = () => new Conditions.DIPL(),
         ["SQEN"] = () => new Conditions.SQEN(), ["DSEN"] = () => new Conditions.DSEN(), ["GREG"] = () => new Conditions.GREG(),
-        ["CHCK"] = () => new Conditions.CHCK(),
+        ["CHCK"] = () => new Conditions.CHCK(), ["DAYN"] = () => new Conditions.DAYN(),
     };
 
     static readonly Dictionary<string, Func<TriggerAction>> Act = new(StringComparer.Ordinal)
@@ -75,6 +75,7 @@ public static class TriggerTypes
         new("DSEN", "DialogEnded", true, "campaign", "a dialogue scene ended"),
         new("GREG", "GroupInRegion", true, "mirage", "members of a group found by the query, against obj_count"),
         new("CHCK", "Check", true, "lua", "a Lua function returns true"),
+        new("DAYN", "DayPhase", true, "lua", "the map's day-night cycle is in a phase (day, dusk, night, dawn), optionally of a night number"),
         // ---- actions (triggers.md §5)
         new("TRIG", "SetTrigger", false, "campaign", "enable (1) / disable (0) / toggle (2) a trigger"),
         new("DGSC", "Dialog", false, "campaign", "play a dialogue scene"),

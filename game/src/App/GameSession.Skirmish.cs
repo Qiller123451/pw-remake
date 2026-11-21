@@ -48,14 +48,14 @@ public partial class GameSession
     {
         var setup = start.Skirmish ?? throw new InvalidOperationException("a skirmish without its setup");
         string? ula = null;
-        if (!string.IsNullOrEmpty(setup.Map))
-            ula = SkirmishMaps.Resolve(cfg, setup.Map) ?? throw new FileNotFoundException($"The map was not found in the installation: {setup.Map}");
+        if (!string.IsNullOrEmpty(setup.Map) && !PwRemake.Sim.Editor.EditorPlaytest.IsKey(setup.Map))      // (the map editor's Test map: from memory, GameSession.Editor.cs)
+            ula = SkirmishMaps.Resolve(cfg, setup.Map, setup.MapHash) ?? throw new FileNotFoundException($"The map was not found in the installation: {setup.Map}");
         var forest = ForestData.LoadFile(Path.Combine(dataDir, "forest.json"));
         var brushes = GroundBrushes.LoadFile(Path.Combine(dataDir, "assets", "terrain", "objbrush.json"));
         var aiData = Json.TryParseFile(Path.Combine(dataDir, "ai.json"));
         var s = setup.Clone();
         s.Debug ??= start.Debug;
-        var sk = SkirmishSession.Create(s, ula, rules, manifest, forest, brushes, aiData, progress, AiControlScript(cfg), flags);
+        var sk = SkirmishSession.Create(s, ula, rules, manifest, forest, brushes, aiData, progress, AiControlScript(cfg), flags, EditorMapOf(setup, rules, manifest, forest));
         Seats.Apply(sk.World, start.Seats);           // (a networked game: who commands which player - docs/MULTIPLAYER.md)
         return sk;
     }
@@ -108,6 +108,7 @@ public partial class GameSession
     /// (the skirmish menu); false: not a skirmish's</summary>
     bool SkirmishEndAction(string a)
     {
+        if (EditorEndAction(a)) return true;
         switch (a)
         {
             case "retry":

@@ -233,8 +233,6 @@ public static partial class MapExtension
         // (land the base made from the old edge's ground going on: walkable only where its mirror image in the old map
         // is - no new ways round the old map's edge)
         var edgeLand = new bool[hx * hy];
-        // (new sample (i, j) lies on the old map's grid: its old height is OH[(j - dj) * md.Hx + i - di])
-        bool InOldGrid(int i, int j) => i - di >= 0 && j - dj >= 0 && i - di < md.Hx && j - dj < md.Hy;
         for (int j = 0; j < hy; j++)
             for (int i = 0; i < hx; i++)
             {
@@ -1154,11 +1152,11 @@ public static partial class MapExtension
     {
         W = md.W, H = md.H, OffX = md.OffX, OffY = md.OffY, Water = md.Water, Hx = md.Hx, Hy = md.Hy, Heights = md.Heights, Mx = md.Mx, My = md.My, Mats = md.Mats,
         TerrainSetting = md.TerrainSetting, Info = new Dictionary<string, string>(md.Info), File = md.File, Preview = md.Preview,
-        Description = md.Description, InfoTree = md.InfoTree, DefaultCamera = md.DefaultCamera, StartTime = md.StartTime, Setting = md.Setting,
+        Description = md.Description, InfoTree = md.InfoTree, DefaultCamera = md.DefaultCamera, StartTime = md.StartTime, DayNight = md.DayNight, Setting = md.Setting,
         SettingName = md.SettingName, Name = md.Name, MaxPlayers = md.MaxPlayers,
         Objects = md.Objects.ToList(), Plants = md.Plants.ToList(),
         Forest = new ForestMap { W = md.Forest.W, H = md.Forest.H, Blocks = md.Forest.Blocks.ToList() },
-        Walk = md.Walk, Regions = md.Regions.ToList(), Extension = md.Extension, Biomes = md.Biomes,
+        Walk = md.Walk, Regions = md.Regions.ToList(), Extension = md.Extension, Biomes = md.Biomes, Materials = md.Materials,
     };
 
     /// <summary>the old map's ground materials by their use: under water, shore, flat land (most and second most used),

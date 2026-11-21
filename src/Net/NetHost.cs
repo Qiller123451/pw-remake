@@ -48,13 +48,31 @@ public sealed class NetHost : IDisposable
         public long AckStep;
         public double LastHeard, LostAt = -1;
         public string? Problem;
+        /// <summary>the player's copy of the lobby's map differs or is missing (its "map-check"; LobbyMap)</summary>
+        public string? MapProblem;
         public int Slot = -1, Player;
         /// <summary>co-op campaign mode: the seat (1..3) this human plays, 0 none</summary>
         public int Seat;
         public double PingSent = -1;
         public int Ping;
         public string Build = "";
+        /// <summary>the lobby's map being sent to this player (null: none)</summary>
+        public MapSend? Tx;
     }
+
+    /// <summary>a map on its way to a player (MapTransfer): the bytes, how many were sent and acknowledged</summary>
+    sealed class MapSend
+    {
+        public string Hash = "", Name = "";
+        public byte[] Data = Array.Empty<byte>();
+        public int Sent, Acked, Pct = -1;
+    }
+
+    /// <summary>the lobby's map as the bytes of a .pwmap, for a player who lacks it (map id, content hash -> bytes; null:
+    /// the host cannot send it - why). The game's host sets it (its maps: MapTransfer.PackFor); a dedicated server may serve
+    /// one map file (--map); null: maps are not sent.</summary>
+    public Func<string, string, (byte[]? Data, string? Why)>? MapFile;
+    readonly Dictionary<string, byte[]> _mapBytes = new();
 
     public readonly int Port;
     /// <summary>proves the host's own client (it sends it with its hello)</summary>
@@ -101,6 +119,13 @@ public sealed class NetHost : IDisposable
     long _dumpStep = -1;
     readonly Dictionary<int, string> _dumps = new();
     string _waitingFor = "";
+    // co-op armies (docs/COOP.md "Armies"): seat -> the army its human chose (null: the level's), who chose it, in which
+    // faction, for which mission - a change of any of them drops the choice
+    readonly Dictionary<int, (Army? Army, int Peer, string Tribe, int Mission)> _armies = new();
+    /// <summary>seconds the state "armies" lasts at most (NetProtocol.ArmyTimeout; tests shorten it)</summary>
+    public double ArmyTimeout = NetProtocol.ArmyTimeout;
+    double _armyDeadline;
+    JsonObject? _armyProfile;
 
     public NetHost(int port = NetProtocol.DefaultPort, bool loopbackOnly = false)
     {
@@ -144,8 +169,54 @@ public sealed class NetHost : IDisposable
             if (p.Conn.Closed && p.Connected) Lost(p, p.Conn.Reason ?? "connection lost");
         }
         if (_now - _lastPing > 2) { _lastPing = _now; foreach (var p in Live) { p.PingSent = _now; p.Conn.Send(Msg("ping")); } }
-        if (Lobby.State == "lobby" && Dedicated && Autostart > 0 && Lobby.Players.Count() >= Autostart && Lobby.Players.All(x => x.Ready) && LobbyStart.Problem(Lobby) == null) BeginGame(null);
+        if (Lobby.State == "lobby" && Dedicated && Autostart > 0 && Lobby.Players.Count() >= Autostart && Lobby.Players.All(x => x.Ready) && LobbyStart.Problem(Lobby) == null) RequestStart(null);
+        if (Lobby.State == "armies") ArmiesTick();
+        if (Lobby.State == "lobby") PumpMaps();
         if (Lobby.State == "running") RunTurns(dt);
+    }
+
+    // ---------------------------------------------------------------- the lobby's map to a player who lacks it (MapTransfer)
+    void MapRequest(Peer p, JsonObject m)
+    {
+        var hash = m["hash"]?.GetValue<string>() ?? "";
+        var sk = Lobby.Skirmish;
+        void Fail(string why) { p.Conn.Send(Msg("map-fail", ("hash", hash), ("reason", why))); p.MapProblem = "does not have the map - the host cannot send it: " + why; p.Ready = false; SyncLobby(); Say($"{p.Name}: the map cannot be sent: {why}"); }
+        if (Lobby.State != "lobby" || Lobby.Mode != "skirmish" || sk == null || sk.MapHash == null || hash != sk.MapHash) return;      // (an old request)
+        if (MapFile == null) { Fail("this host does not send maps (copy the host's .pwmap into your maps folder)"); return; }
+        if (!_mapBytes.TryGetValue(hash, out var data))
+        {
+            (byte[]? Data, string? Why) r;
+            try { r = MapFile(sk.Map, hash); }
+            catch (Exception e) { r = (null, e.Message); }
+            if (r.Data == null) { Fail(r.Why ?? "no such map"); return; }
+            if (r.Data.Length > MapTransfer.MaxBytes) { Fail($"the map is too big ({r.Data.Length >> 20} MB, at most {MapTransfer.MaxBytes >> 20} MB)"); return; }
+            _mapBytes.Clear();                                   // (one map at a time: the lobby's)
+            _mapBytes[hash] = data = r.Data;
+        }
+        p.Tx = new MapSend { Hash = hash, Name = sk.MapName ?? sk.Map, Data = data, Pct = 0 };
+        p.Ready = false;
+        p.MapProblem = MapProgressText(p.Tx);
+        Say($"sending the map {sk.Map} ({data.Length} bytes) to {p.Name}");
+        SyncLobby();
+    }
+
+    static string MapProgressText(MapSend tx) =>
+        $"is receiving the map \"{tx.Name}\": {100L * tx.Acked / Math.Max(1, tx.Data.Length)} % of {tx.Data.Length / 1048576.0:0.0} MB";
+
+    /// <summary>the next chunks of the maps on their way (at most Window chunks ahead of each player's acknowledgement)</summary>
+    void PumpMaps()
+    {
+        foreach (var p in Live)
+        {
+            var tx = p.Tx;
+            if (tx == null) continue;
+            while (tx.Sent < tx.Data.Length && tx.Sent - tx.Acked < MapTransfer.Window * MapTransfer.Chunk)
+            {
+                int n = Math.Min(MapTransfer.Chunk, tx.Data.Length - tx.Sent);
+                p.Conn.Send(Msg("map-data", ("hash", tx.Hash), ("at", tx.Sent), ("total", tx.Data.Length), ("data", Convert.ToBase64String(tx.Data, tx.Sent, n))));
+                tx.Sent += n;
+            }
+        }
     }
 
     IEnumerable<Peer> Live => _peers.Where(p => p.Connected && p.Name != null);
@@ -179,6 +250,24 @@ public sealed class NetHost : IDisposable
                 break;
             case "lobby-set": if (p.IsHost && Lobby.State == "lobby") SetLobby(NetProtocol.FromNode<LobbyState>(m["lobby"])); break;
             case "slot-set": if (Lobby.State == "lobby") SetSlot(p, m); break;
+            case "map-request": MapRequest(p, m); break;
+            case "map-ack":
+                if (p.Tx != null && m["hash"]?.GetValue<string>() == p.Tx.Hash)
+                {
+                    p.Tx.Acked = (int)Math.Clamp(m["got"]?.GetValue<long>() ?? 0, p.Tx.Acked, p.Tx.Sent);
+                    int pct = (int)(100L * p.Tx.Acked / Math.Max(1, p.Tx.Data.Length));
+                    if (pct != p.Tx.Pct) { p.Tx.Pct = pct; p.MapProblem = MapProgressText(p.Tx); SyncLobby(); }
+                }
+                break;
+            case "map-check":
+                // (a player's copy of the lobby's map: the hash it was compared with must still be the lobby's)
+                if (Lobby.State == "lobby" && m["hash"]?.GetValue<string>() == (Lobby.Skirmish?.MapHash ?? ""))
+                {
+                    var mp = m["problem"]?.GetValue<string>();
+                    if (mp == null && p.Tx != null) { Say($"{p.Name} has the map now ({p.Tx.Data.Length} bytes sent)"); p.Tx = null; }
+                    if (mp != p.MapProblem) { p.MapProblem = mp; if (mp != null) p.Ready = false; SyncLobby(); }
+                }
+                break;
             case "coop-player":
                 if (Lobby.State != "lobby") break;
                 int pl = m["player"]?.GetValue<int>() ?? 0;
@@ -189,7 +278,12 @@ public sealed class NetHost : IDisposable
                 // co-op campaign mode: a player takes a free human seat
                 if (Lobby.State != "lobby" || Lobby.Coop == null) break;
                 int seat = m["seat"]?.GetValue<int>() ?? 0;
-                if (Lobby.Coop.Seats.Any(x => x.Seat == seat && x.Kind == "human") && !Players.Any(x => x != p && x.Seat == seat)) { p.Seat = seat; p.Ready = p.IsHost; SyncLobby(); }
+                if (Lobby.Coop.Seats.Any(x => x.Seat == seat && x.Kind == "human") && !Players.Any(x => x != p && x.Seat == seat))
+                {
+                    // (the colour was the seat's human's: the old seat and the new one start without one)
+                    foreach (var x in Lobby.Coop.Seats) if (x.Seat == seat || x.Seat == p.Seat) x.Color = null;
+                    p.Seat = seat; p.Ready = p.IsHost; SyncLobby();
+                }
                 break;
             }
             case "coop-tribe":
@@ -201,7 +295,39 @@ public sealed class NetHost : IDisposable
                 if (st != null) { st.Tribe = tr; p.Ready = p.IsHost; SyncLobby(); }
                 break;
             }
-            case "start": if (p.IsHost && Lobby.State == "lobby") BeginGame(m["profile"] as JsonObject); break;
+            case "coop-color":
+            {
+                // a player's colour of its own seat: not one of the mission's other players or of another human seat
+                // (docs/CAMPAIGN.md "Your colour"); "" the game's
+                if (Lobby.State != "lobby" || Lobby.Coop == null || p.Seat <= 0) break;
+                var col = m["color"]?.GetValue<string>() ?? "";
+                var st = Lobby.Coop.Seats.FirstOrDefault(x => x.Seat == p.Seat && x.Kind == "human");
+                if (st == null) break;
+                if (col.Length == 0) { st.Color = null; SyncLobby(); break; }
+                if (Sim.Rules.Colors.ColorById(col) == null) break;
+                var who = Sim.Campaign.MissionColors.Blocker(col, Lobby.Coop.TakenFor(p.Seat, Lobby.Players));
+                if (who != null) { Say($"{p.Name}: the colour {col} is {who.Name}'s"); break; }
+                st.Color = col; SyncLobby();
+                break;
+            }
+            case "start": if (p.IsHost && Lobby.State == "lobby") RequestStart(m["profile"] as JsonObject); break;
+            case "coop-army":
+            {
+                // a human's army for its own seat (before the start, or in the state "armies"); null: the level's army
+                if ((Lobby.State != "lobby" && Lobby.State != "armies") || Lobby.Coop is not { ArmyBudget: true } c || p.Seat <= 0) break;
+                var st = c.Seats.FirstOrDefault(x => x.Seat == p.Seat && x.Kind == "human");
+                if (st == null || !c.BuysArmy(p.Seat)) break;
+                var army = m["army"] is JsonObject ao ? NetProtocol.FromNode<Army>(ao) : null;
+                if (army != null && army.Cards.Count > 200) break;            // (no sensible army)
+                _armies[p.Seat] = (army, p.Id, st.Tribe, Lobby.Campaign?.Mission ?? -1);
+                Say($"{p.Name}: the army of seat {p.Seat} {(army == null ? "is the level's" : $"bought ({army.Cards.Count} cards)")}");
+                SyncLobby();
+                break;
+            }
+            case "army-cancel":
+                // the host goes back to the lobby from the state "armies"
+                if (p.IsHost && Lobby.State == "armies") { Lobby.State = "lobby"; Lobby.ArmyWait = null; _armyProfile = null; SyncLobby(); Announce("back to the lobby"); }
+                break;
             case "loaded":
                 p.Loaded = true;
                 p.AckStep = Math.Max(p.AckStep, m["step"]?.GetValue<long>() ?? 0);
@@ -247,6 +373,7 @@ public sealed class NetHost : IDisposable
             Rejoin(old, p);
             return;
         }
+        if (Lobby.State == "armies") { Reject("The players are choosing their armies: the game is about to start."); return; }
         if (Lobby.State != "lobby") { Reject("The game is over."); return; }
         if (!host && Players.Count() >= NetProtocol.MaxPlayers) { Reject("The game is full."); return; }
         // a name of its own
@@ -284,8 +411,12 @@ public sealed class NetHost : IDisposable
     public void SetLobby(LobbyState? s)
     {
         if (s == null) return;
+        // (the seats' armies are the host's own state, not the lobby's sender's: SyncArmies)
+        if (s.Coop != null) foreach (var st in s.Coop.Seats) { var cur = Lobby.Coop?.Seats.FirstOrDefault(x => x.Seat == st.Seat); st.Army = cur?.Army; st.ArmyDone = cur?.ArmyDone ?? false; }
         bool changed = NetProtocol.ToNode(s.Skirmish)?.ToJsonString() != NetProtocol.ToNode(Lobby.Skirmish)?.ToJsonString()
                        || NetProtocol.ToNode(s.Campaign)?.ToJsonString() != NetProtocol.ToNode(Lobby.Campaign)?.ToJsonString() || s.Mode != Lobby.Mode;
+        // another map: every player compares its copy again (map-check)
+        if (s.Skirmish?.Map != Lobby.Skirmish?.Map || s.Skirmish?.MapHash != Lobby.Skirmish?.MapHash) foreach (var p in _peers) { p.MapProblem = null; p.Tx = null; }
         Lobby.Mode = s.Mode; Lobby.Name = s.Name; Lobby.Configuration = s.Configuration; Lobby.Skirmish = s.Skirmish?.Clone();
         changed |= s.CoopMode != Lobby.CoopMode || NetProtocol.ToNode(s.Coop)?.ToJsonString() != NetProtocol.ToNode(Lobby.Coop)?.ToJsonString();
         Lobby.CoopMode = s.CoopMode == "campaign" ? "campaign" : "shared"; Lobby.Coop = s.Coop;
@@ -350,19 +481,81 @@ public sealed class NetHost : IDisposable
         }
     }
 
+    /// <summary>the seats' armies into the lobby: a choice stands while its seat is still a human seat of the same player,
+    /// faction and mission</summary>
+    void SyncArmies()
+    {
+        var c = Lobby.Coop;
+        if (c == null) { _armies.Clear(); return; }
+        int mission = Lobby.Campaign?.Mission ?? -1;
+        foreach (var (seat, a) in _armies.ToList())
+        {
+            var st = c.Seats.FirstOrDefault(x => x.Seat == seat);
+            var who = Players.FirstOrDefault(x => x.Seat == seat);
+            if (!c.BuysArmy(seat) || st == null || st.Kind != "human" || who == null || who.Id != a.Peer || st.Tribe != a.Tribe || mission != a.Mission) _armies.Remove(seat);
+        }
+        foreach (var st in c.Seats)
+        {
+            bool has = _armies.TryGetValue(st.Seat, out var a);
+            st.ArmyDone = has; st.Army = has ? a.Army : null;
+        }
+    }
+
     void SyncLobby()
     {
+        SyncArmies();
         foreach (var lp in Lobby.Peers)
         {
             var p = _peers.FirstOrDefault(x => x.Id == lp.Id);
             if (p == null) continue;
-            lp.Name = p.Name ?? ""; lp.Ready = p.Ready; lp.Slot = p.Slot; lp.Player = p.Player; lp.Seat = p.Seat; lp.Ping = p.Ping; lp.Problem = p.Problem; lp.Host = p.IsHost; lp.Spectator = p.Spectator;
+            lp.Name = p.Name ?? ""; lp.Ready = p.Ready; lp.Slot = p.Slot; lp.Player = p.Player; lp.Seat = p.Seat; lp.Ping = p.Ping; lp.Problem = p.Problem ?? (Lobby.Mode == "skirmish" ? p.MapProblem : null); lp.Host = p.IsHost; lp.Spectator = p.Spectator;
+            lp.MapProgress = p.Tx != null && Lobby.Mode == "skirmish" ? Math.Round((double)p.Tx.Acked / Math.Max(1, p.Tx.Data.Length), 3) : null;
         }
         Lobby.Peers.RemoveAll(lp => !_peers.Any(x => x.Id == lp.Id && x.Name != null));
         Broadcast(Msg("lobby", ("lobby", NetProtocol.ToNode(Lobby))));
     }
 
     // ---------------------------------------------------------------- start
+    /// <summary>the host's Start: a co-op mission with an army budget first waits for the seats' armies (the state
+    /// "armies": every human picks on its own machine, at most ArmyTimeout seconds), anything else starts at once</summary>
+    void RequestStart(JsonObject? profile)
+    {
+        var problem = LobbyStart.Problem(Lobby);
+        if (problem != null) { var h = _peers.FirstOrDefault(x => x.IsHost); h?.Conn.Send(Msg("sys", ("text", "Cannot start: " + problem))); return; }
+        SyncArmies();
+        if (Lobby.Mode == "coop" && Lobby.CoopMode == "campaign" && Lobby.Coop?.ArmiesOpen.Any() == true)
+        {
+            Lobby.State = "armies";
+            _armyDeadline = _now + ArmyTimeout;
+            _armyProfile = profile;
+            Lobby.ArmyWait = (int)Math.Ceiling(ArmyTimeout);
+            SyncLobby();
+            Announce($"choosing the armies (seats {string.Join(", ", Lobby.Coop.ArmiesOpen.Select(x => x.Seat))}; at most {ArmyTimeout:0} s)");
+            return;
+        }
+        BeginGame(profile);
+    }
+
+    /// <summary>the state "armies": starts when every human seat has its army or the time is up (the level's army for the
+    /// seats still choosing); back to the lobby when the lobby no longer allows a start (a player left)</summary>
+    void ArmiesTick()
+    {
+        var problem = LobbyStart.Problem(Lobby);
+        if (problem != null) { Lobby.State = "lobby"; Lobby.ArmyWait = null; _armyProfile = null; SyncLobby(); Announce("back to the lobby: " + problem); return; }
+        var open = Lobby.Coop?.ArmiesOpen.ToList() ?? new();
+        bool timeUp = _now >= _armyDeadline;
+        if (open.Count == 0 || timeUp)
+        {
+            if (timeUp && open.Count > 0) Announce($"time is up: seat{(open.Count > 1 ? "s" : "")} {string.Join(", ", open.Select(x => x.Seat))} play{(open.Count > 1 ? "" : "s")} the level's army");
+            var profile = _armyProfile;
+            Lobby.State = "lobby"; Lobby.ArmyWait = null; _armyProfile = null;
+            BeginGame(profile);
+            return;
+        }
+        int left = Math.Max(0, (int)Math.Ceiling(_armyDeadline - _now));
+        if (left != Lobby.ArmyWait) { Lobby.ArmyWait = left; SyncLobby(); }
+    }
+
     void BeginGame(JsonObject? profile)
     {
         var problem = LobbyStart.Problem(Lobby);
@@ -561,7 +754,7 @@ public sealed class NetHost : IDisposable
         if (!p.Connected) { if (drop) Drop(p, why); return; }
         p.Connected = false;
         if (p.Name == null) { _peers.Remove(p); return; }
-        if (Lobby.State == "lobby")
+        if (Lobby.State is "lobby" or "armies")
         {
             _peers.Remove(p);
             AssignSlots();

@@ -53,6 +53,11 @@ public sealed class SessionSequenceStage : ISequenceStage
     float _fov0;
     /// <summary>a timeline's camera is on (the session does not move the camera itself)</summary>
     public bool OwnsCamera { get; private set; }
+    /// <summary>no fog of war is drawn while an in-engine cutscene plays (its timeline camera, from Begin to End):
+    /// terrain, objects and the far scene as if seen - Kacper on the original: "in its cutscenes the scene is fully
+    /// visible" (mission 16's sc_7050 looks over the crater rim, far beyond the 250 m its trigger reveals). A line
+    /// scene (dialogue, the camera eased in the game's view) keeps the fog. docs/GAME_SESSION.md "Cutscenes"</summary>
+    public bool NoFog => OwnsCamera;
     /// <summary>the entities the scene animates (their clips run on the scene's time)</summary>
     public readonly HashSet<Entity> Actors = new();
     /// <summary>their clips while the scene plays (units and buildings; the world's AnimCtl of the entity is left alone)</summary>

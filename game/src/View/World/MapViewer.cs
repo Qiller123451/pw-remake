@@ -66,7 +66,7 @@ public partial class MapViewer : Node3D
         if (def == null || S.Md == null || S.Rebuild == null) { L.Warn($"--coop: no co-op definition {arg}"); return marks; }
         var plan = CoopMapPlan.FromJson(def.Raw, seats);
         S.CopyFrom(S.Rebuild(MapExtension.Apply(S.Md, plan)));
-        // seat 1: the mission's human player's start location (mission.json of the configuration's mission folder,
+        // seat 1: the mission's human player's start location (map.lua's mission of the configuration's mission folder,
         // PW_CONTENT or content/), else the map's start location of slot 0
         (double X, double Z)? s1 = null;
         try
@@ -74,10 +74,10 @@ public partial class MapViewer : Node3D
             var content = System.Environment.GetEnvironmentVariable("PW_CONTENT") is { Length: > 0 } pc ? pc : Path.Combine(PwRemake.App.AppPaths.RootDir, "content");
             var dir = Path.Combine(content, "configs", p[0], "missions");
             var entry = PwRemake.Sim.Campaign.MissionEntry.LoadIndex(dir).FirstOrDefault(e => e.Id == mission);
-            var mj = entry != null ? Json.TryParseFile(Path.Combine(dir, entry.Folder, "mission.json")) : null;
+            var mj = entry != null ? PwMapReader.MissionOf(Path.Combine(dir, entry.Folder)) : null;
             if (mj?["players"]?[0]?["start_location"] is { } sl) s1 = S.ToGame(sl["x"].Num(), sl["y"].Num());
         }
-        catch (Exception e) { L.Warn($"--coop: mission.json: {e.Message}"); }
+        catch (Exception e) { L.Warn($"--coop: the mission data: {e.Message}"); }
         int k0 = S.StartSlots.IndexOf(0);
         if (s1 == null && k0 >= 0) s1 = (S.Starts[k0][0], S.Starts[k0][1]);
         if (s1 is { } a1) marks.Add((a1.X, a1.Z, new Color(0.2f, 1f, 0.2f)));

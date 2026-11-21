@@ -285,6 +285,47 @@ public static class AudioTests
         t.Equal(0.0, bg.Volume, "muted");
     }
 
+    /// <summary>Kacper: "fight music still plays when I lost the mission and exited it". Leaving a game by any way
+    /// (MusicMgr.usl UpdateMusicSwitch while no game runs; GameSession._ExitTree -> GameAudio.Menu -> StopGame): every
+    /// game switch off - Combat, a trigger's looped track, a cutscene's silence - and the main theme plays.</summary>
+    public static void MusicLeaveGame(TestContext t)
+    {
+        var o = new RecordingAudioOut();
+        var A = new AudioCore(o) { Rnd = Mulberry32(7) };
+        void Fight(double at) { A.Mus.Attack(1, 1, at); A.Mus.Attack(50, 1, at); A.Mus.Attack(1, 50, at); A.Mus.Update(at); }
+        string Playing() => A.Mus.State().Playing;
+
+        // lost: the end screen (combat off), then back to the menu
+        A.Mus.Update(0);
+        A.Mus.StartGame("", "jungle.txt", "Hu");
+        Fight(20);
+        t.Equal("Combat", Playing(), "the fight");
+        A.Mus.StopCombat();
+        t.Equal("Background", Playing(), "behind the end screen: no combat music");
+        A.Mus.StopGame();
+        t.Equal("MainMenu", Playing(), "the menu: the main theme");
+        t.Equal("music/01_maintheme.mp3", A.Mus.El?.File ?? "", "its track");
+        t.Equal(0, A.Mus.State().On.Count(n => n != "MainMenu"), "no game switch left on");
+        t.Equal(0, A.Mus.Attacks.Count, "no attacks kept");
+        A.Mus.Update(21);
+        t.Equal("MainMenu", Playing(), "the menus' frames keep it");
+
+        // quit from the pause menu in the middle of a fight, with a mission's looped fight track (MUSI) and a cutscene
+        A.Mus.StartGame("", "jungle.txt", "Hu");
+        A.Mus.Trigger("40_combat_heroes", true);
+        Fight(30);
+        A.Mus.Sequence(true);
+        t.Equal("Sequence", Playing(), "a cutscene");
+        A.Mus.StopGame();
+        t.Equal("MainMenu", Playing(), "quit mid-fight: the main theme");
+        t.Equal("music/01_maintheme.mp3", A.Mus.El?.File ?? "", "not the fight's track");
+
+        // the next game (load, retry) starts fresh: no combat from the last one's attacks
+        A.Mus.StartGame("", "jungle.txt", "Hu");
+        A.Mus.Update(31);
+        t.Equal("Background", Playing(), "a new game: its background music");
+    }
+
     /// <summary>The loading screen's journal voice (MusicMgr.usl OnStartJournalSound / OnEndJournalSound): the Loading
     /// switch with silence above the main theme, the main theme again after it; under a running game's switches.</summary>
     public static void MusicJournal(TestContext t)

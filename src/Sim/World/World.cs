@@ -193,6 +193,8 @@ public sealed partial class World
         // minutes; day from 6:00 to 18:00 - SetVirtualDayOffset(0.25), SetVirtualNightOffset(0.75); the level's start
         // time, 12:00 when it has none)
         DayStart = Opts.StartTime ?? map.StartTime ?? 12 * 3600;
+        // (a map's own day-night cycle: map.lua day_night - DayNight.cs)
+        DayNight = map.DayNight?.Clone();
         Nav = new NavGrid(map.Size, 2);
         Reserved = new byte[Nav.N * Nav.N];
         Play = map.Play;
@@ -422,7 +424,7 @@ public sealed partial class World
     {
         foreach (var n in RHash.Near(x, z, r + 4))
         {
-            if (!n.Alive || n.Type == "stone" || Math.Sqrt((n.Pos.X - x) * (n.Pos.X - x) + (n.Pos.Z - z) * (n.Pos.Z - z)) > r) continue;
+            if (!n.Alive || n.Type == "stone" || n.Infinite || Math.Sqrt((n.Pos.X - x) * (n.Pos.X - x) + (n.Pos.Z - z) * (n.Pos.Z - z)) > r) continue;
             DepleteNode(n);
         }
     }
@@ -825,6 +827,7 @@ public sealed partial class World
         if (u.Fourcc == "Ship") NightCheck(u, dt);     // a ship's lamps (the view switches them by u.Night)
         if (u.InvulnT > 0) u.InvulnT -= dt;
         if (u.St.Poison != null) PoisonUpdate(u);
+        if (u.BurnUntil > 0) { BurnUpdate(u); if (!u.Alive) return; }    // set on fire by a mission (Burning.cs)
         if (u.Fatigue > 0) FatigueUpdate(u, dt);       // a wild animal that fled (systems/animals.js)
         if (u.Pending != null) { u.Pending.T -= dt; if (u.Pending.T <= 0) { var p = u.Pending; u.Pending = null; if (p.Melee) LandBlow(u, p); else Fire(u, p.W, p.Target); } }
         // turrets that shoot by themselves (the titans' ballistas, gatlings and machine guns: Combat.GunnerUpdate)
@@ -995,6 +998,7 @@ public sealed partial class World
         if (u.Wreck != null)
         {
             if (u.DeadT >= u.Wreck.From) u.Wreck.Anim?.Update(dt);
+            CorpseHold(u.Wreck, u.DeadT);                    // (a script corpse's clip held: ScriptCorpses.cs)
             if (u.DeadT > u.Wreck.Until && !u.Removed) { u.Removed = true; u.LookChanged(); }
             return;
         }
@@ -1008,11 +1012,12 @@ public sealed partial class World
 
     // ------------------------------------------------------------------ per-building update
     /// <summary>the time of day in seconds (0 .. 86400)</summary>
-    public double DayTime() => (((DayStart + Time * VIRTUAL_FACTOR) % DAY) + DAY) % DAY;
+    public double DayTime() => DayNight != null ? DayNight.At(Time).Clock : (((DayStart + Time * VIRTUAL_FACTOR) % DAY) + DAY) % DAY;
     /// <summary>is it night (CTimeMgr.IsVirtualDay)</summary>
     public bool IsNight()
     {
         if (NightFn != null) return NightFn();
+        if (DayNight != null) return DayNight.At(Time).IsNight;
         double f = DayTime() / DAY;
         return f < 0.25 || f > 0.75;
     }
@@ -1161,6 +1166,7 @@ public sealed partial class World
     public void Update(double dt)
     {
         Time += dt;
+        if (DayNight != null) DayNightUpdate();
         var P = Profile;
         // delayed actions
         if (Timers.Count > 0)

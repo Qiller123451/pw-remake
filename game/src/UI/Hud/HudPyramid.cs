@@ -148,12 +148,14 @@ public partial class HudPyramid : HudPanel
             else HudSprites.Draw(this, c.Icon, lvIcon, r, hov ? new Color(1.3f, 1.3f, 1.3f) : null);
             if (c.E != null)
             {
-                // hit points on every card, like the original's pyramid: green, yellow below half, red below a quarter
-                var hb = new Rect2(r.Position.X + 1, r.End.Y - 5, r.Size.X - 2, 4);
-                DrawRect(hb.Grow(1), new Color(0, 0, 0, 0.6f));
-                DrawRect(hb, new Color(0, 0, 0, 0.7f));
-                DrawRect(new Rect2(hb.Position, new Vector2((float)(hb.Size.X * c.Hp), hb.Size.Y)),
-                    HudSprites.Hex(c.Hp <= 0.25 ? "#d8452f" : c.Hp <= 0.5 ? "#e3c23b" : "#6fd34f"));
+                // hit points on every card, the card level's layers as the original's (MIRAGE PyramidCard.usl 391-433):
+                // the option AlternativeColoringACHP (settings.cardHpHealth) "layer ovl_hpbar_bg, hslicehp ovl_hpbar
+                // hp%" - green .. yellow .. red; off: the player's ACColors "counter" under the bar in its "dark"
+                // (HudHpBar, HpBarRule)
+                int pc = c.HpSlice;
+                int slot = c.E.Owner?.ColorSlot ?? -1, counter = HpBarRule.CounterRgb(slot);
+                if (PwRemake.App.GameApp.Settings.CardHpHealth || counter < 0) HudHpBar.Draw(this, r, lvIcon, pc, null, null);
+                else HudHpBar.Draw(this, r, lvIcon, pc, HpBarRule.OwnerRgb(slot, c.E.Owner!.Color, false, 0), counter);
                 if (c.Task != null && c.Task != "power") HudSprites.Draw(this, "card_task_" + c.Task, lvIcon, r);
                 if (c.CanLevelUp)
                 {

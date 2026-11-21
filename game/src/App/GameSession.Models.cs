@@ -116,6 +116,13 @@ public partial class GameSession
         var key = S.Setting switch { "Northland" => "nor", "Savanna" => "sav", "Icewaste" => "ice", "Ashvalley" => "ash", _ => "jun" };
         foreach (var n in new[] { "product_wood_jun", "product_stone_jun", $"product_wood_{key}", $"product_stone_{key}", "jungle_tree_01_stump", "jungle_tree_01_timber", "jungle_tree_02_timber", "jungle_fruit_bush" }) need.Add(n);
         if (C != null) foreach (var m in C.Need) need.Add(m.ToLowerInvariant());
+        // the animals the map's breeding buildings and the player's own will breed (the kennel's sabre-tooths ...:
+        // World.BreedsClass) - their model loaded when the first was born, a 200 - 400 ms frame (2026-11-20, Outbreak)
+        foreach (var bc in World.Buildings.Select(b => b.Name).Concat(MyBuilds(true)).Distinct().Select(n => PwRemake.Sim.World.World.BreedsClass(D.Def(n, null)?.Script)).Where(c => c != null).Distinct())
+        {
+            for (int l = 1; l <= 5; l++) if (D.Stats(bc!, l, null)?.Gfx is { Length: > 0 } g) need.Add(g.ToLowerInvariant());
+            if (D.ClassGfx(bc!) is string bg) need.Add(bg.ToLowerInvariant());
+        }
         // the remake's own campaigns: their machines, civilians, creatures, set pieces, the sequel's effect models
         if (Sequel != null) foreach (var m in Sequel.Runtime.ExtraModels()) need.Add(m.ToLowerInvariant());
         // the game's effect models (ui/gamefx.js GAME_FX_MODEL: hits, pings, level-up, deaths ...; small - every one)

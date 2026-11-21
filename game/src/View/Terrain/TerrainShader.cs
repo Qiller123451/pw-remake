@@ -34,6 +34,9 @@ public static class TerrainShader
         var sb = new StringBuilder();
         sb.Append(@"shader_type spatial;
 render_mode diffuse_lambert, specular_disabled;
+// the ground clears the buildings' stencil mark where it is nearer (a hill in front of a building): no unit silhouette
+// through it (UnitsBehind)
+stencil_mode write, compare_always, 0;
 uniform sampler2DArray ta : source_color, filter_linear_mipmap_anisotropic, repeat_enable;
 ");
         sb.Append($"uniform vec4 sc[{MAX_LAYERS / 2}];          // the layers' scales: layer 2i in .xy, 2i + 1 in .zw\n");

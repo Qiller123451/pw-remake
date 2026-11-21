@@ -267,6 +267,10 @@ public abstract class CampaignBot
         }
         double there = 6 + Math.Sqrt(units.Count);
         var far = units.Where(u => dist(u) > there + (u.Radius > 1 ? u.Radius : 0)).ToList();
+        // (a unit with no way there carried across takes the others of the group with no way there along - a transport's
+        // load: one by one, as their counts ran out, mission 9's army was spread over three islands, and the heroes alone
+        // at the airplane fell; mission 15's army came to the stations piecemeal)
+        bool carry = false; var moved = new HashSet<Unit>();
         foreach (var u in far)
         {
             double d = dist(u);
@@ -287,7 +291,13 @@ public abstract class CampaignBot
             // (moving 8 m does not count for a unit that has no way there - Unit.NoWay: one sent from mission 9's village
             // basin, cut off from the launch ramp 400 m away, wandered about it - the failed search ends elsewhere from
             // each place - and its count never ran out: MIRAGE's workers never got to the ramp)
-            if ((s.At == at && d < s.D - 2) || (u.NoWay == null && Hypot(u.Pos.X - s.X, u.Pos.Z - s.Z) > 8)) { s.D = d; s.T = W.Time; s.X = u.Pos.X; s.Z = u.Pos.Z; }
+            // (and coming nearer counts for it only by 8 m: since units sent to a goal they cannot reach walk to the point
+            // nearest it and stop - Nav.Find, 2026-11-20 - mission 15's army sent from the base island to the first
+            // station, 220 m across the channel, crowded at the shore; jostling there, one or another came 2 m nearer now
+            // and then, and they were teleported one by one over minutes instead of together a minute after they got
+            // there: the stations were taken piecemeal and lost again - the Dragon Clan lost the run)
+            bool way = u.NoWay == null;
+            if ((s.At == at && d < s.D - (way ? 2 : 8)) || (way && Hypot(u.Pos.X - s.X, u.Pos.Z - s.Z) > 8)) { s.D = d; s.T = W.Time; s.X = u.Pos.X; s.Z = u.Pos.Z; }
             else if (s.At != at) s.D = d;
             s.At = at;
             stuck[u] = s;
@@ -301,7 +311,9 @@ public abstract class CampaignBot
                 if (nav.Block[nav.NearestFree(nav.Idx(x, z))] != 0) { info($"no teleport ({key}: {u.Name}) to {at} at {N(Round(W.Time))} s: no free ground there"); s.T = W.Time; s.D = 0; continue; }
                 if (StuckLog) { var (sx0, sz0) = C.ToMap(s.X, s.Z); info(StuckInfo(u, x, z) + $"; count began {N(Round(W.Time - s.T))} s ago at {N(Round(sx0))},{N(Round(sz0))}, best distance {N(Round(s.D))}, now {N(Round(d))}"); }
                 C.Teleport(Registry.Get(u), mx, my);       // (as the JS: C.teleport(u.rec || u) - a unit without a record stays)
-                Teleports++; info($"teleport ({key}: {u.Name}) to {at} at {N(Round(W.Time))} s"); s.T = W.Time; s.D = 0; continue;
+                Teleports++; info($"teleport ({key}: {u.Name}) to {at} at {N(Round(W.Time))} s"); s.T = W.Time; s.D = 0;
+                if (u.NoWay != null) carry = true;
+                moved.Add(u); continue;
             }
             // (the JS set the task's goal to the point after the order and skipped units walking there; the order's
             // own point is the point with the unit's offset)
@@ -310,6 +322,14 @@ public abstract class CampaignBot
             if (k.Type == "move" && Math.Abs(k.X - ox) < 1 && Math.Abs(k.Z - oz) < 1) continue;
             Order(u, "move", ox, oz);
         }
+        if (carry)
+            foreach (var u in far)
+            {
+                if (moved.Contains(u) || u.NoWay == null || !u.Alive || u.Inside) continue;
+                var s = stuck[u];
+                C.Teleport(Registry.Get(u), mx, my);
+                Teleports++; info($"teleport ({key}: {u.Name}) to {N(mx)},{N(my)} at {N(Round(W.Time))} s (with the group)"); s.T = W.Time; s.D = 0;
+            }
         return far.Count == 0;
     }
     protected bool go(IEnumerable<Unit?> units, (int X, int Y) at, string key = "all") => go(units, at.X, at.Y, key);
@@ -387,7 +407,7 @@ public abstract class CampaignBot
     /// modes - show actions the player's tree hides; Rules.ActionsOf with the object's rules owner, as the HUD and the
     /// computer player ask)</summary>
     protected List<ActionDef> ActionsOf(Entity b) => Ru.ActionsOf(b.RulesOwner(), b.Name, b.Kind, b.Def?.Type ?? b.Cls);
-    string? StartConstruction(ActionDef a, Placement pl, int n)
+    string StartConstruction(ActionDef a, Placement pl, int n)
     {
         var ws = workers().OrderBy(u => Hypot(u.Pos.X - pl.X, u.Pos.Z - pl.Z)).Take(n).Select(u => u.Id).ToArray();
         return Do(new PlaceBuildingCommand { Action = a.Path, X = pl.X, Z = pl.Z, Rot = pl.Rot, Workers = ws }) ?? "started";

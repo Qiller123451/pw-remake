@@ -225,7 +225,7 @@ public partial class GameSession
             // a skirmish: its setup (GameStart.Skirmish, else the save's "setup"), rebuilt and replayed (docs/SKIRMISH.md)
             s.Start.Skirmish = SkirmishSession.SetupOf(s.Start, s.Setup);
             if (s.Start.Skirmish == null) { Say("This skirmish was saved without its setup."); return false; }
-            if (s.Start.Skirmish.Map != "" && SkirmishMaps.Resolve(cfg, s.Start.Skirmish.Map) == null) { Say($"The map of this saved game is not in the installation: {s.Start.Skirmish.Map}"); return false; }
+            if (s.Start.Skirmish.Map != "" && SkirmishMaps.Resolve(cfg, s.Start.Skirmish.Map, s.Start.Skirmish.MapHash) == null) { Say($"The map of this saved game is not in the installation: {s.Start.Skirmish.Map}"); return false; }
             LS.Info($"loading {file}: {s.Header.Title}, {SaveHeader.Clock(s.Header.GameTime)}");
             Boot.Instance.Show(LoadingScreen.ForSkirmish(s.Start, s));
             return true;
@@ -237,6 +237,14 @@ public partial class GameSession
             if (se == null) { Say($"The mission {s.Start.Mission} of this saved game is not in the game ({s.Start.Mode})."); return false; }
             LS.Info($"loading {file}: {s.Header.Title}, {SaveHeader.Clock(s.Header.GameTime)}");
             Boot.Instance.Show(LoadingScreen.ForSequel(s.Start, se, s));
+            return true;
+        }
+        if (PwRemake.Sim.Editor.Triggers.CustomMission.IsCustomFolder(s.Start.MissionFolder))
+        {
+            // a custom map (CustomPlay: the campaign menu's Custom campaigns): its prepared mission folder
+            if (!System.IO.Directory.Exists(s.Start.MissionFolder)) { Say("The custom map of this saved game is no longer prepared: start it once from Custom maps, then load again."); return false; }
+            LS.Info($"loading {file}: {s.Header.Title}, {SaveHeader.Clock(s.Header.GameTime)}");
+            Boot.Instance.Show(new LoadingScreen(s.Start, PwRemake.UI.CustomPlay.EntryOf(s.Start), s));
             return true;
         }
         var entry = PwRemake.UI.MissionEntry.Load(cfg.MissionsDir).FirstOrDefault(m => m.Id == s.Start.Mission && (s.Start.MissionFolder.Length == 0 || m.Folder == s.Start.MissionFolder))

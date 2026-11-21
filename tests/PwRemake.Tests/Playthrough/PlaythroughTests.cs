@@ -98,7 +98,7 @@ public static class PlaythroughTests
         // their resource collector - a card bought with the budget (mission 6 as the Dustriders had no base). (Not for the
         // other tribes: mission 11's default army for the Norsemen lacks the three heroes - see docs/CAMPAIGN.md)
         if (e.PointBuy && start.Army == null && e.Tribe == "Aje" && (string.IsNullOrEmpty(tribe) || tribe == "Aje"))
-            start.Army = CampaignArmy.Of(Json.TryParseFile(Path.Combine(c.Config.MissionsDir, e.Folder, "mission.json")), c.Rules, tribe, 0)?.Defaults();
+            start.Army = CampaignArmy.Of(PwRemake.Sim.Maps.PwMapReader.MissionOf(Path.Combine(c.Config.MissionsDir, e.Folder)), c.Rules, tribe, 0)?.Defaults();
         var sw = Stopwatch.StartNew();
         var P = new PlayPresenter();
         var s = MissionSession.Create(start, c.Config, new SessionOptions { Presenter = P, Rules = c.Rules, Models = c.Models, Forest = c.Forest, Brushes = c.Brushes, AiData = c.Ai, DataDir = c.Data });

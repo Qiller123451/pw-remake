@@ -231,7 +231,7 @@ public sealed partial class World
                 : tt != null ? FindTarget(tt, R, FindOpts.Around) : null;   // (for the passenger's bow, not the carrier's weapon)
             u.Task.Target = e;
         }
-        if (e == null || Time - u.LastHitDone <= AttackDuration(u, cs)) return;
+        if (e == null || cs == null || Time - u.LastHitDone <= AttackDuration(u, cs)) return;      // (no long weapon: nothing to launch)
         u.LastHitDone = Time;
         var from = t.Pos; from.Y += (t is Unit h && h.Height != 0 ? h.Height : 3) * 0.9;
         Launch(u, from, e, u.Weapons.Long, cs);

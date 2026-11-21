@@ -143,7 +143,7 @@ public static class Sys1MinRangeTests
         var (R, M) = Sys1.Load(t, RulesTestData.Base(t));
         var c = MinRangeClasses(t, R, M).FirstOrDefault(x => !x.Secondary);
         t.True(c.Name != null, "a class with a minimum range and no secondary weapon");
-        var (W, u, es) = Plain(R, M, c.Name, (2.5, 0), (0, c.Min + 6));
+        var (W, u, es) = Plain(R, M, c.Name!, (2.5, 0), (0, c.Min + 6));
         var (near, far) = (es[0], es[1]);
         near.Pos = new V3(u.Radius + 2, 0, 0); W.UHash.Move(near);
         t.True(W.FindTarget(u, W.AlarmRange(u)) == far, $"{c.Name}: the enemy outside the minimum range ({W.Reach(u, far):0.0} m, min {c.Min})");
@@ -161,7 +161,7 @@ public static class Sys1MinRangeTests
         var c = cl.FirstOrDefault(x => x.Secondary && !x.Name.Contains("worker"));
         if (c.Name == null) c = cl.FirstOrDefault(x => x.Secondary);
         t.True(c.Name != null, "a class with a minimum range and a secondary weapon");
-        var (W, u, es) = Plain(R, M, c.Name, (0, 0));
+        var (W, u, es) = Plain(R, M, c.Name!, (0, 0));
         var near = es[0];
         near.Pos = new V3(u.Radius + 2, 0, 0); W.UHash.Move(near);
         t.True(!W.InSortZone(u, near, W.Reach(u, near)), $"{c.Name}: the enemy stands inside the minimum range ({W.Reach(u, near):0.0} m, min {c.Min})");

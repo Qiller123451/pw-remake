@@ -85,6 +85,31 @@ A group order's places that fall on blocked ground (`Formation.FormationSlots`) 
 unit of the group got. Note: units without model data get radius 0.45 (`ModelManifest.UnitSize`); the test data
 lacks most model files (MIRAGE: all), so there ships and big animals stand much closer than in a full installation.
 
+**Goals out of reach** (`Nav.Find`, 2026-11-20). The ground is labelled in connected regions once the terrain is marked
+(`NavGrid.LabelRegions`: across mountains or water - the map's walk grid). A goal in another region than the unit's is
+replaced by the cell of the unit's region nearest it: the unit walks to the point nearest the goal it can reach and
+stops there, as in the original. That cell was looked for within 80 cells (160 m) only; a goal farther off got the
+search that fails, which ends at the cell it reached nearest the goal - another one by where the unit stood and by its
+size (a big unit's search has no coarse route and ran out after 30,000 cells), so units sent on wandered from one such
+end to the next (mission 9: a triceratops sent from the Dragon Clan village to the launch ramp's island stood 104 m from
+the island's point nearest it). Now the whole map is searched (`FarCell`, its last answer kept for the group's other
+units), and "nearest" is the straight-line distance: the ring search took the first square ring holding a cell of the
+region, up to 41 % farther than the nearest (mission 9's west altar: the corner of the island 350 m off instead of the
+shore 280 m off). Such a far goal is still reported not found (`Found` false: `Unit.NoWay`, `Combat` gives up on a foe
+there, the computer players' checks), as before; within 160 m it stays found, as before. (A first try on 2026-11-12
+lost base mission 6's playthrough and was reverted; this one wins it with every tribe in both configurations:
+docs/CAMPAIGN.md mission 9.) `UnreachableGoalTests` (mission 9's village and its islands; mission 6's army sent from
+its island to the pirates' prison): every way to a far goal on another island ends at the one nearest cell (brute force
+over the region), small and big units stand there.
+The same flaw elsewhere: a builder or repairer whose way ended anywhere set to work where it stood (`BuildUpdate` /
+`RepairUpdate`: "arrived, or the way is walked"), so buildings went up from across the water - mission 9's tower at the
+airplane from the village's shore 465 m off, the launch ramp from the village for 50 minutes (docs/CAMPAIGN.md). Now
+(`Construction.WayEndedShort`) a builder whose way ended more than 10 m from the walls looks at the cell of its ground
+region nearest the building: none within 25 m of the walls (another island) - the job is given up, the worker stands;
+it stands at that cell - it works from there (mission 9's launch ramp stands in rocks, the nearest walkable ground 20 m
+from its walls); else it walks there. Not for a harbour (a coastal building, or one standing in the water: MIRAGE's
+Dustrider floating harbour): built from the shore as before.
+
 **Bridges** (`World/Bridges.cs`, 2026-11-13; how the original makes them: docs/MAPS.md "Bridges"). A bridge has no
 walk surface: units walk the ground (the map's walk grid), and a bridge blocks the cells of its model's pathfinder
 boxes like every CDecoColObj - placed by the map source or by the mission (`Campaign.NO_BLOCK` no longer names
@@ -239,6 +264,39 @@ where it stood to S by the time of the hit - `World.FirstStrikeLunge`) and gets 
 named (the attacker's action state >= 2 and an age <= 20 of something it keeps).
 Tests: `FirstStrikeMarkersTests.FirstStrike*`.
 
+## Attacking the ground (`GroundAttack.cs`, order "attackground"; 2026-11-20)
+
+User request: "units that deal aoe damage like catapult diplo when used attack button show their radius of splash
+damage and you can also order them to attack ground ... into the spot you click no need for an exact target".
+
+The original (SecondaryInputController.usl HandleMsg, the "Attack" command) does it like this:
+
+- A click of the Attack mode on open ground sends each selected object whose `hitrange` (splash radius) is above 0
+  a Fight command with no target and the pick point ("Scape").
+- The rest of the selection walks to the point, each shifted by up to sqrt(n) m.
+- While the mode is armed and the selection has an area weapon (CSelectionInfo.AREA_WEAPON), a range marker of the
+  selection's largest splash radius (`m_fAreaRange`) follows the mouse.
+- The cursor reads `attack_area_weapon`, plus `_invalid` inside the minimum range and `_walk` out of reach (GetCursor).
+
+The remake:
+
+- The view (GameInput.Orders: `UpdateAimArea`, `AttackModeCursor`) draws that circle as `SelectionOverlay.AimArea`:
+  red, or grey inside the minimum range.
+- On a ground click the view sends the area units an OrderCommand "attackground" with the point. The others get a
+  group "move" (the formation stands in for the random shift). A selection without an area weapon keeps the old
+  attack-move on a ground click.
+- `World.CanAttackGround`: the primary weapon has Splash > 0 and damage, and no penetration (a flamethrower's cone is
+  no area shot).
+- `GroundReach` gives the reach as `RangeZoneOf` measures it for a target without a body. The unit walks onto the line
+  from the spot to itself, inside that reach and out of its minimum range (a mortar too near steps back). A unit that
+  cannot walk ends the attack.
+- In reach it turns to the spot, setting up first where it sets up to shoot. It then fires at the cadence of its
+  normal attacks, with the same clip choice, fight positions and first-shot overtime.
+- The shot is a `PendingShot { Ground = true, At }` that `World.FireAt` lets go:
+  - with a projectile, a `Projectile` with no target and a fixed aim, jittered as every area shot (Launch);
+  - without one (a tail sweep), the blow's `AreaDamage` at the spot.
+- It goes on until the next order.
+
 ## Setting up and fight positions (Compose.DEPLOY, Combat.FightPosition)
 
 User report (2026-11-12): "When the Black Widow is in the shooting mode and is 'curled up', it should continue to be
@@ -332,6 +390,72 @@ The remake played the whole clip (curl, shot, uncurl) for every shot.
   ranged unit's short weapon - are the carrier's strike and the gun stays still; a ranged clip of the animal's own
   stays (the dilophosaurus' spit "attack_front_m"); vehicles and ships keep their hull clip. A catapult build-up holds
   its throw at the first frame between shots (it was looped as its standing clip). Tests: VariantAttackClipsTests.
+
+## Attack clips of vehicles and big units (2026-11-21)
+
+Kacper: "The SEAS scorpion, the playable unit from MIRAGE, doesn't play its animation when attacking; the same issue
+might be for the scorpion from the final boss battle." Read from MIRAGE master (Mirage.usl CSeasScorpion 6064-6416,
+CScorpionBuildup; TransportObj.usl CTransportObj.AttackEnemy 1013; BuildUpBase.usl CBuildUpWeapon.AttackEnemy 1884;
+Vehicle.usl CWehrspinne, CSeasMGWalker) and the base Building.usl CScorpionBoss.
+
+* **MIRAGE's Scorpion** (`seas_scorpion`, the titan of the launch pad `seas_final_boss`): its own model is
+  `pirate_boss` - an empty carrier with links and no clips -, the robot is the build-up `seas_eb_buildup` (model
+  `scorpion`) at `psh2`, and `CSeasScorpion.AttackEnemy` plays the fight clip (`GetNextFightAnim`) on the build-up:
+  `SetAnim(sFAnim, 1)` at its own speed; with a penetrating weapon (both of its weapons) not again while the timer
+  SCORPION_FLAMER (the clip's length - 0.5 s) runs; `SetAnim("standanim")` of the body is passed on to it. The remake
+  played the clip on the body, which has none: the Scorpion fought without moving. Now `Composite.Fighter` (the classes
+  of `Compose.FightsWithBuildUp`: CSeasScorpion) plays it (`Composite.FighterStrike`, Combat.AttackUpdate), back on
+  `standanim` when it ran out. Against a unit its claws, sting and legs (`seas_boss_weapon_melee_*`: attack_1 /
+  attack_4 / attack_3); **against a building its flamethrower** (`UpdateEquipment` / `GetRightHandWeapon`:
+  `/Objects/SEAS/Weapons/seas_boss_weapon_flamer_a .. _e` by its level, a weapon no "Users" list names - the remake had
+  only the melee weapons and clawed buildings): `World.AgainstBuilding`, taken by `RangeZoneOf` as the primary weapon,
+  with its clip attack_2 (12 s). It turns to face its target within 11.25 degrees before a blow (`GetPenetration() &&
+  fAngle > Pi/16`: RotateToEnemy, no blow). Its corpse: "Script corpses" below.
+* **The end boss of mission 16** (`scorpion`, CScorpionBoss, a building: Buildings.cs `ScorpionB`) plays its own clips -
+  stand_up, then rounds of prepare_<n> / standanim / prepare_<n> / attack_<n> (scissors 1, flamethrower 2, legs 3) -
+  and the view follows its AnimCtl as any building's: it was right (`BossScorpionPlaysItsAttacks`, base and MIRAGE).
+  Its model's attack_4 and prepare_4 are not used by the class.
+* **Set-up vehicles' guns** (the Black Widow `seas_wehrspinne`, MIRAGE's MG walker `seas_mgwalker`): their weapon is a
+  `CBuildUpWeapon`, whose `AttackEnemy` plays `m_sAttackAnim` ("attack_front") on its top - `seas_wehrspinne_top`,
+  `seas_hq_machinegun_nest_top` - with every shot. `Composite.Fired` played the clip only on the log cannon's gun
+  (`Dep == "gun"`): the tops never moved. Now the weapon build-up (`Composite.Gun`) when there is no such part.
+* **The ballista rhino's recoil** (`hu_rhino_ballista`): `CTransportObj.AttackEnemy`, when its weapon build-up fires the
+  primary weapon, plays `attack_front_secondary` on the carrier where the model has it (only `woolly_rhino`); the remake
+  let the rhino stand (`Compose.CarrierStrikes`). Now that clip.
+* **The audit** (`VehicleAttackClipsTests.EveryAttackClipOfVehiclesIsPlayed`): every class of the four tribes of type
+  VHCL or SHIP and every animal carrying a build-up or turret, base and MIRAGE (models from the data's own folder, then
+  the base export), fights a unit and a building for 40 s each; the clips of the weapons it used that a model of it has
+  (its own, else a part's), its gun's, turrets' and riders' attack clips must start. The one left, explained: the MG
+  walker's body (it holds its "standup" while it fights; CTransportObj.AttackEnemy returns before the weapon's clip is
+  set on the body). Attack clips of the models that no weapon table names are listed in its log only (the Black
+  Widow's attack_long / attack_short, the mobile suits' "attack" / "flame", the rhino's attack_left / right ...: no
+  script plays them).
+
+## Script corpses (`ScriptCorpses.cs`, 2026-11-21)
+
+Some units' scripts make a corpse object of their own class (a `CUniversalCorpse`: its model, its clip, a timer
+TIMER_DELETE, then `MoveAction` to a height at a speed in m/s and `Delete` when it arrives; the falling ones wait 5 s
+(TIMERID_SINK) on the ground before they sink). The remake draws them as the dead unit's `Wreck` (EntityViews.Wrecks,
+like the ships' and vehicles' `<gfx>_dest` wrecks of `ShipWreck` / `VehicleWreck`), with `Wreck.Moves` / `YAt` for the
+height, `HoldFrom` / `HoldAt` for a held frame (`World.CorpseHold`) and `Fire` for the burning (AddFX "fire_corpses" =
+the effect model `fire_molotov`, attached at its link). `World.ScriptCorpse` comes before the ship and vehicle wrecks
+(Combat.UnitDied), not for a silent death or one inside a transport. MIRAGE master, Mirage.usl / Vehicle.usl:
+
+| unit (script class) | corpse (class) | model, clip | goes |
+|---|---|---|---|
+| `seas_scorpion` (CSeasScorpion.CreateCorpse) | `seas_scorpion_corpse` (CScorpionCorpse) | `scorpion_dest`, "destroy", held at frame 249 from 10 s | at 14 s sinks to height 0 at 1 m/s |
+| `ninigi_siegetower` (CSiegeTower.CreateCorpse) | `siegetower_corpse` (CSiegeTowerCorpse) | `ninigi_siegetower`, no clip, burning | at 1 s sinks to 0 at 5 m/s |
+| the four zeppelins (CZeppelin.Delete) | `zeppelin_corpse` (CZeppelinCorpse) | `flyingtrader`, burning at Dri2 | falls to the ground - 12.26 m at 15.5 m/s, 5 s, sinks to 0 at 1 m/s |
+| `ninigi_cargolifter`, `ninigi_dirigible` (CNinigiCargoLifter / CNinigiDirigible.CreateCorpse) | `cargolifter_corpse`, `dirigible_corpse` (CCargolifterCorpse) | its model, burning at Dri1 | falls to the ground or the sea (the higher) + 0 / + 3 m at 15 m/s, 5 s, sinks to 0 at 1 m/s |
+
+Before: the Scorpion left the pirate ship's wreck (`VehicleWreck` took its carrier model `pirate_boss` + "_dest"), the
+siege tower played its own dying, and a flying zeppelin, cargolifter or dirigible that died stayed in the air until
+its corpse sank after 12 s. A corpse on high ground sinks for as long as the original's (to height 0), at most 60 s.
+Not taken: the Scorpion's stone corpse with MIRAGE's unit resources (the remake has no unit resources). Not ported
+(other script corpses): the pteranodons' `CPteranodonCorpse` (made in Delete besides CAnimal's own corpse - "dying",
+falls to the ground + 3.5 m, frame 40 held), the SEAS carrier's sinking (`CCarrierSink`, a building: BuildingCorpse or
+the sink at random, with its turret), the rebuild protocol's wreckage (`CWreckageStill`: the protocol is not ported),
+the magma's lava stream (`CCustomCorpse`), the Crash RPG's pilots. Test: `ScriptCorpsesTests`.
 
 ## Animation audit (2026-11-13)
 
@@ -469,6 +593,9 @@ a wall, as the Dustriders' wall does when they raise Miyagi to level 4, or the N
     the weaker one's - the pattern of the clay wall upgrade (clay wall 30 wood / 40 stone / 22 s less bone palisade
     20 / 20 / 10 s = 10 / 20 / 12 s). MIRAGE: SEAS wall 40 / 30 / 22 s less fence 30 / 40 / 15 s = **10 wood, 0 stone,
     7 s**; SEAS wall gate 80 / 60 / 35 s less SEAS gate 60 / 80 / 30 s = **20 wood, 0 stone, 5 s**.
+    Kept this way by Kacper's decision (2026-11-20): per piece, the Dustriders' pattern - not a player-wide research
+    like the Norse wall upgrades (palisade -> small wall 200 stone / 30 s from epoch 3, small -> reinforced wall
+    300 stone / 40 s from epoch 5, both from the original tech tree).
   * Conditions and visibility: the SEAS wall's build action's (Mayor_s4); every filter modificator of the SEAS wall
     build's visibility (the chief's level 4 and 5, the 5th epoch) shows the upgrades too, as the clay wall's are; the
     cost and duration modificators of the stronger class's build action apply to them (the chief bonus x0.7).
@@ -587,7 +714,8 @@ healing well SEAS building currently does nothing".
 * **The launch pads** (MirageBuildings.cs `LaunchpadB`; Mirage.usl CSeasScorpionLaunchpad, CHuAvatarLaunchpad,
   CNinigiPirateBossLaunchpad): a worker builds the pad; finished, it can't be selected or hit and is replaced by its
   titan - a unit of the pad action's level (5) at its place and rotation, the pad gone without a ruin. The Scorpion's
-  pad waits 1 s and plays "stand_up" first; the pirate boss ship appears at the pad's link "Bl_1". The pads count in
+  pad waits 1 s and plays "stand_up" first (the Scorpion fights with its build-up: "Attack clips of vehicles and big
+  units"); the pirate boss ship appears at the pad's link "Bl_1". The pads count in
   the unit limit from the moment the site is placed (DoesCountInUnitLimit; `MiragePads.COUNT_AS_UNIT`, also the zeppelin
   launch pad): the titan takes the pad's card in the pyramid. **The build-up decorations** (CHuAvatarLaunchpad /
   CNinigiPirateBossLaunchpad OnInit + SetProcess; `LaunchpadB.SiteProgress` / `ExtraParts`, the models of MIRAGE's

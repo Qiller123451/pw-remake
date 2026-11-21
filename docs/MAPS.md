@@ -1,14 +1,21 @@
 # Maps
 
-Everything about map data in the simulation, without the engine: reading the original game's maps (`.ula`), the
-remake's random jungle map, forest blocks, the "map source" the world is built from, and the ground levelling of
-buildings. Code: `src/Sim/Maps` (namespace `PwRemake.Sim.Maps`), a port of the JS remake's `game/maps/*.js`,
-`game/mapgen.js`, `game/ground.js` and the data part of `engine/terrain.js` (pw-exporter 98c7703). The file format
-itself is described in the toolkit's `docs/MAP_FORMAT.md` (and `pwexport/data/ksy/paraworld_surf.ksy`).
+Everything about map data in the simulation, without the engine: the maps the game reads (the remake's map format:
+[MAP_FORMAT.md](MAP_FORMAT.md) - folders of Lua and pictures, converted once from the original game's `.ula` by
+Prepare), the reader of the original's maps the converter uses, the remake's random jungle map, forest blocks, the "map
+source" the world is built from, and the ground levelling of buildings. Code: `src/Sim/Maps` (namespace
+`PwRemake.Sim.Maps`), a port of the JS remake's `game/maps/*.js`, `game/mapgen.js`, `game/ground.js` and the data part of
+`engine/terrain.js` (pw-exporter 98c7703). The `.ula` file format itself is described in the toolkit's
+`docs/MAP_FORMAT.md` (and `pwexport/data/ksy/paraworld_surf.ksy`).
+
+How a map gets to the world: `MapFiles.Find(cfg, id)` (the converted map of a setup's id) -> `MapFiles.Read(path)`
+(`PwMapReader` -> `PwMap.ToMapData()`) -> `MapData` -> `MapSource.OriginalSource` -> the world. The `.ula` reader
+(`Ula.cs`) is called only by the converter (`PwMapConvert`; a `.ula` given by its path is converted in memory).
 
 | JS (remake/src) | C# (src/Sim/Maps) | what |
 |---|---|---|
-| game/maps/ula.js | `Ula.cs` (reader), `MapData.cs` (the result) | `.ula` file -> `MapData` |
+| game/maps/ula.js | `Ula.cs` (reader), `MapData.cs` (the result) | `.ula` file -> `MapData` (the converter's: PwMapConvert) |
+| (new) | `PwMap.cs`, `PwMapReader.cs`, `PwMapWriter.cs`, `PwMapConvert.cs`, `LuaData.cs`, `Png.cs`, `MapFiles.cs` | the remake's map format: MAP_FORMAT.md |
 | game/maps/frame.js | `Frame.cs` | map space vs. world: headings, quaternions |
 | game/maps/forest.js | `Forest.cs` (`Forest.ParseForest`, `ForestData`) | forest blocks + forest.json |
 | game/maps/source.js | `MapSource.cs` | `MapData` or the generator -> what the world build needs |
@@ -41,7 +48,7 @@ is the extended map's centre in map coordinates and `MapSource.Half` its half ex
 `MapSource` and everything in it (trees, decor, starts, nests' areas ...) are in **game** coordinates - except
 `MapSource.Regions`, which stay map regions (the campaign's `Regions` converts, as campaign/regions.js does).
 
-## Reading a map: `Ula.ParseUla(bytes, fileName)` -> `MapData`
+## Reading an original map (the converter): `Ula.ParseUla(bytes, fileName)` -> `MapData`
 
 The file is a container of zlib blocks (`Ula.Unpack`) holding a `SURF` chunk tree (`Ula.Chunks`). What each chunk gives:
 
@@ -70,8 +77,8 @@ Kind 0..4, Amount) and undergrowth plant (X, Y, Kind 0..7) in map coordinates - 
 water). `ForestKinds(setting)` names the models. The JS keeps the table in a module variable (`setForestData`); here
 it is an object passed to `MapSource.OriginalSource`.
 
-A map file is read with its remake additions by `MapFiles.Read(path)` (`<map>.biomes.json` beside a .ula; a remake
-map `game/maps/*.pwmap.json` = an installation's map + name, description, biomes): docs/BIOMES.md "Files".
+A map is read by `MapFiles.Read(path)`: a map folder or `.pwmap` of the remake's format (MAP_FORMAT.md; with its biome
+layer, docs/BIOMES.md), or a `.ula` / remake recipe `.pwmap.json` given by its path, converted in memory.
 
 ## Bridges (how the original makes them)
 

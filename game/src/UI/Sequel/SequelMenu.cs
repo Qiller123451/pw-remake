@@ -1,5 +1,5 @@
 // The menus of the remake's own campaigns (docs/SEQUEL.md "Menus"; menu.js sequel() / scenarios()):
-//   * "Containment (1964)": the 1964 and 1966 missions in order, each with its place, date, briefing and what it brings
+//   * "Containment (1964)" (opened from the campaign menu's Custom campaigns tab: "The remake's campaigns"): the 1964 and 1966 missions in order, each with its place, date, briefing and what it brings
 //     in; a mission opens when the one before it was won (the debug options open all); the difficulty. It is played
 //     with the MIRAGE configuration (its SEAS): the menu offers to switch to it.
 //   * "Scenarios": the five scenarios, all open, played as any of the four tribes (the base game: its three) - the menu
@@ -27,9 +27,15 @@ public partial class SequelMenu : MenuScreen
     OptionButton _diff = null!;
     protected OptionButton? TribeBox;
     Button _start = null!;
+    /// <summary>where Back goes (Scenarios: the title screen; Containment: the campaign menu's Custom campaigns - its
+    /// only entry since it left the title screen)</summary>
+    protected Func<Node>? BackTo;
 
-    public SequelMenu() : this("sequel", "Containment") { }
+    public SequelMenu() : this("sequel", "Containment") { BackTo = () => new CampaignMenu(1); }
+    /// <summary>opened from another menu (the campaign menu's Custom campaigns): Back goes there</summary>
+    public SequelMenu(Func<Node> back) : this("sequel", "Containment") { BackTo = back; }
     protected SequelMenu(string kind, string caption) : base(caption, minWidth: 940) { Kind = kind; }
+    Node Again() => Kind == "scenario" ? (BackTo != null ? new ScenarioMenu(BackTo) : new ScenarioMenu()) : (BackTo != null ? new SequelMenu(BackTo) : new SequelMenu());
 
     protected override void Build()
     {
@@ -55,7 +61,7 @@ public partial class SequelMenu : MenuScreen
             row.AddChild(note);
             if (m != null)
             {
-                var sw = PwTheme.Btn($"Switch to {m.Title}", () => { GameApp.UseConfiguration(m); GameApp.Settings.Save(); Boot.Instance.Show(new SequelMenu()); }, 200);
+                var sw = PwTheme.Btn($"Switch to {m.Title}", () => { GameApp.UseConfiguration(m); GameApp.Settings.Save(); Boot.Instance.Show(Again()); }, 200);
                 sw.SizeFlagsVertical = SizeFlags.ShrinkCenter;
                 row.AddChild(sw);
             }
@@ -116,11 +122,11 @@ public partial class SequelMenu : MenuScreen
         _diff.Select(Math.Clamp(s.Difficulty, 0, 2));
         _diff.ItemSelected += i => s.Difficulty = (int)i;
         gd.AddChild(_diff);
-        var dbg = PwTheme.Btn("Debug options …", () => Boot.Instance.Show(new DebugOptionsWindow(() => Kind == "scenario" ? new ScenarioMenu() : new SequelMenu())), 170);
+        var dbg = PwTheme.Btn("Debug options …", () => Boot.Instance.Show(new DebugOptionsWindow(Again)), 170);
         opts.AddChild(dbg);
 
         _start = PwTheme.Btn("Start mission", Start, 170);
-        b.AddChild(Row(PwTheme.Btn("Back", () => { s.Save(); Boot.Instance.Show(new TitleScreen()); }, 140), _start));
+        b.AddChild(Row(PwTheme.Btn("Back", () => { s.Save(); Boot.Instance.Show(BackTo?.Invoke() ?? new TitleScreen()); }, 140), _start));
         if (Missions.Count == 0) { _text.Text = $"No missions in {SequelCatalog.Dir(Kind)}."; _start.Disabled = true; }
         else { _list.Select(sel); ShowMission(sel); }
         if (Kind == "sequel" && !mirage) _start.Disabled = true;
@@ -193,6 +199,7 @@ public partial class SequelMenu : MenuScreen
 public partial class ScenarioMenu : SequelMenu
 {
     public ScenarioMenu() : base("scenario", "Scenarios") { }
+    public ScenarioMenu(Func<Node> back) : base("scenario", "Scenarios") { BackTo = back; }
 }
 
 /// <summary>What a won mission opens (runtime.js unlockNext): the next Containment mission; the tribes that won a scenario.</summary>

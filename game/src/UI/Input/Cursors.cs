@@ -38,7 +38,10 @@ public static class Cursors
     {
         if (name == _shown) return;
         _shown = name;
-        if (name != null && _cur.TryGetValue(name, out var c)) Godot.Input.SetCustomMouseCursor(c.Tex, Godot.Input.CursorShape.Arrow, c.Hot);
+        // (a name the data lacks: the next shorter one - attack_area_weapon_walk -> attack_area_weapon -> ... -> attack)
+        var nm = name;
+        while (nm != null && !_cur.ContainsKey(nm) && nm.LastIndexOf('_') > 0) nm = nm[..nm.LastIndexOf('_')];
+        if (nm != null && _cur.TryGetValue(nm, out var c)) Godot.Input.SetCustomMouseCursor(c.Tex, Godot.Input.CursorShape.Arrow, c.Hot);
         else if (name != null && name != "standard" && _cur.TryGetValue("standard", out var s)) Godot.Input.SetCustomMouseCursor(s.Tex, Godot.Input.CursorShape.Arrow, s.Hot);
         else if (name == "standard" && _cur.TryGetValue("standard", out var st)) Godot.Input.SetCustomMouseCursor(st.Tex, Godot.Input.CursorShape.Arrow, st.Hot);
         else Godot.Input.SetCustomMouseCursor(null);

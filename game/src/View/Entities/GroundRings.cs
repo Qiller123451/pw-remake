@@ -12,7 +12,8 @@
 // exactly the terrain's vertices (same triangle split), so it lies on the drawn ground; its shader takes the circles
 // that reach the tile and draws the band just inside the boundary of their union: d = min over circles of (distance
 // to centre - radius); the line is where -w < d < 0. The vertices are pulled 8 cm towards the camera so the band is
-// never inside the coplanar terrain; depth test stays on, so buildings and units in front hide it as in the original.
+// never inside the coplanar terrain; depth test stays on, so the terrain, buildings and units in front hide it - the
+// back of a building's own ring is behind the building (Kacper's decision 2026-11-21: rings under buildings, docs/VIEW.md).
 //
 // Same as remake/src/ui/groundrings.js.
 using System;
@@ -95,6 +96,7 @@ void fragment() {
     ALPHA = a * alpha_mul;
 }
 ";
+
     static Shader? s_shader;
 
     sealed class Group { public int Rgb; public float Alpha; public readonly List<Vector4> C = new(); public readonly List<Vector2> A = new(); }

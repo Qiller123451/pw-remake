@@ -84,4 +84,24 @@ public sealed class CampaignArmy
         if (hp["unit_limits"] is JsonArray ul) for (int i = 0; i < 5 && i < ul.Count; i++) o.Limits[i] = ul[i]?["max"] is JsonValue mv ? mv.Int() : null;
         return o;
     }
+
+    /// <summary>the army screen of a co-op seat (docs/COOP.md "Armies"): seat 1's is the mission's (Of); seats 2 and 3 get
+    /// the same budget and shop in their tribe without the story heroes - the heroes are seat 1's and split by the lobby's
+    /// hero split (CoopRuntime.AfterBuild), a second copy would be a hero twice. Null: no army screen.</summary>
+    public static CampaignArmy? ForCoopSeat(JsonNode? mission, Rules.Rules D, string tribe, double credits, int seat)
+    {
+        var o = Of(mission, D, tribe, credits);
+        if (o == null || seat <= 1) return o;
+        var PB = new PointBuy(D, null);
+        bool Hero(string card) => D.Def(PB.Resolve(card, o.Tribe).Cls, null)?.Unique == true;
+        if (o.Allowed != null) o.Allowed.RemoveWhere(Hero);
+        var baseDefaults = o.Defaults;
+        o.Defaults = () =>
+        {
+            var a = baseDefaults();
+            foreach (var k in a.Cards.Where(kv => Hero(kv.Value)).Select(kv => kv.Key).ToList()) { a.Cards.Remove(k); a.Fixed.Remove(k); }
+            return a;
+        };
+        return o;
+    }
 }

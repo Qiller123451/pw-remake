@@ -213,7 +213,7 @@ public sealed partial class World
                 n.T = GALLI_RATE;
                 var (x, z) = b.ExitPoint(b.Pos.X + 5, b.Pos.Z + 5);
                 var u = W.SpawnUnit(GALLI, b.Owner, x, z, 1, 0, new UnitOpts { Autonomous = true });
-                if (u != null) { u.HomeX = b.Pos.X; u.HomeZ = b.Pos.Z; u.HomeRadius = GALLI_RADIUS; n.Members.Add(u); }
+                if (u != null) { u.HomeX = b.Pos.X; u.HomeZ = b.Pos.Z; u.HomeRadius = GALLI_RADIUS; n.Members.Add(u); W.InheritInfection(b, u); }
             }
             foreach (var u in n.Members)
                 if (u.Task.Type == "idle" && Hypot(u.Pos.X - b.Pos.X, u.Pos.Z - b.Pos.Z) > GALLI_RADIUS) W.Order(u, new Order("move") { X = b.Pos.X, Z = b.Pos.Z });

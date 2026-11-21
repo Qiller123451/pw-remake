@@ -14,6 +14,7 @@ ParaWorldRemakeGodot/
 │  ├─ src/App/                 start-up, logging into Godot, settings, the game session (sim + view + UI)
 │  ├─ src/View/                drawing and sound: terrain, water, models, parts, animations, effects, audio
 │  ├─ src/UI/                  menus, HUD, mission UI (quests, dialogues, cutscenes), debug options and tools
+│  ├─ src/Editor/              the map editor in the game (docs/MAP_EDITOR.md)
 │  └─ lua/                     the Lua library every map gets (std/*.lua: the trigger syntax, helpers)
 ├─ src/Sim/                    the game without the engine (a plain .NET library, no Godot types)
 │  ├─ Core/                    logging, JSON, deterministic math and random numbers
@@ -22,9 +23,10 @@ ParaWorldRemakeGodot/
 │  ├─ World/                   World, entities, players, navigation, the simulation step
 │  ├─ Systems/                 the rules by topic (combat, economy, construction, production, moves ...)
 │  ├─ Ai/                      the computer player (port of the original's script AI)
-│  ├─ Maps/                    reading original maps (.ula), terrain data, forests
+│  ├─ Maps/                    the map format (PwMap, reader, writer, converter of the .ula), terrain data, forests
 │  ├─ Campaign/                a mission's world: setup, players, objects, regions, tribe swap
 │  ├─ Scripting/               Lua host (sandboxed), Game API for scripts, the trigger engine
+│  ├─ Editor/                  the map editor's document, commands, undo / redo, brushes, terrain, objects, players (no Godot)
 │  └─ Commands/                everything a player does, as data (the seam for co-op and multiplayer)
 ├─ src/Net/                    networked games: TCP, lobby, host ordering turns, lockstep client (docs/MULTIPLAYER.md)
 ├─ src/Server/                 the dedicated server (console)
@@ -104,15 +106,18 @@ so the original's assets can be replaced piece by piece later (docs/CONTENT.md "
 
 ## Maps are Lua
 
-A map (campaign mission today, custom maps later) is a folder (docs/LUA_MAPS.md):
+A map (campaign mission today, custom maps later) is a folder of Lua and pictures in the remake's map format
+(docs/MAP_FORMAT.md; the original maps are converted once by Prepare), its triggers Lua (docs/LUA_MAPS.md):
 
 ```
-missions/11_arena/
-├─ mission.json        what the menu shows and the setup needs: titles, players, start, budget, the terrain source
-├─ world.json          objects, regions, groups, quests, question marks, variables, dialogues, sequences (data)
+missions/11_single_11/
+├─ map.lua             the map and the mission: titles, players, start, budget (`mission = { ... }`), level settings
+├─ terrain/            height.png (16-bit), materials.png, walk.png, plants.lua, forest.lua
+├─ objects.lua, regions.lua   the map's placed objects and regions
+├─ world.lua           objects, regions, groups, quests, question marks, variables, dialogues, sequences (data)
 ├─ triggers.lua        the triggers, converted 1:1 from the original map - readable and editable
 ├─ custom.lua          (optional) own code: anything the triggers cannot express
-└─ texts/uk.json       the mission's texts
+└─ texts/uk.lua        the mission's texts
 ```
 
 `triggers.lua` is declarative:

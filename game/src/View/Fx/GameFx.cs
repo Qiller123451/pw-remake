@@ -61,7 +61,7 @@ public sealed class GameFx
     };
     static readonly Dictionary<string, string> CASTE_SPAWN = new() { ["res"] = "spawnping_char_res_fx", ["nat"] = "spawnping_char_nat_fx", ["tec"] = "spawnping_char_tec_fx" };
     /// <summary>the effect models used here (the session loads them with the map: main.js GAME_FX_MODEL)</summary>
-    public static readonly System.Text.RegularExpressions.Regex GAME_FX_MODEL = new(@"^(hit_|fx_impact_|spawnping_|readyping_|placeping_|deathping_animal_|levelup_char_fx$|leave_blast$|vehicle_explosion$|explo_logcannon_building$|fx_poison|fx_ice_freeze$|hu_wallstones$"
+    public static readonly System.Text.RegularExpressions.Regex GAME_FX_MODEL = new(@"^(hit_|fx_impact_|spawnping_|readyping_|placeping_|deathping_animal_|levelup_char_fx$|leave_blast$|vehicle_explosion$|explo_logcannon_building$|fx_poison|fx_ice_freeze$|fire_molotov$|hu_wallstones$"
         // and those of WorldFx (the original effect models tools/prepare/effect_models.py adds to the data)
         + @"|hu_temple_dem_fx$|hu_wall_dem_fx$|fx_seas_rpg$|fx_ghost_big$|ninigi_fireworks$|aje_tornado$|aje_quicksand_trap$)");
 
@@ -260,6 +260,13 @@ public sealed class GameFx
             {
                 var k = "poison:" + u.Id;
                 if (!M.Extend(k, M.Time + 0.5)) M.Attach(Follow(u), u.Radius < 8 ? "fx_poison" : "fx_poison_big", 0.5, k);
+            }
+            // set on fire by a mission (World.Ignite: Outbreak's infected in the sunlight) - the original's molotov fire
+            // (particle/fx/weapon/fx_fire_molotov) burns on it until it dies
+            if (u.BurnUntil > W.Time)
+            {
+                var k = "burn:" + u.Id;
+                if (!M.Extend(k, M.Time + 0.5)) M.Attach(Follow(u), "fire_molotov", 0.5, k);
             }
             if (u.St.TrapWhy == "iced" && u.St.T.GetValueOrDefault("trapped") > W.Time && !M.HasKey("ice:" + u.Id)) M.Attach(Follow(u), "fx_ice_freeze", 5.0, "ice:" + u.Id);
         }

@@ -50,6 +50,9 @@ public sealed partial class Player : IRulesOwner
     /// <summary>model tint (0xRRGGBB) or null = untinted</summary>
     public int? PartyColor;
     public int ColorSlot;
+    /// <summary>the colour id the human chose for a campaign mission (Campaign.MissionColors.Apply: GameStart.Color,
+    /// CoopSeat.Color), null: the colour the game gave - mixed into the state hash when set (World.StateHash)</summary>
+    public string? ColorPicked;
     /// <summary>skirmish diplomacy: players of one team are friends</summary>
     public int Team;
     /// <summary>

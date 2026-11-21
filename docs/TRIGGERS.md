@@ -36,7 +36,7 @@ engine.Update(0.05);
 Lua is only the file format: `trigger "name" { ... }` calls back into C# (`LuaMission.Define`), which checks the
 fields and records a `TriggerDef` (name, guid, folder, flags, expression, nodes with their string parameters). The
 engine then creates the objects exactly as from the JSON (`MissionScript.FromCampaignJson`): the node type's defaults
-(`world.json trigger_defaults` = the JSON's `defaults`) under the node's own parameters, one object per node. Only
+(`world.lua trigger_defaults` = the JSON's `defaults`) under the node's own parameters, one object per node. Only
 `Script` / `Check` nodes keep a Lua function; they run through `LuaHost.Call` with the instruction budget.
 
 The round trip is tested on every mission of both configurations (`TriggersRoundTripTests`): convert, load, and
@@ -125,7 +125,8 @@ building destroyed), `OnGroupChanged`, `OnDiplomacyChanged`, `OnAttacked(victim,
 ## 5. Status of the types
 
 All 23 condition and 44 action types of the campaign are implemented, plus the MIRAGE ones (`GREG`, `RMGR`, the
-MIRAGE `ACDO` commands), the unused `MUSI`, `WTHR`, `AICM`, `AIST`, and the Lua `CHCK` / `SCRP`. Approximations are
+MIRAGE `ACDO` commands), the unused `MUSI`, `WTHR`, `AICM`, `AIST`, the Lua `CHCK` / `SCRP`, and the remake's own
+`DAYN` (DayPhase: the map's day-night cycle, polled every 0.25 s through `IMissionHost.DayNight`; docs/OUTBREAK.md). Approximations are
 the JS remake's: `SGHT` (sight range of the A objects, no fog-of-war test), `UNTT` (camera polled, selection polled,
 boarding event), `PLDE` ("producer" = what the host marks `Produces`), `WYPT` / `TRSP` (the world's patrol and boarding
 orders), `DEAD` / `DYIN` (one moment: the death). `FDBK` writes to the log category `Campaign.Feedback` (debug).

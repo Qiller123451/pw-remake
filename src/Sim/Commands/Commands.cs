@@ -257,6 +257,7 @@ public sealed class KillCommand : Command
     {
         foreach (var e in Cmd.Own<Entity>(w, Player, Entities))
         {
+            if (e.Indestructible) continue;                                        // (a map's indestructible object)
             if (e is Building b) w.SelfDestruct(b);
             else if (e is Unit ku) { ku.SelfKill = true; w.Kill(e, null); }      // DiePerHarakiri: "harakiri" (character.usl:2294)
         }

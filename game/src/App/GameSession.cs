@@ -253,6 +253,9 @@ public partial class GameSession : Node3D
         BuildView();
         yield return (TerrainEnd, "Placing the objects");
         BuildEntities();
+        // (what the view and the entities made survives into the game: collected now, under the loading screen - else
+        // the game's first collections promoted it, a pause of 90 - 130 ms some 20 s into the Outbreak, --perf-to)
+        GC.Collect(); GC.WaitForPendingFinalizers();
         yield return (1.0, "Ready");
         L.Info($"loaded in {sw.ElapsedMilliseconds} ms");
     }
@@ -304,7 +307,7 @@ public partial class GameSession : Node3D
     void BuildEntities()
     {
         Selection = new Selection(() => Me);
-        Entities = new EntityViews(World, Models, View, () => Me, Fog, Sees);
+        Entities = new EntityViews(World, Models, View, () => Me, Fog, Sees) { PrepareInfectedAhead = !_args.ContainsKey("no-warmup"), NoFog = () => Stage?.NoFog == true };
         Entities.Sync(0, 1, null, true);
         BuildEffects();
     }
@@ -378,6 +381,7 @@ public partial class GameSession : Node3D
         ApplySettings(set);                       // (the Options window's settings: GameSession.Settings.cs)
         if (Resume == null && Sequel == null) ui.ShowTitle();       // (a loaded game: no title card; the remake's campaigns: their briefing)
         ReadySequel();                            // (the remake's own campaigns: GameSession.Sequel.cs)
+        ReadyDayNight();                          // (a map's day-night cycle: GameSession.DayNight.cs)
         ReadyCoop();                              // (a co-op campaign game: GameSession.Coop.cs)
         // sound and music: the level's playlist and ambience (main.js after buildWorld)
         try { GameAudio.I.StartGame(S.LevelName, S.Kind == "original" ? S.Atmos : S.Setting.ToLowerInvariant() + ".txt", Me.Tribe); }
@@ -398,7 +402,11 @@ public partial class GameSession : Node3D
         PwRemake.View.Materials.UnitsBehind.SetSuspended(false);
         Log.GameClock = () => double.NaN;
         _recorder?.Detach();
-        try { GameAudio.Current?.EndGame(); } catch (Exception) { }
+        // the game is left (lost / won / quit, load, retry, back to the editor, a co-op game closed): its music and
+        // ambience end, the main theme plays - MusicMgr.usl turns every game switch off while no game runs (the combat,
+        // a trigger's looped track, a cutscene's silence would otherwise go on in the menus). (Children leave the
+        // tree first: the mission UI's cutscene skip has run.)
+        try { if (GameAudio.Current is { } ga && ga.IsInsideTree()) ga.Menu(); } catch (Exception e) { L.Warn($"menu music: {e.Message}"); }
     }
 
     // ======================================================================================== the frame
@@ -459,6 +467,8 @@ public partial class GameSession : Node3D
         Input.Step(dt);
         if (!Cinematic) _camInput.Step(dt);
         if (!Stage.OwnsCamera) Camera.Update(dt);
+        View.Fog.Suspended = Stage.NoFog;                // (a cutscene: no fog of war drawn - SessionSequenceStage.NoFog)
+        if (View.Clouds != null) { View.Clouds.Suspended = Stage.NoFog; UpdateCloudTint(); }
         Entities.LiveDt = dt;
         Mark("input");
         Entities.Sync(gdt, Alpha, Renderer.Camera, false);
@@ -466,6 +476,10 @@ public partial class GameSession : Node3D
         StepEffects(dt, gdt);
         Mark("effects");
         Biomes?.Update(Camera.Target);
+        // the light of the mixed particles (smoke, steam, dust): the original's sun colour of the setting, darkened with
+        // the scene's sun (night, dusk, a cutscene's time of day) - WorldRenderer.ParticleLight, docs/EFFECTS.md
+        SkyTable();
+        View.Particles.MixLight = Renderer.ParticleLight;
         View.Step(dt, Renderer.Camera, Camera.Target, Biomes != null ? Biomes.Weather(WeatherNow()) : WeatherNow());
         PerfProbe.P?.Begin();
         UpdateDayLight();
@@ -502,6 +516,40 @@ public partial class GameSession : Node3D
 
     PwRemake.Sim.Content.SkyGradient? _skyTable;
     bool _skyLoaded;
+    /// <summary>the setting's sky gradient (assets/terrain/<Setting>/sky.json: the prepare tool's sky.py), loaded once</summary>
+    PwRemake.Sim.Content.SkyGradient? SkyTable()
+    {
+        if (_skyLoaded) return _skyTable;
+        _skyLoaded = true;
+        var path = Assets.Resolve($"assets/terrain/{Sim.Map.Setting}/sky.json");
+        _skyTable = PwRemake.Sim.Content.SkyGradient.Load(path);
+        L.Info(_skyTable != null ? $"sky table of {Sim.Map.Setting}: {_skyTable.Source}, {_skyTable.Width} x {_skyTable.Height}{(_skyTable.Varies(PwRemake.Sim.Content.SkyGradient.RowSun) ? "" : " (the same light all day)")}"
+                                 : $"no sky table for {Sim.Map.Setting} (assets/terrain/{Sim.Map.Setting}/sky.json: the prepare tool's sky.py) - a cutscene's time of day turns only the sun");
+        // its sun colour at noon (row 2) lights the mixed particles (WorldRenderer.SetSunTint: PWClient 0x723520 lights
+        // them with the table's sun colour, at least 0x0f0f0f - docs/EFFECTS.md)
+        if (_skyTable != null)
+        {
+            var c = _skyTable.At(PwRemake.Sim.Content.SkyGradient.RowSun, PwRemake.View.World.DayLight.Noon);
+            Renderer.SetSunTint(new Color((float)c.R, (float)c.G, (float)c.B));
+        }
+        return _skyTable;
+    }
+
+    double _cloudTod = -1e9;
+    /// <summary>the fog of war clouds' colour: the original's sky manager colour (PWClient 0x727e00) - row 8 of the
+    /// setting's sky gradient at the time of day (row 0 with fewer rows, 0x607090 without a table); the time: a
+    /// cutscene's, the map's cycle, else the map's start time (the original's clock runs from it: GTime)</summary>
+    void UpdateCloudTint()
+    {
+        if (View.Clouds is not { } cl) return;
+        double tod = Stage?.Day?.Tod ?? (World.DayNight is { } spec ? spec.At(CycleViewTime ?? World.Time).Clock : Sim.Map.StartTime);
+        if (Math.Abs(tod - _cloudTod) < 60) return;
+        _cloudTod = tod;
+        var t = SkyTable();
+        if (t == null) { cl.SetTint(new Color(0x60 / 255f, 0x70 / 255f, 0x90 / 255f)); return; }
+        var (r, g, b, a) = t.At(t.Height >= 9 ? 8 : 0, tod);
+        cl.SetTint(new Color((float)r, (float)g, (float)b, (float)a));
+    }
     /// <summary>
     /// A cutscene's time of day lights the scene (its day time items: SessionSequenceStage.Day): the sun's way and the
     /// original's sky table of the map's setting (assets/terrain/&lt;Setting&gt;/sky.json, the prepare tool's
@@ -513,17 +561,12 @@ public partial class GameSession : Node3D
     {
         var d = Stage?.Day;
         var cur = Renderer.DayLightNow;
+        // a map's own day-night cycle (GameSession.DayNight.cs) when no cutscene sets a time of day
+        if (d == null && World.DayNight != null) { CycleLight(); return; }
+        if (d != null) _cycDark = -1;                     // (after the scene: the cycle's light again)
         if (d == null) { if (cur != null) { Renderer.SetDayLight(null); View.SetSpriteLight(null); } return; }
         if (cur != null && Math.Abs(cur.Tod - d.Value.Tod) < 60) return;
-        if (!_skyLoaded)
-        {
-            _skyLoaded = true;
-            var path = Assets.Resolve($"assets/terrain/{Sim.Map.Setting}/sky.json");
-            _skyTable = PwRemake.Sim.Content.SkyGradient.Load(path);
-            L.Info(_skyTable != null ? $"sky table of {Sim.Map.Setting}: {_skyTable.Source}, {_skyTable.Width} x {_skyTable.Height}{(_skyTable.Varies(PwRemake.Sim.Content.SkyGradient.RowSun) ? "" : " (the same light all day)")}"
-                                     : $"no sky table for {Sim.Map.Setting} (assets/terrain/{Sim.Map.Setting}/sky.json: the prepare tool's sky.py) - a cutscene's time of day turns only the sun");
-        }
-        var dl = PwRemake.View.World.DayLight.At(d.Value.Tod, _skyTable);
+        var dl = PwRemake.View.World.DayLight.At(d.Value.Tod, SkyTable());
         Renderer.SetDayLight(dl);
         View.SetSpriteLight((dl.SunMul + dl.AmbientMul) / 2);
     }
@@ -669,24 +712,29 @@ public partial class GameSession : Node3D
         if (Net != null || NetSession.Current != null)
         {
             // a networked game: leaving it (Retry and the next mission are the host's new lobby)
-            if (a == "exit") { NetSession.Close(); Boot.Instance.Quit(); return; }
+            if (a == "exit") { NetSession.Close(); Boot.Instance.RequestQuit(); return; }
             NetSession.Close();
             Boot.Instance.Show(new MultiplayerMenu());
             return;
         }
         if (Skirmish != null && SkirmishEndAction(a)) return;
+        if (Mission != null && EditorEndAction(a)) return;                // (the map editor's Test map of a map with triggers)
         if (Sequel != null && SequelEndAction(a)) return;
         switch (a)
         {
             case "next":
-                var next = Mission?.Next;
-                if (next == null) Boot.Instance.Show(new CampaignMenu());
+                // a user campaign's mission: its next one (CustomPlay); else the next mission of the same group - the
+                // original campaign, the Booster Pack, MIRAGE's own missions (MissionGroups.NextInGroup) -, at its end
+                // the campaign menu's tab of the group
+                if (Start.CustomCampaign != null) { CustomPlay.Continue(Start, _missionWon); break; }
+                var next = NextMission();
+                if (next == null) Boot.Instance.Show(new CampaignMenu(GroupTab()));
                 else StartMission(next.Id, next.Folder);
                 break;
             case "retry": StartMission(Start.Mission, Start.MissionFolder); break;
-            case "exit": Boot.Instance.Quit(); break;
+            case "exit": Boot.Instance.RequestQuit(); break;
             case "load": Boot.Instance.Show(new LoadGameScreen()); break;           // (the end screen's Load Game: the load window)
-            default: Boot.Instance.Show(new CampaignMenu()); break;
+            default: Boot.Instance.Show(new CampaignMenu(Mission != null ? GroupTab() : null)); break;
         }
     }
 
@@ -700,9 +748,13 @@ public partial class GameSession : Node3D
             Configuration = Start.Configuration, Mode = Start.Mode, Mission = id, MissionFolder = folder, Tribe = Start.Tribe,
             Difficulty = Start.Difficulty, Debug = Start.Debug, Seed = Start.Seed,
             Army = id == Start.Mission ? Start.Army : null,                  // (retry: the same army; the next mission: its army screen)
+            Gameplay = Start.Gameplay,
+            CustomCampaign = id == Start.Mission ? Start.CustomCampaign : null,      // (retry of a user campaign's mission: still the campaign's)
         };
+        // your colour (docs/CAMPAIGN.md "Your colour"): retry the same, the next mission the campaign's remembered one if free there
+        s.Color = id == Start.Mission ? Start.Color : CampaignColor.For(entry.FolderPath(cfg.MissionsDir), CampaignColor.Key(s));
         if (id == Start.Mission) Boot.Instance.Show(new LoadingScreen(s, entry));
-        else CampaignMenu.StartWithArmy(entry, s, () => new CampaignMenu());
+        else CampaignMenu.StartWithArmy(entry, s, () => new CampaignMenu(GroupTab()));
     }
 
     /// <summary>--skip-cine: cutscenes and dialogues end at once (tests)</summary>
@@ -714,6 +766,8 @@ public partial class GameSession : Node3D
     {
         L.Info($"mission {(won ? "won" : "lost")}: {text}");
         RememberCredits(won);
+        _missionWon = won;
+        if (won) CustomPlay.Won(Start);                                    // (a user campaign's mission: the next one opens)
         try { GameAudio.Current?.EndGame(); } catch (Exception) { }
         int t = (int)Math.Floor(World.Time);
         Presenter.EndStats = ($"{t / 60}:{t % 60:00}", Me.Kills, Me.Lost);

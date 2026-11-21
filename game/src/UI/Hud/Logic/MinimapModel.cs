@@ -12,7 +12,8 @@
 //   transparent (table row 3), visible ones solid (row 0).
 // * Dots: square texels of fixed size, turned with the map - resources (half transparent white, stones bigger),
 //   buildings (the owner's colour lightened), units (the owner's colour); objects without an owner (wild animals) are
-//   not drawn. "Use Player Colors" off: own green, allies blue, everyone else red. Buildings seen once and now in the
+//   not drawn. "Use Player Colors" off - and always in a campaign mission, whose players' colours come from the mission
+//   (mission 1 gives the player and the village the same red) -: own green, allies blue, everyone else red. Buildings seen once and now in the
 //   fog stay as dimmed dots.
 // * The camera's ground footprint in white lines; markers ("pings") as pulsing squares: attacks (red, 3.2 s at
 //   1.3 Hz), finished production or research (blue), the player's own map pings.
@@ -246,7 +247,8 @@ public sealed class MinimapModel
     {
         var T = Table![row];
         var me = H.Me;
-        if (!PlayerColors)
+        // (a campaign mission: by relation - its colours are the mission's, not chosen, and often shared)
+        if (!PlayerColors || H.Campaign)
         {
             if (p == me) return T[sel != null && e != null && sel.Contains(e) ? 0 : 1];
             return T[me.IsFriend(p) && p.IsFriend(me) ? 2 : 3];

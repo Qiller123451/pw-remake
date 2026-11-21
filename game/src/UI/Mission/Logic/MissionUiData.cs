@@ -178,19 +178,14 @@ public sealed class MissionUiData
     /// <summary>A text of the mission or of the installation, or null.</summary>
     public string? TextOrNull(string key) => Texts.TryGetValue(key, out var t) ? t : GameText?.Invoke(key);
 
-    /// <summary>From a mission folder (world.json, mission.json, texts/&lt;lang&gt;.json - uk, else any).</summary>
+    /// <summary>From a mission folder (world.lua, map.lua's mission, texts/&lt;lang&gt;.lua - uk, else any:
+    /// docs/MAP_FORMAT.md).</summary>
     public static MissionUiData Load(string folder, string lang = "uk")
     {
-        var world = Json.TryParseFile(System.IO.Path.Combine(folder, "world.json"));
-        var mission = Json.TryParseFile(System.IO.Path.Combine(folder, "mission.json"));
-        JsonNode? texts = null;
-        var td = System.IO.Path.Combine(folder, "texts");
-        if (Directory.Exists(td))
-        {
-            var f = new[] { lang, "uk" }.Select(l => System.IO.Path.Combine(td, l + ".json")).FirstOrDefault(System.IO.File.Exists)
-                    ?? Directory.GetFiles(td, "*.json").OrderBy(x => x, StringComparer.Ordinal).FirstOrDefault();
-            if (f != null) texts = Json.TryParseFile(f);
-        }
+        var world = PwRemake.Sim.Maps.PwMapReader.WorldOf(folder);
+        var mission = PwRemake.Sim.Maps.PwMapReader.MissionOf(folder);
+        var texts = new JsonObject();
+        foreach (var (k, v) in PwRemake.Sim.Maps.PwMapReader.TextsOf(folder, lang)) texts[k] = v;
         return FromJson(world, mission, texts);
     }
 

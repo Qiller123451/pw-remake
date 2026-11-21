@@ -9,15 +9,26 @@ What it does (docs/CONTENT.md):
      <ParaWorld>/export/remake or %APPDATA%/ParaWorldToolkit/remake;
   2. exports every campaign mission of each configuration with the toolkit's exporter (pwexport.campaign) into
      content/cache/campaign/<config>/ - only missions whose map, or the exporter, changed since the last run;
-  3. converts the missions to Lua mission folders (campaign_to_lua.py) in content/configs/<config>/missions/;
+  3. converts the missions to Lua mission folders of the intermediate layout (campaign_to_lua.py: mission.json,
+     world.json, triggers.lua, texts/*.json) in content/cache/missions/<config>/<lang>/;
+  3a. converts the maps to the remake's map format (tools/mapconvert, C#: docs/MAP_FORMAT.md) - every original map
+     of the configuration's Data folders (Data/<folder>/Maps/**/*.ula) into content/configs/<config>/maps/, the
+     remake's own maps (game/maps/*.pwmap.json) into maps/Remake/, and every mission (its map + the folder of step 3)
+     into content/configs/<config>/missions/<NN>_<key>/ (map.lua, terrain/*.png, world.lua, triggers.lua, texts/*.lua;
+     custom.lua there is kept). Incremental: a map is converted again only when its source files or the converter
+     changed (content/cache/maps/<config>.json), --force converts all. Needs the .NET SDK (dotnet), as the game;
   4. converts the story films and the start films (logos, intro) to Ogg Theora (films.py; needs ffmpeg, else
      skipped) into content/configs/<config>/overrides/assets/video/;
   5. converts the original effect models the toolkit's export leaves out (effect_models.py: the ruins' dust, the
      rocket smoke, the spirits, fireworks, tornado, quicksand) into content/configs/<config>/overrides/assets/;
   5a. converts the models only the cutscenes' own actors use that the export leaves out (cutscene_models.py: mission
      1's Stina with her sabre-tooth in sc_1050) into the same overrides;
+  5a'. writes every model's GSF box (selection_boxes.py: the box the original sizes the selection circles by) into
+     content/configs/<config>/overrides/assets/selboxes.json;
   5b. converts the landscape settings' day-time light tables (sky.py: Texture/Scape/<Setting>/skygradient*.tga) into
      content/configs/<config>/overrides/assets/terrain/<Setting>/sky.json;
+  5b2. converts the fog of war's cloud atlases (fog_textures.py: Texture/Scape/<Setting>/fog_(0256).dds and the
+     fallback Texture/Effects/fogofwar.tga) into overrides/assets/terrain/<Setting>/fog.png and fogofwar.png;
   5c. converts the buildings' setting textures (setting_textures.py: the atlases repainted per landscape setting,
      Texture/Buildings/settings/<setting>/*.dds - snow in the Icewaste, sand in the Savanna ...) into
      content/configs/<config>/overrides/assets/tex/settings/<setting>/<name>.png + index.json;
@@ -214,8 +225,25 @@ def prepare_cutscene_models(toolkit, pw, mod, data, missions_dir, overrides_dir,
         return 0
 
 
+def prepare_selection_boxes(toolkit, pw, mod, overrides_dir, force):
+    """selection_boxes.py: every model's GSF box, which the original sizes its selection circles by"""
+    sys.path.insert(0, toolkit)
+    from pwexport import gsf                       # noqa: E402  (the toolkit's GSF reader)
+    from pwexport.install import Install           # noqa: E402
+    from pwexport.mods import ModInstall           # noqa: E402
+    sys.path.insert(0, HERE)
+    import selection_boxes                         # noqa: E402
+    inst = ModInstall(pw, mod=mod) if mod else Install(pw)
+    try:
+        return selection_boxes.convert(gsf, inst.archives(), overrides_dir, force=force, log=log)
+    except Exception as e:                         # a box problem must not stop the preparation
+        log('  selection boxes failed: %s' % e)
+        return 0
+
+
 def convert_missions(cache_dir, missions_dir, force):
-    """campaign_to_lua.py: the exported missions -> Lua mission folders (+ missions/index.json)"""
+    """campaign_to_lua.py: the exported missions -> Lua mission folders of the intermediate layout (+ index.json);
+    convert_maps makes the game's mission folders from them"""
     conv = os.path.join(HERE, 'campaign_to_lua.py')
     args = [sys.executable, conv, cache_dir, missions_dir]
     if force:
@@ -224,6 +252,29 @@ def convert_missions(cache_dir, missions_dir, force):
     r = subprocess.run(args)
     if r.returncode != 0:
         raise SystemExit('the Lua conversion failed (exit code %d)' % r.returncode)
+
+
+MAPCONVERT = os.path.join(ROOT, 'tools', 'mapconvert')
+
+
+def convert_maps(cdir, pw, folders, missions_from, force):
+    """tools/mapconvert (C#): the configuration's original maps and its missions -> the remake's map format
+    (docs/MAP_FORMAT.md). False when it could not run (no dotnet) or a map failed - the game then lacks those maps."""
+    args = ['dotnet', 'run', '--project', MAPCONVERT, '-c', 'Release', '--', 'prepare', '--out', cdir,
+            '--install', pw, '--folders', ','.join(folders), '--missions-from', missions_from]
+    if force:
+        args.append('--force')
+    log('  ' + ' '.join(args))
+    try:
+        r = subprocess.run(args)
+    except FileNotFoundError:
+        log('  the maps were NOT converted: the .NET SDK (dotnet) was not found - install it (the game needs it too) '
+            'and run Prepare again')
+        return False
+    if r.returncode != 0:
+        log('  some maps were not converted (exit code %d, see above) - the game lists only the converted ones' % r.returncode)
+        return False
+    return True
 
 
 def main(argv=None):
@@ -260,14 +311,19 @@ def main(argv=None):
         cache = os.path.join(a.content, 'cache', 'campaign', c['id'], a.lang)
         index = export_missions(toolkit, pw, mod, cache, a.lang, a.force)
         log('  %d missions' % len(index))
-        convert_missions(cache, os.path.join(cdir, 'missions'), a.force)
+        # the missions' Lua folders of the intermediate layout, then the map converter makes the game's map folders
+        # (maps and missions in the map format, docs/MAP_FORMAT.md)
+        lua_cache = os.path.join(a.content, 'cache', 'missions', c['id'], a.lang)
+        convert_missions(cache, lua_cache, a.force)
+        convert_maps(cdir, pw, c['folders'], lua_cache, a.force)
         if not a.no_films:
             ready, total = prepare_films(toolkit, pw, mod, os.path.join(a.content, 'cache', 'films', a.lang),
                                          os.path.join(cdir, 'overrides'), a.lang, a.force)
             log('  films: %d of %d ready' % (ready, total))
         log('  effect models: %d' % prepare_effects(toolkit, pw, mod, folder, os.path.join(cdir, 'overrides'), a.force))
-        log('  cutscene models: %d' % prepare_cutscene_models(toolkit, pw, mod, folder, os.path.join(cdir, 'missions'),
+        log('  cutscene models: %d' % prepare_cutscene_models(toolkit, pw, mod, folder, lua_cache,
                                                              os.path.join(cdir, 'overrides'), a.force))
+        log('  selection boxes: %d' % prepare_selection_boxes(toolkit, pw, mod, os.path.join(cdir, 'overrides'), a.force))
         # the day-time light tables of the landscape settings (sky.py: Texture/Scape/<Setting>/skygradient*.tga)
         sys.path.insert(0, HERE)
         import sky                                 # noqa: E402
@@ -277,6 +333,15 @@ def main(argv=None):
             log('  sky tables: %s' % (', '.join(done) if done else 'none in the installation'))
         except Exception as e:                     # the light must not stop the preparation
             log('  sky tables failed: %s' % e)
+        # the fog of war's cloud atlases (fog_textures.py: Texture/Scape/<Setting>/fog*, Texture/Effects/fogofwar* ->
+        # overrides/assets/terrain/<Setting>/fog.png, fogofwar.png; docs/TERRAIN.md "Fog of war")
+        import fog_textures                        # noqa: E402
+        try:
+            fog_data = os.path.join(pw, 'Data') if os.path.isdir(os.path.join(pw, 'Data')) else pw
+            done = fog_textures.convert(fog_data, c['folders'], os.path.join(cdir, 'overrides'), a.force, log)
+            log('  fog of war clouds: %s' % (', '.join(done) if done else 'none in the installation (the game falls back)'))
+        except Exception as e:                     # the clouds must not stop the preparation
+            log('  fog of war clouds failed: %s' % e)
         # the buildings' setting textures (setting_textures.py: Texture/Buildings/settings/<setting>/* ->
         # overrides/assets/tex/settings/, the snowy Icewaste atlases ...)
         import setting_textures                    # noqa: E402

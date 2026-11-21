@@ -92,6 +92,7 @@ public static class MirageMoves
                 double a = u.Heading + W.Rng.Next() * 3.14;
                 var c = W.SpawnUnit(cls, u.Owner, u.Pos.X + SMath.Cos(a) * off, u.Pos.Z + SMath.Sin(a) * off, u.Level, u.Heading, new UnitOpts { Temp = true });
                 if (c == null) continue;
+                W.InheritInfection(u, c);
                 W.Later(TWINS_TIME, "vanish", new Args { ["u"] = c });
                 var t = u.Task;
                 if (t.Type == "build" && t.Building != null) W.Order(c, new Order("build") { Target = t.Building, Auto = true });
@@ -599,6 +600,7 @@ static class MirageDelayed
         if (W.DeepWaterAt(s.Pos.X, s.Pos.Z) || s.Owner == null) return;
         var b = W.SpawnUnit(s.Driver!, s.Owner, s.Pos.X, s.Pos.Z, s.Level, s.Heading);
         if (b == null) return;
+        W.InheritInfection(s, b);
         b.Hp = b.MaxHp / 2;
         double cd = s.Cd.Get("Babbage_ExoMinigun_0");
         if (cd != 0) b.Cd.Set("Babbage_Minigun_0", cd);
@@ -617,7 +619,8 @@ static class MirageDelayed
         b.SilentDeath = true;
         W.RemoveEntity(b);
         var s = W.SpawnUnit("special_mobile_suit", p, b.Pos.X, b.Pos.Z, b.Level, b.Heading);
-        if (s == null) { W.SpawnUnit("babbage_s0", p, b.Pos.X, b.Pos.Z, b.Level, b.Heading); return; }
+        if (s == null) { W.InheritInfection(b, W.SpawnUnit("babbage_s0", p, b.Pos.X, b.Pos.Z, b.Level, b.Heading)); return; }
+        W.InheritInfection(b, s);
         s.Driver = "babbage_s0";
         if (cd != 0) s.Cd.Set("Babbage_ExoMinigun_0", cd);
         s.LiftH = 150; s.Lift = new Lift { From = 150, To = 0, T = 0, TT = 10 };

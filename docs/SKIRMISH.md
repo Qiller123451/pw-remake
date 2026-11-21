@@ -18,7 +18,7 @@ src/Sim/Game/Skirmish.cs          the setup (SkirmishSetup, SkirmishSlot: JSON) 
 src/Sim/Game/SkirmishSession.cs   the game of a setup (IGameSim): resolveSetup, skirmishPlayers (colours, handicap,
                                   the army budget), gameOverInit, the brains and their armies
 src/Sim/Game/SkirmishMaps.cs      the maps of the installation (level info only), their names and descriptions
-                                  (mapnames.ltf), a setup's map file
+                                  (mapnames.ltf), a setup's map file; the user's own maps (group "My maps")
 src/Sim/Game/PointBuy.cs          the army budget (pointbuy.js): prices, shop, pyramid, presets, AI armies, placing
 src/Sim/Campaign/CampaignArmy.cs  the army screen of a campaign mission with point_buy (menu.js campaignArmy)
 src/Sim/Game/IGameSim.cs          what GameSession runs: a MissionSession or a SkirmishSession
@@ -47,9 +47,14 @@ to the machines of a lockstep game later (docs/ROADMAP.md):
              { "type": "closed", ... } ] }
 ```
 
-* `map`: below the installation's `Data` folder (found without regard to case), an absolute path (a map file), or ""
+* `map`: below the installation's `Data` folder (found without regard to case), a user's map `User/<name>` (the map
+  editor's *My maps*: the user folder's `maps/`, folders and `.pwmap` files - listed last in the map list, group "My
+  maps"; docs/MAP_EDITOR.md "Playing your map"), an absolute path (a map file), or ""
   for a random jungle (the remake's map generator). The menu keeps the last setup per configuration in
   `settings.json` (`skirmish.<configuration>`).
+* `mapHash` (multiplayer): the content hash of the host's map (`MapFiles.ContentHash`: every file of the map) - a
+  player whose copy is missing or different has a problem in the lobby (docs/MULTIPLAYER.md "Maps"); not written when
+  null.
 * `slots`: sixteen (the original: eight; older setups and saves with eight still load - "16 players" below); slot 0
   is the human. `type` human | ai | closed (a remote player of a lobby later: one more type).
   `tribe` or Random (one of the tribes the start position allows: the map's `Restrictions/Base/Tribes`, and the
@@ -136,7 +141,7 @@ preset), the debug switches Free and All units.
 ### Campaign missions with an army budget
 
 `point_buy` missions (2 - 8, B41 - B43 ...) open the army screen before the loading screen (`CampaignMenu.StartWithArmy`;
-CampaignMenu.usl:199-206): `CampaignArmy.Of(mission.json, rules, tribe, credits)` - the level's preset of the human's
+CampaignMenu.usl:199-206): `CampaignArmy.Of(map.lua's mission, rules, tribe, credits)` - the level's preset of the human's
 tribe (another tribe: its equivalents, campaign/tribes.js), fixed; the budget max(the bonus points the mission before
 earned, the mission's least credits); the shop limited to the classes the level allows; the level's limits per pyramid
 row; a resource of "-1" locked at the tribe's start stock. The army goes into `GameStart.Army`; the start location
@@ -182,7 +187,8 @@ predefined colours):
   `Validate`, avoided by `FreeColor` / `OpenSlot`. The lobby's colour cell (`PlayerColorCell`): a swatch that opens
   Godot's colour picker (HSV square, hue, RGB / HSV sliders, hex) with the palette's sixteen colours below it, and a list
   of the palette's names ("Custom" for a colour of its own); while the picker is open the colours are checked at once,
-  the choice is saved / sent when it closes.
+  the choice is saved / sent when it closes. The campaign menus use the same cell with an "As in the mission" entry
+  and the colours of the mission's other players greyed out (`BlockedBy`, `UpdateBlocked`: docs/CAMPAIGN.md "Your colour").
   Where the colour goes: `Player.Color` (dark) / `PartyColor` (light) / `ColorSlot` (palette index, -1 custom) ->
   the party-colour materials and SEAS markings (`ModelMaterials` caches a tinted copy per material and colour value, so
   any colour works), selection rings / health bar circles / units behind buildings (`GroundRings.RingRgb`: the
@@ -191,7 +197,8 @@ predefined colours):
   players' lines (the sender's name in its colour: `Hud.ChatKind`). The colour travels in the setup: the network
   lobby, `GameStart`, saved games.
 * **Network**: protocol 3 (a client of protocol 2 is refused: "Different versions!"); the lobby takes 16 humans.
-  (Protocol 4 since 2026-11-13: MIRAGE's game options of a campaign mission, docs/MULTIPLAYER.md.)
+  (Protocol 4 since 2026-11-13: MIRAGE's game options of a campaign mission; protocol 5 since 2026-11-19: the map's
+  content hash; protocol 6: the map sent to a player who lacks it - docs/MULTIPLAYER.md "Maps".)
 * **Saved games**: a save keeps its setup; one of before (eight slots, palette ids) loads and replays as it was.
 * **Performance** (2026-11, a 2-core test machine, `PerfSaveSkirmish` / `PerfReplaySkirmish` with `PW_PERF_PLAYERS=16`,
   docs/DEBUG.md "Performance"): you and 15 computer players of level 8, 23 game minutes (~600 units, ~470 buildings):

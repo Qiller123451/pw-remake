@@ -49,6 +49,9 @@ public sealed class PartRef
     public Material[]? Surfaces;
     /// <summary>A particle emitter node (Kind Particles): its data (null: nothing to draw - no texture).</summary>
     public PwRemake.View.Fx.EmitterDef? Emitter;
+    /// <summary>A part that rises out of the ground or sinks into it while its building is built (BuildUp): the top of
+    /// its geometry in the model's GSF frame (z up), NaN = no geometry (it takes its group's height)</summary>
+    public float Top = float.NaN;
 }
 
 public sealed class ModelLoadOptions
@@ -81,6 +84,8 @@ public sealed class ModelTemplate
     public Node3D Scene = null!;
     public PackedScene Packed = null!;
     public List<PartRef> Parts = new();
+    /// <summary>Some parts rise or sink while the building is built (the GSF build-up flags: BuildUp, ModelInstance.BuildUp.cs)</summary>
+    public bool HasBuildUp;
     /// <summary>The particle emitters of the model (Parts of kind Particles with data): engine/particles.js sprays them.</summary>
     public List<PartRef> Emitters = new();
     /// <summary>link name (without "link_") -> path from ModelRoot</summary>
